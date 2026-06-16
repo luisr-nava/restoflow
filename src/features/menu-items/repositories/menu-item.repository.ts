@@ -74,7 +74,15 @@ class MenuItemRepository implements IMenuItemRepository {
   ): Promise<{ data: MenuItem[] | null; error: Error | null }> {
     const { data, error } = await supabase
       .from("menu_items")
-      .select("*")
+      .select(
+        `
+      *,
+      menu_categories (
+        id,
+        name
+      )
+    `,
+      )
       .eq("restaurant_id", restaurantId)
       .order("name", { ascending: true });
 
@@ -157,4 +165,5 @@ class MenuItemRepository implements IMenuItemRepository {
 }
 
 export const menuItemRepository = new MenuItemRepository();
+
 

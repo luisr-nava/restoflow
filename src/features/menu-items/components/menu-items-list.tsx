@@ -48,7 +48,7 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
                 )}
 
                 <p className="mt-2 font-mono text-xs text-muted-foreground">
-                  {item.category_id ? "Con categoría" : "Sin categoría"}
+                  {item.menu_categories?.name ?? "Sin categoría"}{" "}
                 </p>
               </div>
             </div>
@@ -84,3 +84,4 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
     </div>
   );
 }
+

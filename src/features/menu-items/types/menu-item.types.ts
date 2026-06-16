@@ -26,7 +26,12 @@ export type MenuItem = {
 
   created_at: string;
   updated_at: string;
+  menu_categories: {
+    id: string;
+    name: string;
+  } | null;
 };
+
 
 
 export type DeleteMenuItemInput = z.infer<typeof DeleteMenuItemSchema>;
