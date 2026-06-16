@@ -1,8 +1,14 @@
 "use server";
 
-import { CloseTableSchema, CreateTableOrderSchema } from "../schemas/order.schema";
+import {
+  CloseTableSchema,
+  CreateTableOrderSchema,
+} from "../schemas/order.schema";
 import { orderService } from "../services/order.service";
-import type { CloseTableInput, CreateTableOrderInput } from "../types/order.types";
+import type {
+  CloseTableInput,
+  CreateTableOrderInput,
+} from "../types/order.types";
 
 export async function createTableOrderAction(input: CreateTableOrderInput) {
   const data = CreateTableOrderSchema.safeParse(input);
@@ -35,5 +41,16 @@ export async function closeTableAction(input: CloseTableInput) {
   }
 
   return orderService.closeTable(data.data);
+}
+export async function getOrdersAction() {
+  return orderService.getOrders();
+}
+
+export async function getOrderItemsAction(orderId: string) {
+  if (!orderId) {
+    return [];
+  }
+
+  return orderService.getOrderItems(orderId);
 
 }

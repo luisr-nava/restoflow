@@ -4,6 +4,8 @@ import type {
   CreateTableOrderInput,
   Order,
   OrderItem,
+  OrderItemDetail,
+  OrderWithTable,
 } from "../types/order.types";
 
 type CreateOrderParams = {
@@ -66,6 +68,16 @@ export interface IOrderRepository {
     supabase: SupabaseClient,
     orderId: string,
   ): Promise<{ data: Order | null; error: Error | null }>;
+
+  findOrdersByRestaurantId(
+    supabase: SupabaseClient,
+    restaurantId: string,
+  ): Promise<{ data: OrderWithTable[] | null; error: Error | null }>;
+
+  findOrderItems(
+    supabase: SupabaseClient,
+    orderId: string,
+  ): Promise<{ data: OrderItemDetail[] | null; error: Error | null }>;
 }
 
 class OrderRepository implements IOrderRepository {
@@ -190,6 +202,39 @@ class OrderRepository implements IOrderRepository {
       .eq("id", orderId)
       .select("*")
       .single();
+
+    return { data, error };
+  }
+  async findOrdersByRestaurantId(
+    supabase: SupabaseClient,
+    restaurantId: string,
+  ): Promise<{ data: OrderWithTable[] | null; error: Error | null }> {
+    const { data, error } = await supabase
+      .from("orders")
+      .select(
+        `
+      *,
+      restaurant_tables (
+        id,
+        name
+      )
+    `,
+      )
+      .eq("restaurant_id", restaurantId)
+      .order("paid_at", { ascending: false, nullsFirst: true });
+
+    return { data, error };
+  }
+
+  async findOrderItems(
+    supabase: SupabaseClient,
+    orderId: string,
+  ): Promise<{ data: OrderItemDetail[] | null; error: Error | null }> {
+    const { data, error } = await supabase
+      .from("order_items")
+      .select("*")
+      .eq("order_id", orderId)
+      .order("created_at", { ascending: true });
 
     return { data, error };
   }

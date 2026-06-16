@@ -10,6 +10,8 @@ import {
 import type {
   CloseTableInput,
   CreateTableOrderInput,
+  OrderItemDetail,
+  OrderWithTable,
 } from "../types/order.types";
 class OrderService {
   constructor(private readonly orderRepository: IOrderRepository) {}
@@ -300,10 +302,67 @@ class OrderService {
       };
     }
   }
+  async getOrders(): Promise<OrderWithTable[]> {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
+
+      if (!member) {
+        return [];
+      }
+
+      const { data, error } =
+        await this.orderRepository.findOrdersByRestaurantId(
+          supabase,
+          member.restaurant_id,
+        );
+
+      if (error) {
+        return [];
+      }
+
+      return data ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  async getOrderItems(orderId: string): Promise<OrderItemDetail[]> {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
+
+      if (!member) {
+        return [];
+      }
+
+      const { data: order } = await this.orderRepository.findOrderById(
+        supabase,
+        orderId,
+      );
+
+      if (!order || order.restaurant_id !== member.restaurant_id) {
+        return [];
+      }
+
+      const { data, error } = await this.orderRepository.findOrderItems(
+        supabase,
+        orderId,
+      );
+
+      if (error) {
+        return [];
+      }
+
+      return data ?? [];
+    } catch {
+      return [];
+    }
+  }
 }
 
 export const orderService = new OrderService(orderRepository);
-
-
 
 

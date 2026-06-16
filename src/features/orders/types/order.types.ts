@@ -38,7 +38,25 @@ export type Order = {
   paid_at: string | null;
 };
 
+export type OrderWithTable = Order & {
+  restaurant_tables: {
+    id: string;
+    name: string;
+  } | null;
+};
+
 export type OrderItem = {
+  id: string;
+  order_id: string;
+  menu_item_id: string;
+  name: string;
+  quantity: number;
+  unit_price: number;
+  total: number;
+  created_at: string;
+};
+
+export type OrderItemDetail = {
   id: string;
   order_id: string;
   menu_item_id: string;
@@ -61,5 +79,6 @@ export type Payment = {
   created_at: string;
 };
 
-
 export type CloseTableInput = z.infer<typeof CloseTableSchema>;
+
+
