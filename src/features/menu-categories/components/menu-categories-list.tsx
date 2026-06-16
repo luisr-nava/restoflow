@@ -1,6 +1,8 @@
 "use client";
 
-import { useDeleteMenuCategory } from "../hooks/use-delete-menu-category";
+import { DeleteMenuCategoryButton } from "./delete-menu-category-button";
+import { UpdateMenuCategoryModal } from "./update-menu-category-modal";
+import { useUpdateMenuCategoryStatus } from "../hooks/use-update-menu-category-status";
 import type { MenuCategory } from "../types/menu-category.types";
 
 type MenuCategoriesListProps = {
@@ -8,7 +10,7 @@ type MenuCategoriesListProps = {
 };
 
 export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
-  const { mutate, isPending } = useDeleteMenuCategory();
+  const { mutate, isPending } = useUpdateMenuCategoryStatus();
 
   if (categories.length === 0) {
     return (
@@ -36,22 +38,26 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <span
-                className={`rounded-full px-2 py-1 font-mono text-[10px] uppercase ${
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() =>
+                  mutate({
+                    categoryId: category.id,
+                    isActive: !category.is_active,
+                  })
+                }
+                className={`rounded-full px-2 py-1 font-mono text-[10px] uppercase disabled:cursor-not-allowed disabled:opacity-40 ${
                   category.is_active
                     ? "border border-green-200 text-green-600"
                     : "border border-border text-muted-foreground"
                 }`}>
                 {category.is_active ? "Activa" : "Inactiva"}
-              </span>
-
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => mutate(category.id)}
-                className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
-                Eliminar
               </button>
+
+              <UpdateMenuCategoryModal category={category} />
+
+              <DeleteMenuCategoryButton category={category} />
             </div>
           </div>
         </div>

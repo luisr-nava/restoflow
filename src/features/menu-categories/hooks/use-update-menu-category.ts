@@ -3,14 +3,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-import { updateMenuItemAction } from "../actions/menu-item.actions";
-import type { UpdateMenuItemInput } from "../types/menu-item.types";
+import { updateMenuCategoryAction } from "../actions/menu-category.actions";
+import type { UpdateMenuCategoryInput } from "../types/menu-category.types";
 
-export function useUpdateMenuItem() {
+export function useUpdateMenuCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateMenuItemInput) => updateMenuItemAction(input),
+    mutationFn: (input: UpdateMenuCategoryInput) =>
+      updateMenuCategoryAction(input),
 
     onSuccess: async (response) => {
       if (response.error) {
@@ -19,14 +20,14 @@ export function useUpdateMenuItem() {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: ["menu-items"],
+        queryKey: ["menu-categories"],
       });
 
       toast.success(response.success);
     },
 
     onError: () => {
-      toast.error("No se pudo actualizar el item");
+      toast.error("No se pudo actualizar la categoría");
     },
   });
 }

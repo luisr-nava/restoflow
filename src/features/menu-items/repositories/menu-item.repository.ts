@@ -38,6 +38,11 @@ export interface IMenuItemRepository {
     menuItemId: string,
     isAvailable: boolean,
   ): Promise<{ data: MenuItem | null; error: Error | null }>;
+
+  deleteMenuItem(
+    supabase: SupabaseClient,
+    menuItemId: string,
+  ): Promise<{ error: Error | null }>;
 }
 
 class MenuItemRepository implements IMenuItemRepository {
@@ -138,13 +143,18 @@ class MenuItemRepository implements IMenuItemRepository {
 
     return { data, error };
   }
+  async deleteMenuItem(
+    supabase: SupabaseClient,
+    menuItemId: string,
+  ): Promise<{ error: Error | null }> {
+    const { error } = await supabase
+      .from("menu_items")
+      .delete()
+      .eq("id", menuItemId);
+
+    return { error };
+  }
 }
 
 export const menuItemRepository = new MenuItemRepository();
-
-
-
-
-
-
 

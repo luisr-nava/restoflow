@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   CreateMenuItemSchema,
+  DeleteMenuItemSchema,
   UpdateMenuItemSchema,
 } from "../schemas/menu-item.schema";
 
@@ -27,3 +28,5 @@ export type MenuItem = {
   updated_at: string;
 };
 
+
+export type DeleteMenuItemInput = z.infer<typeof DeleteMenuItemSchema>;

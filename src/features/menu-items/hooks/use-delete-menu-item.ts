@@ -3,14 +3,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-import { updateMenuItemAction } from "../actions/menu-item.actions";
-import type { UpdateMenuItemInput } from "../types/menu-item.types";
+import { deleteMenuItemAction } from "../actions/menu-item.actions";
+import type { DeleteMenuItemInput } from "../types/menu-item.types";
 
-export function useUpdateMenuItem() {
+export function useDeleteMenuItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateMenuItemInput) => updateMenuItemAction(input),
+    mutationFn: (input: DeleteMenuItemInput) => deleteMenuItemAction(input),
 
     onSuccess: async (response) => {
       if (response.error) {
@@ -26,7 +26,7 @@ export function useUpdateMenuItem() {
     },
 
     onError: () => {
-      toast.error("No se pudo actualizar el item");
+      toast.error("No se pudo eliminar el item");
     },
   });
 }

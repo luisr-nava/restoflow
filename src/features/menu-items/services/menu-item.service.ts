@@ -7,6 +7,7 @@ import {
 } from "../repositories/menu-item.repository";
 import type {
   CreateMenuItemInput,
+  DeleteMenuItemInput,
   UpdateMenuItemInput,
 } from "../types/menu-item.types";
 
@@ -204,6 +205,71 @@ class MenuItemService {
       };
     }
   }
+
+  async deleteMenuItem(input: DeleteMenuItemInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
+
+      if (!member) {
+        return {
+          error: "El usuario no pertenece a un restaurante",
+          success: "",
+        };
+      }
+
+      if (member.role !== "OWNER" && member.role !== "MANAGER") {
+        return {
+          error: "No tenés permisos para eliminar items del menú",
+          success: "",
+        };
+      }
+
+      const { data: menuItem, error: menuItemError } =
+        await this.menuItemRepository.findMenuItemById(
+          supabase,
+          input.menuItemId,
+        );
+
+      if (menuItemError || !menuItem) {
+        return {
+          error: menuItemError?.message || "El item no existe",
+          success: "",
+        };
+      }
+
+      if (menuItem.restaurant_id !== member.restaurant_id) {
+        return {
+          error: "No tenés permisos para eliminar este item",
+          success: "",
+        };
+      }
+
+      const { error } = await this.menuItemRepository.deleteMenuItem(
+        supabase,
+        menuItem.id,
+      );
+
+      if (error) {
+        return {
+          error: error.message,
+          success: "",
+        };
+      }
+
+      return {
+        error: "",
+        success: "Item eliminado correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo eliminar el item",
+        success: "",
+      };
+    }
+  }
 }
 
 export const menuItemService = new MenuItemService(menuItemRepository);
+
