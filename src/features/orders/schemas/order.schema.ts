@@ -42,5 +42,13 @@ export const CloseTableSchema = z.object({
   paidAmount: z.coerce.number().min(0).optional(),
 
   changeAmount: z.coerce.number().min(0).optional(),
-
 });
+
+export const UpdateOrderStatusSchema = z.object({
+  orderId: z.string().uuid({ error: "El pedido es obligatorio" }),
+
+  status: z.enum(["ACCEPTED", "PREPARING", "READY", "SERVED"], {
+    error: "El estado es obligatorio",
+  }),
+});
+

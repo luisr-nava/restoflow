@@ -1,13 +1,16 @@
 "use server";
 
+import { orderService } from "../services/order.service";
 import {
   CloseTableSchema,
   CreateTableOrderSchema,
+  UpdateOrderStatusSchema,
 } from "../schemas/order.schema";
-import { orderService } from "../services/order.service";
+
 import type {
   CloseTableInput,
   CreateTableOrderInput,
+  UpdateOrderStatusInput,
 } from "../types/order.types";
 
 export async function createTableOrderAction(input: CreateTableOrderInput) {
@@ -52,5 +55,18 @@ export async function getOrderItemsAction(orderId: string) {
   }
 
   return orderService.getOrderItems(orderId);
-
 }
+
+export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
+  const data = UpdateOrderStatusSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return orderService.updateOrderStatus(data.data);
+}
+

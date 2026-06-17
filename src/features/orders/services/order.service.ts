@@ -12,6 +12,7 @@ import type {
   CreateTableOrderInput,
   OrderItemDetail,
   OrderWithTable,
+  UpdateOrderStatusInput,
 } from "../types/order.types";
 class OrderService {
   constructor(private readonly orderRepository: IOrderRepository) {}
@@ -361,8 +362,61 @@ class OrderService {
       return [];
     }
   }
+
+  async updateOrderStatus(input: UpdateOrderStatusInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
+
+      if (!member) {
+        return {
+          error: "El usuario no pertenece a un restaurante",
+          success: "",
+        };
+      }
+
+      const { data: order, error: orderError } =
+        await this.orderRepository.findOrderById(supabase, input.orderId);
+
+      if (orderError || !order) {
+        return {
+          error: orderError?.message || "El pedido no existe",
+          success: "",
+        };
+      }
+
+      if (order.restaurant_id !== member.restaurant_id) {
+        return {
+          error: "No tenés permisos para modificar este pedido",
+          success: "",
+        };
+      }
+
+      const { error } = await this.orderRepository.updateOrderStatus(
+        supabase,
+        input,
+      );
+
+      if (error) {
+        return {
+          error: error.message,
+          success: "",
+        };
+      }
+
+      return {
+        error: "",
+        success: "Estado actualizado correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo actualizar el estado",
+        success: "",
+      };
+    }
+  }
 }
 
 export const orderService = new OrderService(orderRepository);
-
 

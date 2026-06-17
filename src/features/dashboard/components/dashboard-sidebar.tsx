@@ -50,7 +50,8 @@ const navItems = [
 
 export function DashboardSidebar() {
   return (
-    <aside className="hidden min-h-screen border-r border-border bg-surface px-3 py-5 lg:flex lg:flex-col">
+    <aside className="hidden border-r border-border bg-surface px-3 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:overflow-y-auto">
+      {" "}
       <div className="flex items-center gap-3 px-2 pb-6">
         <div className="grid size-8 place-items-center rounded-lg bg-text font-serif text-lg italic text-bg">
           R
@@ -65,7 +66,6 @@ export function DashboardSidebar() {
           </p>
         </div>
       </div>
-
       <nav className="space-y-1">
         <p className="px-2 pb-2 font-mono text-[10px] uppercase tracking-[0.08em] text-text-3">
           Operación
@@ -77,7 +77,6 @@ export function DashboardSidebar() {
           return (
             <Link
               key={item.href}
-              href={item.href}
               className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-text-2 transition hover:bg-surface-2 hover:text-text">
               <Icon className="size-4 text-text-3" />
               {item.label}
@@ -85,7 +84,6 @@ export function DashboardSidebar() {
           );
         })}
       </nav>
-
       <div className="mt-auto space-y-1 border-t border-border pt-4">
         <Link
           // href="/dashboard/settings"
@@ -113,3 +111,4 @@ export function DashboardSidebar() {
     </aside>
   );
 }
+

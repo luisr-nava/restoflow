@@ -4,6 +4,7 @@ import {
   CloseTableSchema,
   CreateOrderItemSchema,
   CreateTableOrderSchema,
+  UpdateOrderStatusSchema,
 } from "../schemas/order.schema";
 
 export type CreateOrderItemInput = z.infer<typeof CreateOrderItemSchema>;
@@ -81,4 +82,5 @@ export type Payment = {
 
 export type CloseTableInput = z.infer<typeof CloseTableSchema>;
 
+export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
 

@@ -6,6 +6,7 @@ import type {
   OrderItem,
   OrderItemDetail,
   OrderWithTable,
+  UpdateOrderStatusInput,
 } from "../types/order.types";
 
 type CreateOrderParams = {
@@ -78,6 +79,11 @@ export interface IOrderRepository {
     supabase: SupabaseClient,
     orderId: string,
   ): Promise<{ data: OrderItemDetail[] | null; error: Error | null }>;
+
+  updateOrderStatus(
+    supabase: SupabaseClient,
+    input: UpdateOrderStatusInput,
+  ): Promise<{ data: Order | null; error: Error | null }>;
 }
 
 class OrderRepository implements IOrderRepository {
@@ -235,6 +241,30 @@ class OrderRepository implements IOrderRepository {
       .select("*")
       .eq("order_id", orderId)
       .order("created_at", { ascending: true });
+
+    return { data, error };
+  }
+
+  async updateOrderStatus(
+    supabase: SupabaseClient,
+    input: UpdateOrderStatusInput,
+  ): Promise<{ data: Order | null; error: Error | null }> {
+    const timestampByStatus = {
+      ACCEPTED: "accepted_at",
+      PREPARING: "preparing_at",
+      READY: "ready_at",
+      SERVED: "served_at",
+    } as const;
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update({
+        status: input.status,
+        [timestampByStatus[input.status]]: new Date().toISOString(),
+      })
+      .eq("id", input.orderId)
+      .select("*")
+      .single();
 
     return { data, error };
   }
