@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-import { CreateRestaurantSchema } from "../schemas/restaurant.schema";
-
+import {
+  CreateRestaurantSchema,
+  UpdateRestaurantSchema,
+} from "../schemas/restaurant.schema";
 export type CreateRestaurantInput = z.infer<typeof CreateRestaurantSchema>;
+export type UpdateRestaurantInput = z.infer<typeof UpdateRestaurantSchema>;
 
 export type RestaurantRole = "OWNER" | "MANAGER" | "WAITER" | "KITCHEN";
 
@@ -29,3 +32,4 @@ export type RestaurantMember = {
   role: RestaurantRole;
   created_at: string;
 };
+

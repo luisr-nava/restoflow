@@ -41,3 +41,6 @@ export const CreateRestaurantSchema = z.object({
 
   logoUrl: z.string().optional().or(z.literal("")),
 });
+
+
+export const UpdateRestaurantSchema = CreateRestaurantSchema;

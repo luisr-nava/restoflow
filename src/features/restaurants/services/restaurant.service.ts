@@ -4,7 +4,10 @@ import {
   IRestaurantRepository,
   restaurantRepository,
 } from "../repositories/restaurant.repository";
-import type { CreateRestaurantInput } from "../types/restaurant.types";
+import type {
+  CreateRestaurantInput,
+  UpdateRestaurantInput,
+} from "../types/restaurant.types";
 
 class RestaurantService {
   constructor(private readonly restaurantRepository: IRestaurantRepository) {}
@@ -117,6 +120,74 @@ class RestaurantService {
     );
 
     return data;
+  }
+
+  async getRestaurantSettings() {
+    const supabase = await this.getSupabase();
+
+    const member = await this.getCurrentUserRestaurantMember();
+
+    if (!member) {
+      return {
+        data: null,
+        error: "No se encontró el restaurante",
+      };
+    }
+
+    const { data, error } = await this.restaurantRepository.findRestaurantById(
+      supabase,
+      member.restaurant_id,
+    );
+
+    if (error) {
+      return {
+        data: null,
+        error: error.message,
+      };
+    }
+
+    return {
+      data,
+      error: "",
+    };
+  }
+
+  async updateRestaurantSettings(input: UpdateRestaurantInput) {
+    const supabase = await this.getSupabase();
+
+    const member = await this.getCurrentUserRestaurantMember();
+
+    if (!member) {
+      return {
+        error: "No se encontró el restaurante",
+        success: "",
+      };
+    }
+
+    if (member.role !== "OWNER" && member.role !== "MANAGER") {
+      return {
+        error: "No tenés permisos para editar el restaurante",
+        success: "",
+      };
+    }
+
+    const { error } = await this.restaurantRepository.updateRestaurant(
+      supabase,
+      member.restaurant_id,
+      input,
+    );
+
+    if (error) {
+      return {
+        error: error.message,
+        success: "",
+      };
+    }
+
+    return {
+      error: "",
+      success: "Configuración actualizada correctamente",
+    };
   }
 }
 

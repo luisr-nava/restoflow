@@ -8,6 +8,7 @@ import {
   Table2,
   Users,
   Utensils,
+  QrCode,
 } from "lucide-react";
 
 const navItems = [
@@ -46,7 +47,12 @@ const navItems = [
     href: "/dashboard/reports",
     icon: BarChart3,
   },
-];
+  {
+    label: "QR Mesas",
+    href: "/dashboard/qr",
+    icon: QrCode,
+  },
+] as const;
 
 export function DashboardSidebar() {
   return (
@@ -77,6 +83,7 @@ export function DashboardSidebar() {
           return (
             <Link
               key={item.href}
+              href={item.href}
               className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-text-2 transition hover:bg-surface-2 hover:text-text">
               <Icon className="size-4 text-text-3" />
               {item.label}
@@ -86,8 +93,7 @@ export function DashboardSidebar() {
       </nav>
       <div className="mt-auto space-y-1 border-t border-border pt-4">
         <Link
-          // href="/dashboard/settings"
-          href="/"
+          href="/dashboard/settings"
           className="flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-text-2 transition hover:bg-surface-2 hover:text-text">
           <Settings className="size-4 text-text-3" />
           Configuración
@@ -111,4 +117,7 @@ export function DashboardSidebar() {
     </aside>
   );
 }
+
+
+
 

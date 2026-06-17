@@ -27,6 +27,7 @@ export type RestaurantTable = {
   height: number;
   created_at: string;
   updated_at: string;
+  qr_token: string;
 };
 
 export type UpdateTableInput = z.infer<typeof UpdateTableSchema>;

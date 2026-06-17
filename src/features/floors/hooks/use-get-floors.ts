@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getFloorsAction } from "../actions/floor.actions";
 
+type GetFloorsResponse = Awaited<ReturnType<typeof getFloorsAction>>;
+
 export function useGetFloors() {
-  return useQuery({
+  return useQuery<GetFloorsResponse>({
     queryKey: ["floors"],
-    queryFn: () => getFloorsAction(),
+    queryFn: getFloorsAction,
   });
 }
