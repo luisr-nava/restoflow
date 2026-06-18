@@ -31,14 +31,12 @@ const nextStatusByStatus: Partial<
   PENDING: "ACCEPTED",
   ACCEPTED: "PREPARING",
   PREPARING: "READY",
-  READY: "SERVED",
 };
 
 const actionLabelByStatus: Partial<Record<OrderStatus, string>> = {
   PENDING: "Aceptar",
   ACCEPTED: "Preparar",
   PREPARING: "Marcar listo",
-  READY: "Entregado",
 };
 
 function KitchenOrderCard({ order }: { order: OrderWithTable }) {
@@ -151,4 +149,3 @@ export function KitchenView() {
     </div>
   );
 }
-

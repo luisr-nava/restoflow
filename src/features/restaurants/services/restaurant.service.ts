@@ -1,4 +1,5 @@
 import { createClient } from "@/src/lib/supabase/server";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   IRestaurantRepository,
@@ -24,6 +25,28 @@ class RestaurantService {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)+/g, "");
+  }
+
+  private async getCurrentUserId(supabase: SupabaseClient) {
+    const { data: claimsData, error: claimsError } =
+      await supabase.auth.getClaims();
+
+    const claimUserId = claimsData?.claims?.sub;
+
+    if (!claimsError && typeof claimUserId === "string" && claimUserId) {
+      return claimUserId;
+    }
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return null;
+    }
+
+    return user.id;
   }
 
   async createRestaurant(input: CreateRestaurantInput) {
@@ -102,22 +125,22 @@ class RestaurantService {
     }
   }
 
-  async getCurrentUserRestaurantMember() {
-    const supabase = await this.getSupabase();
+  async getCurrentUserRestaurantMember(supabaseClient?: SupabaseClient) {
+    const supabase = supabaseClient ?? (await this.getSupabase());
+    const userId = await this.getCurrentUserId(supabase);
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
+    if (!userId) {
       return null;
     }
 
-    const { data } = await this.restaurantRepository.findMemberByUserId(
+    const { data, error } = await this.restaurantRepository.findMemberByUserId(
       supabase,
-      user.id,
+      userId,
     );
+
+    if (error) {
+      return null;
+    }
 
     return data;
   }
@@ -192,4 +215,3 @@ class RestaurantService {
 }
 
 export const restaurantService = new RestaurantService(restaurantRepository);
-

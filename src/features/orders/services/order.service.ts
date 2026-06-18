@@ -25,7 +25,8 @@ class OrderService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
         return {
@@ -193,7 +194,8 @@ class OrderService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
         return null;
@@ -220,7 +222,8 @@ class OrderService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
         return {
@@ -306,34 +309,32 @@ class OrderService {
   async getOrders(): Promise<OrderWithTable[]> {
     const supabase = await this.getSupabase();
 
-    try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+    const member = await restaurantService.getCurrentUserRestaurantMember(
+      supabase,
+    );
 
-      if (!member) {
-        return [];
-      }
-
-      const { data, error } =
-        await this.orderRepository.findOrdersByRestaurantId(
-          supabase,
-          member.restaurant_id,
-        );
-
-      if (error) {
-        return [];
-      }
-
-      return data ?? [];
-    } catch {
-      return [];
+    if (!member) {
+      throw new Error("No se pudo obtener la membresía del restaurante");
     }
+
+    const { data, error } = await this.orderRepository.findOrdersByRestaurantId(
+      supabase,
+      member.restaurant_id,
+    );
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data ?? [];
   }
 
   async getOrderItems(orderId: string): Promise<OrderItemDetail[]> {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
         return [];
@@ -367,7 +368,8 @@ class OrderService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
         return {
@@ -389,6 +391,24 @@ class OrderService {
       if (order.restaurant_id !== member.restaurant_id) {
         return {
           error: "No tenés permisos para modificar este pedido",
+          success: "",
+        };
+      }
+
+      const nextStatusByCurrentStatus: Partial<
+        Record<OrderWithTable["status"], UpdateOrderStatusInput["status"]>
+      > = {
+        PENDING: "ACCEPTED",
+        ACCEPTED: "PREPARING",
+        PREPARING: "READY",
+        READY: "SERVED",
+      };
+
+      const expectedNextStatus = nextStatusByCurrentStatus[order.status];
+
+      if (!expectedNextStatus || input.status !== expectedNextStatus) {
+        return {
+          error: "No se puede avanzar el pedido a ese estado",
           success: "",
         };
       }
@@ -543,4 +563,3 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
-

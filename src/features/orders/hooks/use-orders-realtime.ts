@@ -31,7 +31,10 @@ export function useOrdersRealtime() {
           schema: "public",
           table: "orders",
         },
-        invalidateOrders,
+        (payload) => {
+          console.log("REALTIME ORDERS:", payload);
+          invalidateOrders();
+        },
       )
       .on(
         "postgres_changes",
@@ -40,20 +43,13 @@ export function useOrdersRealtime() {
           schema: "public",
           table: "order_items",
         },
-        invalidateOrders,
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "restaurant_tables",
+        (payload) => {
+          console.log("REALTIME ITEMS:", payload);
+          invalidateOrders();
         },
-        invalidateOrders,
       )
-      .subscribe((status, error) => {
-        console.log("orders realtime status:", status);
-        console.log("orders realtime error:", error);
+      .subscribe((status) => {
+        console.log("REALTIME STATUS:", status);
       });
 
     return () => {
