@@ -66,3 +66,7 @@ export async function getTableByQrTokenAction(qrToken: string) {
   return tableService.getTableByQrToken(qrToken);
 }
 
+export async function getTablesByRestaurantIdAction() {
+  return tableService.getTablesByRestaurantId();
+}
+

@@ -14,6 +14,7 @@ import type {
   OrderWithTable,
   UpdateOrderStatusInput,
 } from "../types/order.types";
+import { createPublicClient } from "@/src/lib/supabase/public";
 class OrderService {
   constructor(private readonly orderRepository: IOrderRepository) {}
 
@@ -309,9 +310,8 @@ class OrderService {
   async getOrders(): Promise<OrderWithTable[]> {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember(
-      supabase,
-    );
+    const member =
+      await restaurantService.getCurrentUserRestaurantMember(supabase);
 
     if (!member) {
       throw new Error("No se pudo obtener la membresía del restaurante");
@@ -437,7 +437,7 @@ class OrderService {
     }
   }
   async createQrTableOrder(input: CreateTableOrderInput) {
-    const supabase = await this.getSupabase();
+    const supabase = createPublicClient();
 
     try {
       const { data: table, error: tableError } =
@@ -563,3 +563,4 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
+

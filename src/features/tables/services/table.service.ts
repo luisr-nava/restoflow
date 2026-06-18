@@ -282,9 +282,23 @@ class TableService {
 
     return data;
   }
+  async getTablesByRestaurantId() {
+    const supabase = await this.getSupabase();
+
+    const member = await restaurantService.getCurrentUserRestaurantMember();
+
+    if (!member) {
+      return [];
+    }
+
+    const { data } = await this.tableRepository.findTablesByRestaurantId(
+      supabase,
+      member.restaurant_id,
+    );
+
+    return data ?? [];
+  }
 }
 
-
-
-
 export const tableService = new TableService(tableRepository);
+

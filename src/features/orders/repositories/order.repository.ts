@@ -92,6 +92,8 @@ class OrderRepository implements IOrderRepository {
     supabase: SupabaseClient,
     input: CreateOrderParams,
   ): Promise<{ data: Order | null; error: Error | null }> {
+    const { data: userData } = await supabase.auth.getUser();
+    console.log("USER:", userData);
     const { data, error } = await supabase
       .from("orders")
       .insert({
@@ -105,7 +107,7 @@ class OrderRepository implements IOrderRepository {
       })
       .select("*")
       .single();
-
+    console.log("SOURCE:", input.source);
     return { data, error };
   }
 
