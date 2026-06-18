@@ -70,3 +70,16 @@ export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
   return orderService.updateOrderStatus(data.data);
 }
 
+export async function createQrTableOrderAction(input: CreateTableOrderInput) {
+  const data = CreateTableOrderSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return orderService.createQrTableOrder(data.data);
+}
+

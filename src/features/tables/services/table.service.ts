@@ -268,7 +268,22 @@ class TableService {
       };
     }
   }
+  async getTableByQrToken(qrToken: string) {
+    const supabase = await this.getSupabase();
+
+    if (!qrToken) {
+      return null;
+    }
+
+    const { data } = await this.tableRepository.findTableByQrToken(
+      supabase,
+      qrToken,
+    );
+
+    return data;
+  }
 }
+
 
 
 

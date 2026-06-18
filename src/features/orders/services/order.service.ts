@@ -416,6 +416,130 @@ class OrderService {
       };
     }
   }
+  async createQrTableOrder(input: CreateTableOrderInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const { data: table, error: tableError } =
+        await tableRepository.findTableById(supabase, input.tableId);
+
+      if (tableError || !table) {
+        return {
+          error: tableError?.message || "La mesa no existe",
+          success: "",
+        };
+      }
+
+      if (table.status === "CLOSED") {
+        return {
+          error: "No se puede crear un pedido en una mesa cerrada",
+          success: "",
+        };
+      }
+
+      const { data: order, error: orderError } =
+        await this.orderRepository.createOrder(supabase, {
+          restaurantId: table.restaurant_id,
+          tableId: table.id,
+          waiterId: null,
+          source: "QR",
+        });
+
+      if (orderError || !order) {
+        return {
+          error: orderError?.message || "No se pudo crear el pedido",
+          success: "",
+        };
+      }
+
+      let total = 0;
+
+      for (const item of input.items) {
+        const { data: menuItem, error: menuItemError } =
+          await menuItemRepository.findMenuItemById(supabase, item.menuItemId);
+
+        if (menuItemError || !menuItem) {
+          return {
+            error: menuItemError?.message || "Un item del menú no existe",
+            success: "",
+          };
+        }
+
+        if (menuItem.restaurant_id !== table.restaurant_id) {
+          return {
+            error: "Un item del menú no pertenece al restaurante",
+            success: "",
+          };
+        }
+
+        if (!menuItem.is_available) {
+          return {
+            error: `El item ${menuItem.name} no está disponible`,
+            success: "",
+          };
+        }
+
+        const itemTotal = Number(menuItem.price) * item.quantity;
+        total += itemTotal;
+
+        const { error: orderItemError } =
+          await this.orderRepository.createOrderItem(supabase, {
+            orderId: order.id,
+            menuItemId: menuItem.id,
+            name: menuItem.name,
+            quantity: item.quantity,
+            unitPrice: Number(menuItem.price),
+            total: itemTotal,
+          });
+
+        if (orderItemError) {
+          return {
+            error: orderItemError.message,
+            success: "",
+          };
+        }
+      }
+
+      const { error: totalError } = await this.orderRepository.updateOrderTotal(
+        supabase,
+        order.id,
+        total,
+      );
+
+      if (totalError) {
+        return {
+          error: totalError.message,
+          success: "",
+        };
+      }
+
+      if (table.status === "AVAILABLE" || table.status === "RESERVED") {
+        const { error: tableStatusError } =
+          await tableRepository.updateTableStatus(
+            supabase,
+            table.id,
+            "OCCUPIED",
+          );
+
+        if (tableStatusError) {
+          return {
+            error: tableStatusError.message,
+            success: "",
+          };
+        }
+      }
+
+      return {
+        error: "",
+        success: "Pedido enviado correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo enviar el pedido",
+        success: "",
+      };
+    }
+  }
 }
 
 export const orderService = new OrderService(orderRepository);

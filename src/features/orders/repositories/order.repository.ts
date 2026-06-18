@@ -1,10 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
-  CreateTableOrderInput,
   Order,
   OrderItem,
   OrderItemDetail,
+  OrderSource,
   OrderWithTable,
   UpdateOrderStatusInput,
 } from "../types/order.types";
@@ -12,7 +12,8 @@ import type {
 type CreateOrderParams = {
   restaurantId: string;
   tableId: string;
-  waiterId?: string;
+  waiterId?: string | null;
+  source?: OrderSource;
   notes?: string;
 };
 
@@ -96,8 +97,8 @@ class OrderRepository implements IOrderRepository {
       .insert({
         restaurant_id: input.restaurantId,
         table_id: input.tableId,
-        created_by: input.waiterId || null,
-        source: "WAITER",
+        created_by: input.waiterId ?? null,
+        source: input.source ?? "WAITER",
         status: "PENDING",
         covers: 1,
         total: 0,
@@ -166,7 +167,7 @@ class OrderRepository implements IOrderRepository {
       .from("orders")
       .select("*")
       .eq("table_id", tableId)
-      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY", "SERVED"])
+      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY"])
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -227,7 +228,7 @@ class OrderRepository implements IOrderRepository {
     `,
       )
       .eq("restaurant_id", restaurantId)
-      .order("paid_at", { ascending: false, nullsFirst: true });
+      .order("created_at", { ascending: false });
 
     return { data, error };
   }

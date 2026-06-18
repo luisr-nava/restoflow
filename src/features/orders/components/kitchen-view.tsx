@@ -2,6 +2,7 @@
 
 import { OrderDetailsModal } from "./order-details-modal";
 import { useGetOrders } from "../hooks/use-get-orders";
+import { useOrdersRealtime } from "../hooks/use-orders-realtime";
 import { useUpdateOrderStatus } from "../hooks/use-update-order-status";
 import type { OrderStatus, OrderWithTable } from "../types/order.types";
 import type { UpdateOrderStatusInput } from "../types/order.types";
@@ -71,10 +72,6 @@ function KitchenOrderCard({ order }: { order: OrderWithTable }) {
             type="button"
             disabled={isPending}
             onClick={() => {
-              if (!nextStatus) {
-                return;
-              }
-
               mutate({
                 orderId: order.id,
                 status: nextStatus,
@@ -90,8 +87,10 @@ function KitchenOrderCard({ order }: { order: OrderWithTable }) {
 }
 
 export function KitchenView() {
-  const { data: orders = [], isLoading } = useGetOrders();
+  useOrdersRealtime();
 
+  const { data: orders = [], isLoading } = useGetOrders();
+  console.log("Kitchen orders:", orders);
   const activeOrders = orders.filter((order) =>
     ["PENDING", "ACCEPTED", "PREPARING", "READY"].includes(order.status),
   );

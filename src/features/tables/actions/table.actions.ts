@@ -62,3 +62,7 @@ export async function deleteTableAction(tableId: string) {
   return tableService.deleteTable(tableId);
 }
 
+export async function getTableByQrTokenAction(qrToken: string) {
+  return tableService.getTableByQrToken(qrToken);
+}
+

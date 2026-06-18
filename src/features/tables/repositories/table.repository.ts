@@ -61,6 +61,11 @@ export interface ITableRepository {
     supabase: SupabaseClient,
     floorId: string,
   ): Promise<{ error: Error | null }>;
+
+  findTableByQrToken(
+    supabase: SupabaseClient,
+    qrToken: string,
+  ): Promise<{ data: RestaurantTable | null; error: Error | null }>;
 }
 
 class TableRepository implements ITableRepository {
@@ -199,7 +204,22 @@ class TableRepository implements ITableRepository {
 
     return { error };
   }
+
+  async findTableByQrToken(
+    supabase: SupabaseClient,
+    qrToken: string,
+  ): Promise<{ data: RestaurantTable | null; error: Error | null }> {
+    const { data, error } = await supabase
+      .from("restaurant_tables")
+      .select("*")
+      .eq("qr_token", qrToken)
+      .maybeSingle();
+
+    return { data, error };
+  }
 }
 
 export const tableRepository = new TableRepository();
+
+
 
