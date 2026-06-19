@@ -10,6 +10,7 @@ import type {
   UpdateTableInput,
   UpdateTablePositionInput,
 } from "../types/table.types";
+import { getStaffSession } from "../../team/lib/staff-session";
 
 class TableService {
   constructor(private readonly tableRepository: ITableRepository) {}
@@ -294,6 +295,27 @@ class TableService {
     const { data } = await this.tableRepository.findTablesByRestaurantId(
       supabase,
       member.restaurant_id,
+    );
+
+    return data ?? [];
+  }
+
+  async getTablesByStaffSession() {
+    const supabase = await this.getSupabase();
+
+    const session = await getStaffSession();
+
+    if (!session) {
+      return [];
+    }
+
+    if (session.role !== "WAITER") {
+      return [];
+    }
+
+    const { data } = await this.tableRepository.findTablesByRestaurantId(
+      supabase,
+      session.restaurantId,
     );
 
     return data ?? [];

@@ -70,3 +70,7 @@ export async function getTablesByRestaurantIdAction() {
   return tableService.getTablesByRestaurantId();
 }
 
+export async function getTablesByStaffSessionAction() {
+  return tableService.getTablesByStaffSession();
+}
+
