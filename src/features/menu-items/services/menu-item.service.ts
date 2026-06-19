@@ -10,7 +10,7 @@ import type {
   DeleteMenuItemInput,
   UpdateMenuItemInput,
 } from "../types/menu-item.types";
-
+import { getStaffSession } from "@/src/features/team/lib/staff-session";
 class MenuItemService {
   constructor(private readonly menuItemRepository: IMenuItemRepository) {}
 
@@ -268,6 +268,22 @@ class MenuItemService {
         success: "",
       };
     }
+  }
+  async getMenuItemsByStaffSession() {
+    const supabase = await this.getSupabase();
+
+    const session = await getStaffSession();
+
+    if (!session) {
+      return [];
+    }
+
+    const { data } = await this.menuItemRepository.findMenuItemsByRestaurantId(
+      supabase,
+      session.restaurantId,
+    );
+
+    return data ?? [];
   }
 }
 

@@ -154,14 +154,12 @@ class TableRepository implements ITableRepository {
     tableId: string,
     status: TableStatus,
   ): Promise<{ data: RestaurantTable | null; error: Error | null }> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("restaurant_tables")
       .update({ status })
-      .eq("id", tableId)
-      .select("*")
-      .single();
+      .eq("id", tableId);
 
-    return { data, error };
+    return { data: null, error };
   }
 
   async updateTable(
@@ -260,5 +258,4 @@ class TableRepository implements ITableRepository {
 }
 
 export const tableRepository = new TableRepository();
-
 

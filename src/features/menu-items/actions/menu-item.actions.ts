@@ -61,5 +61,9 @@ export async function deleteMenuItemAction(input: DeleteMenuItemInput) {
   }
 
   return menuItemService.deleteMenuItem(data.data);
-
 }
+
+export async function getStaffMenuItemsAction() {
+  return menuItemService.getMenuItemsByStaffSession();
+}
+

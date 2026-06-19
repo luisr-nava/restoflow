@@ -15,6 +15,7 @@ import type {
   UpdateOrderStatusInput,
 } from "../types/order.types";
 import { createPublicClient } from "@/src/lib/supabase/public";
+import { getStaffSession } from "../../team/lib/staff-session";
 class OrderService {
   constructor(private readonly orderRepository: IOrderRepository) {}
 
@@ -94,6 +95,8 @@ class OrderService {
           });
 
         if (orderError || !createdOrder) {
+          console.log("CREATE ORDER ERROR:", orderError);
+
           return {
             error: orderError?.message || "No se pudo crear el pedido",
             success: "",
@@ -556,6 +559,170 @@ class OrderService {
     } catch {
       return {
         error: "No se pudo enviar el pedido",
+        success: "",
+      };
+    }
+  }
+  async createStaffTableOrder(input: CreateTableOrderInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        return {
+          error: "No hay sesión de personal activa",
+          success: "",
+        };
+      }
+
+      if (session.role !== "WAITER") {
+        return {
+          error: "Sólo los mozos pueden tomar pedidos",
+          success: "",
+        };
+      }
+
+      const { data: table, error: tableError } =
+        await tableRepository.findTableById(supabase, input.tableId);
+
+      if (tableError || !table) {
+        return {
+          error: tableError?.message || "La mesa no existe",
+          success: "",
+        };
+      }
+
+      if (table.restaurant_id !== session.restaurantId) {
+        return {
+          error: "No tenés permisos para usar esta mesa",
+          success: "",
+        };
+      }
+
+      if (table.status === "CLOSED") {
+        return {
+          error: "No se puede crear un pedido en una mesa cerrada",
+          success: "",
+        };
+      }
+
+      const { data: activeOrder, error: activeOrderError } =
+        await this.orderRepository.findActiveOrderByTableId(supabase, table.id);
+
+      if (activeOrderError) {
+        return {
+          error: activeOrderError.message,
+          success: "",
+        };
+      }
+
+      let order = activeOrder;
+      let total = activeOrder ? Number(activeOrder.total) : 0;
+
+      if (!order) {
+        const { data: createdOrder, error: orderError } =
+          await this.orderRepository.createOrder(supabase, {
+            restaurantId: session.restaurantId,
+            tableId: table.id,
+            waiterId: session.id,
+            source: "WAITER",
+          });
+
+        if (orderError || !createdOrder) {
+          return {
+            error: `createOrder: ${orderError?.message || "No se pudo crear el pedido"}`,
+            success: "",
+          };
+        }
+
+        order = createdOrder;
+      }
+
+      for (const item of input.items) {
+        const { data: menuItem, error: menuItemError } =
+          await menuItemRepository.findMenuItemById(supabase, item.menuItemId);
+
+        if (menuItemError || !menuItem) {
+          return {
+            error: menuItemError?.message || "Un item del menú no existe",
+            success: "",
+          };
+        }
+
+        if (menuItem.restaurant_id !== session.restaurantId) {
+          return {
+            error: "Un item del menú no pertenece al restaurante",
+            success: "",
+          };
+        }
+
+        if (!menuItem.is_available) {
+          return {
+            error: `El item ${menuItem.name} no está disponible`,
+            success: "",
+          };
+        }
+
+        const itemTotal = Number(menuItem.price) * item.quantity;
+        total += itemTotal;
+
+        const { error: orderItemError } =
+          await this.orderRepository.createOrderItem(supabase, {
+            orderId: order.id,
+            menuItemId: menuItem.id,
+            name: menuItem.name,
+            quantity: item.quantity,
+            unitPrice: Number(menuItem.price),
+            total: itemTotal,
+          });
+
+        if (orderItemError) {
+          return {
+            error: `createOrderItem: ${orderItemError.message}`,
+            success: "",
+          };
+        }
+      }
+
+      const { error: totalError } = await this.orderRepository.updateOrderTotal(
+        supabase,
+        order.id,
+        total,
+      );
+
+      if (totalError) {
+        return {
+          error: `updateOrderTotal: ${totalError.message}`,
+          success: "",
+        };
+      }
+
+      if (table.status === "AVAILABLE" || table.status === "RESERVED") {
+        const { error: tableStatusError } =
+          await tableRepository.updateTableStatus(
+            supabase,
+            table.id,
+            "OCCUPIED",
+          );
+
+        if (tableStatusError) {
+          return {
+            error: `updateTableStatus: ${tableStatusError.message}`,
+            success: "",
+          };
+        }
+      }
+
+      return {
+        error: "",
+        success: activeOrder
+          ? "Pedido actualizado correctamente"
+          : "Pedido creado correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo crear el pedido",
         success: "",
       };
     }

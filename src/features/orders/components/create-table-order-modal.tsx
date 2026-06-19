@@ -7,11 +7,13 @@ import { CreateTableOrderForm } from "./create-table-order-form";
 type CreateTableOrderModalProps = {
   tableId: string;
   disabled?: boolean;
+  mode?: "admin" | "staff";
 };
 
 export function CreateTableOrderModal({
   tableId,
   disabled = false,
+  mode = "admin",
 }: CreateTableOrderModalProps) {
   const [open, setOpen] = useState(false);
 
@@ -48,6 +50,7 @@ export function CreateTableOrderModal({
 
             <CreateTableOrderForm
               tableId={tableId}
+              mode={mode}
               onSuccess={() => setOpen(false)}
             />
           </div>
@@ -56,3 +59,6 @@ export function CreateTableOrderModal({
     </>
   );
 }
+
+
+

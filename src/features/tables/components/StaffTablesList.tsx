@@ -1,7 +1,7 @@
 "use client";
 
+import { CreateTableOrderModal } from "../../orders/components/create-table-order-modal";
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
-
 export function StaffTablesList() {
   const { data: tables = [], isLoading } = useGetStaffTables();
 
@@ -24,23 +24,33 @@ export function StaffTablesList() {
   return (
     <div className="grid gap-3">
       {tables.map((table) => (
-        <button
+        <div
           key={table.id}
-          type="button"
-          className="rounded-2xl border border-border bg-surface p-4 text-left transition hover:border-primary">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{table.name}</h3>
+          className="rounded-2xl border border-border bg-surface p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="font-medium">{table.name}</h3>
+
+              <p className="mt-2 text-sm text-muted-foreground">
+                {table.seats} lugares
+              </p>
+            </div>
 
             <span className="text-xs text-muted-foreground">
               {table.status}
             </span>
           </div>
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            {table.seats} lugares
-          </p>
-        </button>
+          <div className="mt-4 flex justify-end">
+            <CreateTableOrderModal
+              tableId={table.id}
+              mode="staff"
+              disabled={table.status === "CLOSED"}
+            />
+          </div>
+        </div>
       ))}
     </div>
   );
 }
+

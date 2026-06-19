@@ -11,9 +11,10 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
+import { useGetStaffMenuItems } from "@/src/features/menu-items/hooks/use-get-staff-menu-items";
 
 import { useGetMenuItems } from "@/src/features/menu-items/hooks/use-get-menu-items";
-
+import { useCreateStaffTableOrder } from "../hooks/use-create-staff-table-order";
 import { useCreateTableOrder } from "../hooks/use-create-table-order";
 import { CreateTableOrderSchema } from "../schemas/order.schema";
 import type { CreateTableOrderInput } from "../types/order.types";
@@ -21,15 +22,23 @@ import type { CreateTableOrderInput } from "../types/order.types";
 type CreateTableOrderFormProps = {
   tableId: string;
   onSuccess?: () => void;
+  mode?: "admin" | "staff";
 };
 
 export function CreateTableOrderForm({
   tableId,
   onSuccess,
+  mode = "admin",
 }: CreateTableOrderFormProps) {
   const [expandedIndex, setExpandedIndex] = useState(0);
 
-  const { data: menuItems = [] } = useGetMenuItems();
+  const adminMenuItems = useGetMenuItems();
+  const staffMenuItems = useGetStaffMenuItems();
+
+  const menuItems =
+    mode === "staff"
+      ? (staffMenuItems.data ?? [])
+      : (adminMenuItems.data ?? []);
 
   const form = useForm<CreateTableOrderInput>({
     resolver: zodResolver(
@@ -53,7 +62,14 @@ export function CreateTableOrderForm({
     name: "items",
   });
 
-  const { mutate, isPending } = useCreateTableOrder();
+  const adminCreateOrder = useCreateTableOrder();
+  const staffCreateOrder = useCreateStaffTableOrder();
+
+  const mutate =
+    mode === "staff" ? staffCreateOrder.mutate : adminCreateOrder.mutate;
+
+  const isPending =
+    mode === "staff" ? staffCreateOrder.isPending : adminCreateOrder.isPending;
 
   const items = form.watch("items");
 

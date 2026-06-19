@@ -83,3 +83,18 @@ export async function createQrTableOrderAction(input: CreateTableOrderInput) {
   return orderService.createQrTableOrder(data.data);
 }
 
+export async function createStaffTableOrderAction(
+  input: CreateTableOrderInput,
+) {
+  const data = CreateTableOrderSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return orderService.createStaffTableOrder(data.data);
+
+}

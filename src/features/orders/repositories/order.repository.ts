@@ -92,14 +92,12 @@ class OrderRepository implements IOrderRepository {
     supabase: SupabaseClient,
     input: CreateOrderParams,
   ): Promise<{ data: Order | null; error: Error | null }> {
-    const { data: userData } = await supabase.auth.getUser();
-    console.log("USER:", userData);
     const { data, error } = await supabase
       .from("orders")
       .insert({
         restaurant_id: input.restaurantId,
         table_id: input.tableId,
-        created_by: input.waiterId ?? null,
+        created_by: input.source === "WAITER" ? null : (input.waiterId ?? null),
         source: input.source ?? "WAITER",
         status: "PENDING",
         covers: 1,
@@ -107,7 +105,6 @@ class OrderRepository implements IOrderRepository {
       })
       .select("*")
       .single();
-    console.log("SOURCE:", input.source);
     return { data, error };
   }
 
@@ -169,7 +166,7 @@ class OrderRepository implements IOrderRepository {
       .from("orders")
       .select("*")
       .eq("table_id", tableId)
-      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY"])
+      .in("status", ["PENDING"])
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -274,4 +271,6 @@ class OrderRepository implements IOrderRepository {
 }
 
 export const orderRepository = new OrderRepository();
+
+
 
