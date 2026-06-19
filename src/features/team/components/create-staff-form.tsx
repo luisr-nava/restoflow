@@ -13,6 +13,7 @@ import {
 import { useCreateStaff } from "../hooks/use-create-staff";
 import { CreateStaffSchema } from "../schemas/team.schema";
 import type { CreateStaffInput } from "../types/team.types";
+import { useGetStaffTables } from "../../tables/hooks/use-get-staff-tables";
 
 type CreateStaffFormProps = {
   onSuccess?: () => void;
@@ -26,11 +27,13 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
       email: "",
       role: "WAITER",
       pin: "",
+      tableIds: [],
     },
   });
 
   const { mutate, isPending } = useCreateStaff();
-
+  const selectedRole = form.watch("role");
+  const { data: tables = [] } = useGetStaffTables();
   const onSubmit = (input: CreateStaffInput) => {
     mutate(input, {
       onSuccess: (response) => {
@@ -43,6 +46,7 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
           email: "",
           role: "WAITER",
           pin: "",
+          tableIds: [],
         });
 
         onSuccess?.();
@@ -67,7 +71,35 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
         placeholder="Ej: 1234"
         type="password"
       />
+      {selectedRole === "WAITER" && (
+        <div className="space-y-2 rounded-xl border border-border p-3">
+          <p className="text-sm font-medium text-foreground">Mesas asignadas</p>
 
+          {tables.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Todavía no hay mesas creadas.
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {tables.map((table) => (
+                <label
+                  key={table.id}
+                  className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    value={table.id}
+                    {...form.register("tableIds")}
+                  />
+
+                  <span>
+                    {table.name} · {table.status}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       <FormSubmit
         value="Crear personal"
         loadingText="Creando..."
@@ -76,3 +108,5 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
     </Form>
   );
 }
+
+

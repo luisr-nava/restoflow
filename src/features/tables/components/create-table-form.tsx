@@ -6,7 +6,13 @@ import { useForm, type Resolver } from "react-hook-form";
 import { useCreateTable } from "../hooks/use-create-table";
 import { CreateTableSchema } from "../schemas/table.schema";
 import type { CreateTableInput } from "../types/table.types";
-import { Form, FormInput, FormSubmit } from "@/src/shared/components/forms";
+import {
+  Form,
+  FormInput,
+  FormSelect,
+  FormSubmit,
+} from "@/src/shared/components/forms";
+import { useGetStaff } from "@/src/features/team/hooks/use-get-staff";
 
 type CreateTableFormProps = {
   floorId: string;
@@ -25,6 +31,14 @@ export function CreateTableForm({ floorId, onSuccess }: CreateTableFormProps) {
   });
 
   const { mutate, isPending } = useCreateTable();
+  const { data: staff = [] } = useGetStaff();
+
+  const waiterOptions = staff
+    .filter((member) => member.role === "WAITER" && member.is_active)
+    .map((member) => ({
+      label: member.name,
+      value: member.id,
+    }));
 
   const onSubmit = (input: CreateTableInput) => {
     mutate(input, {
@@ -57,6 +71,15 @@ export function CreateTableForm({ floorId, onSuccess }: CreateTableFormProps) {
         placeholder="Ej: 4"
         type="number"
       />
+      <FormSelect name="waiterId" label="Mozo asignado">
+        <option value="">Sin mozo asignado</option>
+
+        {waiterOptions.map((waiter) => (
+          <option key={waiter.value} value={waiter.value}>
+            {waiter.label}
+          </option>
+        ))}
+      </FormSelect>
 
       <FormSubmit
         value="Crear mesa"

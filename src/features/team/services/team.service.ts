@@ -12,6 +12,7 @@ import type {
   DeleteStaffInput,
   UpdateStaffInput,
 } from "../types/team.types";
+import { tableRepository } from "../../tables/repositories/table.repository";
 
 class TeamService {
   constructor(private readonly teamRepository: ITeamRepository) {}
@@ -44,19 +45,42 @@ class TeamService {
         };
       }
 
-      const { error } = await this.teamRepository.createStaff(supabase, {
-        restaurantId: member.restaurant_id,
-        name: input.name,
-        email: input.email || undefined,
-        role: input.role,
-        pinHash: this.hashPin(input.pin),
-      });
+      const { data: staff, error } = await this.teamRepository.createStaff(
+        supabase,
+        {
+          restaurantId: member.restaurant_id,
+          name: input.name,
+          email: input.email || undefined,
+          role: input.role,
+          pinHash: this.hashPin(input.pin),
+        },
+      );
 
-      if (error) {
+      if (error || !staff) {
         return {
-          error: error.message,
+          error: error?.message || "No se pudo crear el personal",
           success: "",
         };
+      }
+
+      if (
+        input.role === "WAITER" &&
+        input.tableIds &&
+        input.tableIds.length > 0
+      ) {
+        const { error: assignError } =
+          await tableRepository.assignTablesToWaiter(
+            supabase,
+            input.tableIds,
+            staff.id,
+          );
+
+        if (assignError) {
+          return {
+            error: assignError.message,
+            success: "",
+          };
+        }
       }
 
       return {
@@ -219,6 +243,4 @@ class TeamService {
 }
 
 export const teamService = new TeamService(teamRepository);
-
-
 

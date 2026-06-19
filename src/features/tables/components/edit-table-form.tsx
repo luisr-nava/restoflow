@@ -3,11 +3,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
 
-
 import { useUpdateTable } from "../hooks/use-update-table";
 import { UpdateTableSchema } from "../schemas/table.schema";
 import type { RestaurantTable, UpdateTableInput } from "../types/table.types";
-import { Form, FormInput, FormSubmit } from "@/src/shared/components/forms";
+import {
+  Form,
+  FormInput,
+  FormSelect,
+  FormSubmit,
+} from "@/src/shared/components/forms";
+import { useGetStaff } from "@/src/features/team/hooks/use-get-staff";
 
 type EditTableFormProps = {
   table: RestaurantTable;
@@ -26,6 +31,14 @@ export function EditTableForm({ table, onSuccess }: EditTableFormProps) {
   });
 
   const { mutate, isPending } = useUpdateTable();
+  const { data: staff = [] } = useGetStaff();
+
+  const waiterOptions = staff
+    .filter((member) => member.role === "WAITER" && member.is_active)
+    .map((member) => ({
+      label: member.name,
+      value: member.id,
+    }));
 
   const onSubmit = (input: UpdateTableInput) => {
     mutate(input, {
@@ -43,6 +56,16 @@ export function EditTableForm({ table, onSuccess }: EditTableFormProps) {
 
       <FormInput name="seats" label="Cantidad de sillas" type="number" />
 
+      <FormSelect name="waiterId" label="Mozo asignado">
+        <option value="">Sin mozo asignado</option>
+
+        {waiterOptions.map((waiter) => (
+          <option key={waiter.value} value={waiter.value}>
+            {waiter.label}
+          </option>
+        ))}
+      </FormSelect>
+      
       <FormSubmit
         value="Guardar cambios"
         loadingText="Guardando..."
@@ -51,3 +74,4 @@ export function EditTableForm({ table, onSuccess }: EditTableFormProps) {
     </Form>
   );
 }
+

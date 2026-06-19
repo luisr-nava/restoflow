@@ -8,6 +8,7 @@ import {
   FormInput,
   FormSelect,
   FormSubmit,
+  FormToggle,
 } from "@/src/shared/components/forms";
 
 import { useUpdateStaff } from "../hooks/use-update-staff";
@@ -59,10 +60,14 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
         <option value="KITCHEN">Cocina</option>
       </FormSelect>
 
-      <FormSelect name="isActive" label="Estado">
-        <option value="true">Activo</option>
-        <option value="false">Inactivo</option>
-      </FormSelect>
+      <div className="flex items-center justify-between rounded-xl border border-border p-3">
+        <div>
+          <p className="text-sm font-medium text-foreground">Estado</p>
+          <p className="text-xs text-muted-foreground">Activo / Inactivo</p>
+        </div>
+
+        <FormToggle name="isActive" />
+      </div>
 
       <FormInput
         name="pin"
