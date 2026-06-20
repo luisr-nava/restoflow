@@ -8,12 +8,14 @@ type CloseTableModalProps = {
   tableId: string;
   total: number;
   disabled?: boolean;
+  mode?: "admin" | "staff";
 };
 
 export function CloseTableModal({
   tableId,
   total,
   disabled = false,
+  mode = "admin",
 }: CloseTableModalProps) {
   const [open, setOpen] = useState(false);
 
@@ -51,6 +53,7 @@ export function CloseTableModal({
             <CloseTableForm
               tableId={tableId}
               total={total}
+              mode={mode}
               onSuccess={() => setOpen(false)}
             />
           </div>
@@ -59,3 +62,6 @@ export function CloseTableModal({
     </>
   );
 }
+
+
+

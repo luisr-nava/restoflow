@@ -236,33 +236,40 @@ class OrderService {
         };
       }
 
-      const { data: order, error: orderError } =
-        await this.orderRepository.findActiveOrderByTableId(
+      const { data: orders, error: ordersError } =
+        await this.orderRepository.findOpenOrdersByTableId(
           supabase,
           input.tableId,
         );
 
-      if (orderError || !order) {
+      if (ordersError || !orders || orders.length === 0) {
         return {
-          error: orderError?.message || "La mesa no tiene un pedido activo",
+          error: ordersError?.message || "La mesa no tiene pedidos abiertos",
           success: "",
         };
       }
 
-      if (order.restaurant_id !== member.restaurant_id) {
+      const hasInvalidRestaurant = orders.some(
+        (order) => order.restaurant_id !== member.restaurant_id,
+      );
+
+      if (hasInvalidRestaurant) {
         return {
           error: "No tenés permisos para cerrar esta mesa",
           success: "",
         };
       }
 
+      const total = orders.reduce((acc, order) => acc + Number(order.total), 0);
+      const orderIds = orders.map((order) => order.id);
+
       const { error: paymentError } = await this.orderRepository.createPayment(
         supabase,
         {
           restaurantId: member.restaurant_id,
-          orderId: order.id,
+          orderId: orderIds[0],
+          amount: total,
           method: input.method,
-          amount: Number(order.total),
           paidAmount: input.paidAmount,
           changeAmount: input.changeAmount,
         },
@@ -275,12 +282,12 @@ class OrderService {
         };
       }
 
-      const { error: orderPaidError } =
-        await this.orderRepository.markOrderAsPaid(supabase, order.id);
+      const { error: ordersPaidError } =
+        await this.orderRepository.markOrdersAsPaid(supabase, orderIds);
 
-      if (orderPaidError) {
+      if (ordersPaidError) {
         return {
-          error: orderPaidError.message,
+          error: ordersPaidError.message,
           success: "",
         };
       }
@@ -725,6 +732,189 @@ class OrderService {
         error: "No se pudo crear el pedido",
         success: "",
       };
+    }
+  }
+  async getOpenOrderByTableId(tableId: string) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
+
+      if (!member) {
+        return null;
+      }
+
+      const { data: orders, error } =
+        await this.orderRepository.findOpenOrdersByTableId(supabase, tableId);
+
+      if (error || !orders || orders.length === 0) {
+        return null;
+      }
+
+      const validOrders = orders.filter(
+        (order) => order.restaurant_id === member.restaurant_id,
+      );
+
+      if (validOrders.length === 0) {
+        return null;
+      }
+
+      const total = validOrders.reduce(
+        (acc, order) => acc + Number(order.total),
+        0,
+      );
+
+      return {
+        ...validOrders[0],
+        total,
+      };
+    } catch {
+      return null;
+    }
+  }
+  async closeStaffTable(input: CloseTableInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        return {
+          error: "No hay sesión de personal activa",
+          success: "",
+        };
+      }
+
+      if (session.role !== "WAITER") {
+        return {
+          error: "Sólo los mozos pueden cerrar mesas",
+          success: "",
+        };
+      }
+
+      const { data: orders, error: ordersError } =
+        await this.orderRepository.findOpenOrdersByTableId(
+          supabase,
+          input.tableId,
+        );
+
+      if (ordersError || !orders || orders.length === 0) {
+        return {
+          error: ordersError?.message || "La mesa no tiene pedidos abiertos",
+          success: "",
+        };
+      }
+
+      const hasInvalidRestaurant = orders.some(
+        (order) => order.restaurant_id !== session.restaurantId,
+      );
+
+      if (hasInvalidRestaurant) {
+        return {
+          error: "No tenés permisos para cerrar esta mesa",
+          success: "",
+        };
+      }
+
+      const total = orders.reduce((acc, order) => acc + Number(order.total), 0);
+      const orderIds = orders.map((order) => order.id);
+
+      const { error: paymentError } = await this.orderRepository.createPayment(
+        supabase,
+        {
+          restaurantId: session.restaurantId,
+          orderId: orderIds[0],
+          amount: total,
+          method: input.method,
+          paidAmount: input.paidAmount,
+          changeAmount: input.changeAmount,
+        },
+      );
+
+      if (paymentError) {
+        return {
+          error: paymentError.message,
+          success: "",
+        };
+      }
+
+      const { error: ordersPaidError } =
+        await this.orderRepository.markOrdersAsPaid(supabase, orderIds);
+
+      if (ordersPaidError) {
+        return {
+          error: ordersPaidError.message,
+          success: "",
+        };
+      }
+
+      const { error: tableStatusError } =
+        await tableRepository.updateTableStatus(
+          supabase,
+          input.tableId,
+          "AVAILABLE",
+        );
+
+      if (tableStatusError) {
+        return {
+          error: tableStatusError.message,
+          success: "",
+        };
+      }
+
+      return {
+        error: "",
+        success: "Mesa cerrada correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo cerrar la mesa",
+        success: "",
+      };
+    }
+  }
+
+  async getStaffOpenOrderByTableId(tableId: string) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        return null;
+      }
+
+      if (session.role !== "WAITER") {
+        return null;
+      }
+
+      const { data: orders, error } =
+        await this.orderRepository.findOpenOrdersByTableId(supabase, tableId);
+
+      if (error || !orders || orders.length === 0) {
+        return null;
+      }
+
+      const validOrders = orders.filter(
+        (order) => order.restaurant_id === session.restaurantId,
+      );
+
+      if (validOrders.length === 0) {
+        return null;
+      }
+
+      const total = validOrders.reduce(
+        (acc, order) => acc + Number(order.total),
+        0,
+      );
+
+      return {
+        ...validOrders[0],
+        total,
+      };
+    } catch {
+      return null;
     }
   }
 }

@@ -4,16 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { CreateTableModal } from "@/src/features/tables/components/create-table-modal";
 import { FloorTableCanvas } from "@/src/features/tables/components/floor-table-canvas";
-
+import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
 import { useGetFloors } from "../hooks/use-get-floors";
 import { CreateFloorModal } from "./create-floor-modal";
 import { DeleteFloorButton } from "./delete-floor-button";
 import { FloorTabs } from "./floor-tabs";
 
 export function FloorPlanView() {
+  useOrdersRealtime();
   const { data: floors = [], isLoading } = useGetFloors();
   const [selectedFloorId, setSelectedFloorId] = useState<string | null>(null);
-
   const selectedFloor = useMemo(
     () => floors.find((floor) => floor.id === selectedFloorId) ?? null,
     [floors, selectedFloorId],
@@ -75,3 +75,4 @@ export function FloorPlanView() {
     </section>
   );
 }
+

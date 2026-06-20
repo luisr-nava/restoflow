@@ -10,7 +10,7 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
-
+import { useCloseStaffTable } from "../hooks/use-close-staff-table";
 import { useCloseTable } from "../hooks/use-close-table";
 import { CloseTableSchema } from "../schemas/order.schema";
 import type { CloseTableInput } from "../types/order.types";
@@ -19,12 +19,14 @@ type CloseTableFormProps = {
   tableId: string;
   total: number;
   onSuccess?: () => void;
+  mode?: "admin" | "staff";
 };
 
 export function CloseTableForm({
   tableId,
   total,
   onSuccess,
+  mode = "admin",
 }: CloseTableFormProps) {
   const form = useForm<CloseTableInput>({
     resolver: zodResolver(CloseTableSchema) as Resolver<CloseTableInput>,
@@ -36,7 +38,14 @@ export function CloseTableForm({
     },
   });
 
-  const { mutate, isPending } = useCloseTable();
+  const adminCloseTable = useCloseTable();
+  const staffCloseTable = useCloseStaffTable();
+
+  const mutate =
+    mode === "staff" ? staffCloseTable.mutate : adminCloseTable.mutate;
+
+  const isPending =
+    mode === "staff" ? staffCloseTable.isPending : adminCloseTable.isPending;
 
   const paidAmount = form.watch("paidAmount");
 
@@ -99,3 +108,4 @@ export function CloseTableForm({
     </Form>
   );
 }
+

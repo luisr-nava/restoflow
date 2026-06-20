@@ -12,13 +12,32 @@ export function useOrdersRealtime() {
     const supabase = createClient();
 
     function invalidateOrders() {
-      console.log("orders realtime event received");
       queryClient.invalidateQueries({
         queryKey: ["orders"],
       });
 
       queryClient.invalidateQueries({
         queryKey: ["dashboard"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["tables"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["open-order"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["staff-tables"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["staff-open-order"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["active-order"],
       });
     }
 
@@ -45,6 +64,17 @@ export function useOrdersRealtime() {
         },
         (payload) => {
           console.log("REALTIME ITEMS:", payload);
+          invalidateOrders();
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "restaurant_tables",
+        },
+        () => {
           invalidateOrders();
         },
       )

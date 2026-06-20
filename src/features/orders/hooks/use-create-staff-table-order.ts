@@ -13,25 +13,25 @@ export function useCreateStaffTableOrder() {
     mutationFn: (input: CreateTableOrderInput) =>
       createStaffTableOrderAction(input),
 
-    onSuccess: (response) => {
+    onSuccess: async (response, input) => {
       if (response.error) {
         toast.error(response.error);
         return;
       }
 
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["staff-tables"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["staff-open-order", input.tableId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["orders"],
+        }),
+      ]);
+
       toast.success(response.success);
-
-      queryClient.invalidateQueries({
-        queryKey: ["staff-tables"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["active-order"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["orders"],
-      });
     },
 
     onError: () => {

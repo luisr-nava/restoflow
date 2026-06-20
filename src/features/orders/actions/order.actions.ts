@@ -96,5 +96,33 @@ export async function createStaffTableOrderAction(
   }
 
   return orderService.createStaffTableOrder(data.data);
-
 }
+
+export async function getOpenOrderByTableIdAction(tableId: string) {
+  if (!tableId) {
+    return null;
+  }
+
+  return orderService.getOpenOrderByTableId(tableId);
+}
+
+export async function closeStaffTableAction(input: CloseTableInput) {
+  const data = CloseTableSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return orderService.closeStaffTable(data.data);
+}
+export async function getStaffOpenOrderByTableIdAction(tableId: string) {
+  if (!tableId) {
+    return null;
+  }
+
+  return orderService.getStaffOpenOrderByTableId(tableId);
+}
+

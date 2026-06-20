@@ -1,13 +1,12 @@
 "use client";
 
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
-import { useGetActiveOrderByTableId } from "@/src/features/orders/hooks/use-get-active-order-by-table-id";
+import { useGetOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
 
 import { DeleteTableButton } from "./delete-table-button";
 import { EditTableModal } from "./edit-table-modal";
 import type { RestaurantTable } from "../types/table.types";
 import { CloseTableModal } from "../../orders/components/close-table-modal";
-
 type FloorTablesPanelProps = {
   tables: RestaurantTable[];
 };
@@ -24,7 +23,7 @@ const statusLabel: Record<RestaurantTable["status"], string> = {
 };
 
 function FloorTableCard({ table }: FloorTableCardProps) {
-  const { data: activeOrder } = useGetActiveOrderByTableId(table.id);
+  const { data: activeOrder } = useGetOpenOrderByTableId(table.id);
 
   const consumption = activeOrder?.total ?? 0;
   const hasActiveOrder = Boolean(activeOrder);
@@ -82,7 +81,7 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
         </h2>
       </div>
 
-      <div className="max-h-[520px] space-y-3 overflow-y-auto p-3">
+      <div className="max-h-130 space-y-3 overflow-y-auto p-3">
         {tables.length === 0 ? (
           <p className="px-1 py-6 text-center text-sm text-muted-foreground">
             No hay mesas creadas.

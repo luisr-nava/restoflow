@@ -85,6 +85,21 @@ export interface IOrderRepository {
     supabase: SupabaseClient,
     input: UpdateOrderStatusInput,
   ): Promise<{ data: Order | null; error: Error | null }>;
+
+  findOpenOrderByTableId(
+    supabase: SupabaseClient,
+    tableId: string,
+  ): Promise<{ data: Order | null; error: Error | null }>;
+
+  findOpenOrdersByTableId(
+    supabase: SupabaseClient,
+    tableId: string,
+  ): Promise<{ data: Order[] | null; error: Error | null }>;
+
+  markOrdersAsPaid(
+    supabase: SupabaseClient,
+    orderIds: string[],
+  ): Promise<{ error: Error | null }>;
 }
 
 class OrderRepository implements IOrderRepository {
@@ -268,9 +283,56 @@ class OrderRepository implements IOrderRepository {
 
     return { data, error };
   }
+
+  async findOpenOrderByTableId(
+    supabase: SupabaseClient,
+    tableId: string,
+  ): Promise<{ data: Order | null; error: Error | null }> {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("table_id", tableId)
+      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY", "SERVED"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return { data, error };
+  }
+
+  async findOpenOrdersByTableId(
+    supabase: SupabaseClient,
+    tableId: string,
+  ): Promise<{ data: Order[] | null; error: Error | null }> {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("table_id", tableId)
+      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY", "SERVED"])
+      .order("created_at", { ascending: true });
+
+    return { data, error };
+  }
+
+  async markOrdersAsPaid(
+    supabase: SupabaseClient,
+    orderIds: string[],
+  ): Promise<{ error: Error | null }> {
+    const { error } = await supabase
+      .from("orders")
+      .update({
+        status: "PAID",
+        paid_at: new Date().toISOString(),
+      })
+      .in("id", orderIds);
+
+    return { error };
+  }
 }
 
 export const orderRepository = new OrderRepository();
+
+
 
 
 

@@ -1,7 +1,58 @@
 "use client";
 
-import { CreateTableOrderModal } from "../../orders/components/create-table-order-modal";
+import { CloseTableModal } from "@/src/features/orders/components/close-table-modal";
+import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
+import { useGetStaffOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-staff-open-order-by-table-id";
+
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
+import type { RestaurantTable } from "../types/table.types";
+import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
+function StaffTableCard({ table }: { table: RestaurantTable }) {
+  useOrdersRealtime();
+  const { data: openOrder } = useGetStaffOpenOrderByTableId(table.id);
+
+  const total = openOrder?.total ?? 0;
+  const hasOpenOrder = Boolean(openOrder);
+  const canCloseTable = hasOpenOrder;
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-medium">{table.name}</h3>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            {table.seats} lugares
+          </p>
+
+          {hasOpenOrder && (
+            <p className="mt-2 text-sm font-medium text-foreground">
+              Consumo: ${total}
+            </p>
+          )}
+        </div>
+
+        <span className="text-xs text-muted-foreground">{table.status}</span>
+      </div>
+
+      <div className="mt-4 flex justify-end gap-2">
+        <CreateTableOrderModal
+          tableId={table.id}
+          mode="staff"
+          disabled={table.status === "CLOSED"}
+        />
+
+        {canCloseTable && (
+          <CloseTableModal tableId={table.id} total={total} mode="staff" />
+        )}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Debug: openOrder={String(hasOpenOrder)} status={table.status}
+      </p>
+    </div>
+  );
+}
+
 export function StaffTablesList() {
   const { data: tables = [], isLoading } = useGetStaffTables();
 
@@ -24,31 +75,7 @@ export function StaffTablesList() {
   return (
     <div className="grid gap-3">
       {tables.map((table) => (
-        <div
-          key={table.id}
-          className="rounded-2xl border border-border bg-surface p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="font-medium">{table.name}</h3>
-
-              <p className="mt-2 text-sm text-muted-foreground">
-                {table.seats} lugares
-              </p>
-            </div>
-
-            <span className="text-xs text-muted-foreground">
-              {table.status}
-            </span>
-          </div>
-
-          <div className="mt-4 flex justify-end">
-            <CreateTableOrderModal
-              tableId={table.id}
-              mode="staff"
-              disabled={table.status === "CLOSED"}
-            />
-          </div>
-        </div>
+        <StaffTableCard key={table.id} table={table} />
       ))}
     </div>
   );
