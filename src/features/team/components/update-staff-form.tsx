@@ -10,6 +10,7 @@ import {
   FormSubmit,
   FormToggle,
 } from "@/src/shared/components/forms";
+import { useGetRestaurantTables } from "@/src/features/tables/hooks/use-get-restaurant-tables";
 
 import { useUpdateStaff } from "../hooks/use-update-staff";
 import { UpdateStaffSchema } from "../schemas/team.schema";
@@ -21,6 +22,12 @@ type UpdateStaffFormProps = {
 };
 
 export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
+  const { data: tables = [] } = useGetRestaurantTables();
+
+  const assignedTableIds = tables
+    .filter((table) => table.waiter_id === staff.id)
+    .map((table) => table.id);
+
   const form = useForm<UpdateStaffInput>({
     resolver: zodResolver(UpdateStaffSchema) as Resolver<UpdateStaffInput>,
     defaultValues: {
@@ -30,10 +37,13 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
       role: staff.role,
       isActive: staff.is_active,
       pin: "",
+      tableIds: assignedTableIds,
     },
   });
 
   const { mutate, isPending } = useUpdateStaff();
+
+  const selectedRole = form.watch("role");
 
   const onSubmit = (input: UpdateStaffInput) => {
     mutate(input, {
@@ -76,6 +86,39 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
         type="password"
       />
 
+      {selectedRole === "WAITER" && (
+        <div className="space-y-2 rounded-xl border border-border p-3">
+          <p className="text-sm font-medium text-foreground">Mesas asignadas</p>
+
+          {tables.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Todavía no hay mesas creadas.
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {tables.map((table) => (
+                <label
+                  key={table.id}
+                  className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    value={table.id}
+                    {...form.register("tableIds")}
+                  />
+
+                  <span>
+                    {table.name} · {table.status}
+                    {table.waiter_id && table.waiter_id !== staff.id
+                      ? " · asignada a otro mozo"
+                      : ""}
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <FormSubmit
         value="Guardar cambios"
         loadingText="Guardando..."
@@ -84,4 +127,3 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
     </Form>
   );
 }
-

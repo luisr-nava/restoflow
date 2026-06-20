@@ -169,6 +169,40 @@ class TeamService {
         };
       }
 
+      if (input.role === "WAITER") {
+        const { error: syncTablesError } =
+          await tableRepository.syncWaiterTables(
+            supabase,
+            member.restaurant_id,
+            input.staffId,
+            input.tableIds ?? [],
+          );
+
+        if (syncTablesError) {
+          return {
+            error: syncTablesError.message,
+            success: "",
+          };
+        }
+      }
+
+      if (input.role === "KITCHEN") {
+        const { error: syncTablesError } =
+          await tableRepository.syncWaiterTables(
+            supabase,
+            member.restaurant_id,
+            input.staffId,
+            [],
+          );
+
+        if (syncTablesError) {
+          return {
+            error: syncTablesError.message,
+            success: "",
+          };
+        }
+      }
+
       return {
         error: "",
         success: "Personal actualizado correctamente",
@@ -243,4 +277,5 @@ class TeamService {
 }
 
 export const teamService = new TeamService(teamRepository);
+
 

@@ -50,6 +50,7 @@ export const UpdateStaffSchema = z.object({
   }),
 
   isActive: z.boolean(),
+
   pin: z
     .string()
     .trim()
@@ -58,6 +59,8 @@ export const UpdateStaffSchema = z.object({
     })
     .optional()
     .or(z.literal("")),
+
+  tableIds: z.array(z.string().uuid()).optional(),
 });
 
 export const DeleteStaffSchema = z.object({
@@ -65,4 +68,5 @@ export const DeleteStaffSchema = z.object({
     error: "El personal es obligatorio",
   }),
 });
+
 

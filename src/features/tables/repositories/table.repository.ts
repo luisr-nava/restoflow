@@ -77,6 +77,13 @@ export interface ITableRepository {
     tableIds: string[],
     waiterId: string,
   ): Promise<{ error: Error | null }>;
+
+  syncWaiterTables(
+    supabase: SupabaseClient,
+    restaurantId: string,
+    waiterId: string,
+    tableIds: string[],
+  ): Promise<{ error: Error | null }>;
 }
 
 class TableRepository implements ITableRepository {
@@ -251,6 +258,41 @@ class TableRepository implements ITableRepository {
         waiter_id: waiterId,
         updated_at: new Date().toISOString(),
       })
+      .in("id", tableIds);
+
+    return { error };
+  }
+
+  async syncWaiterTables(
+    supabase: SupabaseClient,
+    restaurantId: string,
+    waiterId: string,
+    tableIds: string[],
+  ): Promise<{ error: Error | null }> {
+    const { error: clearError } = await supabase
+      .from("restaurant_tables")
+      .update({
+        waiter_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("restaurant_id", restaurantId)
+      .eq("waiter_id", waiterId);
+
+    if (clearError) {
+      return { error: clearError };
+    }
+
+    if (tableIds.length === 0) {
+      return { error: null };
+    }
+
+    const { error } = await supabase
+      .from("restaurant_tables")
+      .update({
+        waiter_id: waiterId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("restaurant_id", restaurantId)
       .in("id", tableIds);
 
     return { error };

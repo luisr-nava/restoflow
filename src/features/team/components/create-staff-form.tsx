@@ -13,8 +13,7 @@ import {
 import { useCreateStaff } from "../hooks/use-create-staff";
 import { CreateStaffSchema } from "../schemas/team.schema";
 import type { CreateStaffInput } from "../types/team.types";
-import { useGetStaffTables } from "../../tables/hooks/use-get-staff-tables";
-
+import { useGetRestaurantTables } from "../../tables/hooks/use-get-restaurant-tables";
 type CreateStaffFormProps = {
   onSuccess?: () => void;
 };
@@ -33,7 +32,7 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
 
   const { mutate, isPending } = useCreateStaff();
   const selectedRole = form.watch("role");
-  const { data: tables = [] } = useGetStaffTables();
+  const { data: tables = [] } = useGetRestaurantTables();
   const onSubmit = (input: CreateStaffInput) => {
     mutate(input, {
       onSuccess: (response) => {
@@ -108,5 +107,4 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
     </Form>
   );
 }
-
 
