@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import type { Route } from "next";
-import { getStaffSession } from "@/src/features/team/lib/staff-session";
+
+import { StaffKitchenView } from "@/src/features/orders/components/staff-kitchen-view";
 import { StaffHeader } from "@/src/features/team/components/StaffHeader";
+import { getStaffSession } from "@/src/features/team/lib/staff-session";
 
 export default async function StaffKitchenPage() {
   const session = await getStaffSession();
@@ -18,12 +20,7 @@ export default async function StaffKitchenPage() {
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6">
       <StaffHeader session={session} title="Vista de cocina" />
 
-      <div className="rounded-2xl border border-dashed border-border bg-surface p-6 text-sm text-muted-foreground">
-        Próximo paso: reutilizar el Kanban de pedidos de cocina que ya existe en
-        /dashboard/kitchen.
-      </div>
+      <StaffKitchenView />
     </section>
   );
 }
-
-

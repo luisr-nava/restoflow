@@ -917,7 +917,116 @@ class OrderService {
       return null;
     }
   }
+
+  async getOrdersByStaffSession(): Promise<OrderWithTable[]> {
+    const supabase = await this.getSupabase();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        return [];
+      }
+
+      if (session.role !== "KITCHEN") {
+        return [];
+      }
+
+      const { data, error } =
+        await this.orderRepository.findOrdersByRestaurantId(
+          supabase,
+          session.restaurantId,
+        );
+
+      if (error) {
+        return [];
+      }
+
+      return data ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  async updateStaffOrderStatus(input: UpdateOrderStatusInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        return {
+          error: "No hay sesión de personal activa",
+          success: "",
+        };
+      }
+
+      if (session.role !== "KITCHEN") {
+        return {
+          error: "Sólo cocina puede actualizar pedidos",
+          success: "",
+        };
+      }
+
+      const { data: order, error: orderError } =
+        await this.orderRepository.findOrderById(supabase, input.orderId);
+
+      if (orderError || !order) {
+        return {
+          error: orderError?.message || "El pedido no existe",
+          success: "",
+        };
+      }
+
+      if (order.restaurant_id !== session.restaurantId) {
+        return {
+          error: "No tenés permisos para modificar este pedido",
+          success: "",
+        };
+      }
+
+      const nextStatusByCurrentStatus: Partial<
+        Record<OrderWithTable["status"], UpdateOrderStatusInput["status"]>
+      > = {
+        PENDING: "ACCEPTED",
+        ACCEPTED: "PREPARING",
+        PREPARING: "READY",
+      };
+
+      const expectedNextStatus = nextStatusByCurrentStatus[order.status];
+
+      if (!expectedNextStatus || input.status !== expectedNextStatus) {
+        return {
+          error: "No se puede avanzar el pedido a ese estado",
+          success: "",
+        };
+      }
+
+      const { error } = await this.orderRepository.updateOrderStatus(
+        supabase,
+        input,
+      );
+
+      if (error) {
+        return {
+          error: error.message,
+          success: "",
+        };
+      }
+
+      return {
+        error: "",
+        success: "Estado actualizado correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo actualizar el estado",
+        success: "",
+      };
+    }
+  }
 }
 
 export const orderService = new OrderService(orderRepository);
+
 

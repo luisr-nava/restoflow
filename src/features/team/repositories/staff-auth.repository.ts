@@ -14,10 +14,12 @@ class StaffAuthRepository implements IStaffAuthRepository {
     supabase: SupabaseClient,
     email: string,
   ): Promise<{ data: RestaurantStaff | null; error: Error | null }> {
+    const normalizedEmail = email.trim().toLowerCase();
+
     const { data, error } = await supabase
       .from("restaurant_staff")
       .select("*")
-      .eq("email", email)
+      .ilike("email", normalizedEmail)
       .maybeSingle();
 
     return { data, error };
@@ -25,3 +27,4 @@ class StaffAuthRepository implements IStaffAuthRepository {
 }
 
 export const staffAuthRepository = new StaffAuthRepository();
+

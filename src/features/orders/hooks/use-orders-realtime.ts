@@ -39,6 +39,10 @@ export function useOrdersRealtime() {
       queryClient.invalidateQueries({
         queryKey: ["active-order"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["staff-orders"],
+      });
     }
 
     const channel = supabase

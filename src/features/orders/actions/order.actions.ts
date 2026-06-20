@@ -125,4 +125,22 @@ export async function getStaffOpenOrderByTableIdAction(tableId: string) {
 
   return orderService.getStaffOpenOrderByTableId(tableId);
 }
+export async function getStaffOrdersAction() {
+  return orderService.getOrdersByStaffSession();
+}
+
+export async function updateStaffOrderStatusAction(
+  input: UpdateOrderStatusInput,
+) {
+  const data = UpdateOrderStatusSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return orderService.updateStaffOrderStatus(data.data);
+}
 
