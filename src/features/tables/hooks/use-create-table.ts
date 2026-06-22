@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { createTableAction } from "../actions/table.actions";
+import { tableKeys } from "../query-keys/table.keys";
 import type { CreateTableInput } from "../types/table.types";
 
 export function useCreateTable() {
@@ -19,10 +20,15 @@ export function useCreateTable() {
 
       return result;
     },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({
-        queryKey: ["tables"],
-      });
+    onSuccess: async (result) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.restaurantAll,
+        }),
+      ]);
 
       toast.success(result.success);
     },

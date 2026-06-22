@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { deleteFloorAction } from "../actions/floor.actions";
 import type { DeleteFloorInput, RestaurantFloor } from "../types/floor.types";
 
@@ -31,7 +32,7 @@ export function useDeleteFloor() {
       );
 
       queryClient.removeQueries({
-        queryKey: ["tables", input.floorId],
+        queryKey: tableKeys.byFloor(input.floorId),
       });
 
       queryClient.invalidateQueries({
@@ -39,7 +40,7 @@ export function useDeleteFloor() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: tableKeys.all,
       });
 
       toast.success(result.success);

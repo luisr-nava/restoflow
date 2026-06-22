@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { updateRestaurantSettingsAction } from "../actions/restaurant.actions";
+import { restaurantKeys } from "../query-keys/restaurant.keys";
 import type { UpdateRestaurantInput } from "../types/restaurant.types";
 
 export function useUpdateRestaurantSettings() {
@@ -18,7 +19,7 @@ export function useUpdateRestaurantSettings() {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: ["restaurant-settings"],
+        queryKey: restaurantKeys.settings,
       });
 
       toast.success(response.success);

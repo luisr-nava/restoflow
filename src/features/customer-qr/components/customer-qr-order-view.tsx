@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { createQrTableOrderAction } from "@/src/features/orders/actions/order.actions";
+import { orderKeys } from "@/src/features/orders/query-keys/order.keys";
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 
 import type { CustomerQrData } from "../types/customer-qr.types";
-import { useQueryClient } from "@tanstack/react-query";
 
 type CartItem = {
   menuItemId: string;
@@ -94,10 +96,10 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
 
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: ["orders"],
+        queryKey: orderKeys.all,
       }),
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: tableKeys.all,
       }),
       queryClient.invalidateQueries({
         queryKey: ["dashboard"],
@@ -235,4 +237,3 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
     </main>
   );
 }
-

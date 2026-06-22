@@ -4,7 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { updateStaffOrderStatusAction } from "../actions/order.actions";
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import type { UpdateOrderStatusInput } from "../types/order.types";
+import { orderKeys } from "../query-keys/order.keys";
 
 export function useUpdateStaffOrderStatus() {
   const queryClient = useQueryClient();
@@ -21,13 +23,13 @@ export function useUpdateStaffOrderStatus() {
 
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: ["staff-orders"],
+          queryKey: orderKeys.staffAll,
         }),
         queryClient.invalidateQueries({
-          queryKey: ["orders"],
+          queryKey: orderKeys.all,
         }),
         queryClient.invalidateQueries({
-          queryKey: ["staff-tables"],
+          queryKey: tableKeys.staffAll,
         }),
       ]);
 

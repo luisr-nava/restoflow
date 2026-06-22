@@ -3,10 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getStaffMenuItemsAction } from "../actions/menu-item.actions";
+import { menuItemKeys } from "../query-keys/menu-item.keys";
 
 export function useGetStaffMenuItems() {
   return useQuery({
-    queryKey: ["staff-menu-items"],
+    queryKey: menuItemKeys.staffAll,
     queryFn: getStaffMenuItemsAction,
   });
 }

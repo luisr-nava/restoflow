@@ -3,12 +3,12 @@
 import { CloseTableModal } from "@/src/features/orders/components/close-table-modal";
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetStaffOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-staff-open-order-by-table-id";
+import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
 
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
 import type { RestaurantTable } from "../types/table.types";
-import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
+
 function StaffTableCard({ table }: { table: RestaurantTable }) {
-  useOrdersRealtime();
   const { data: openOrder } = useGetStaffOpenOrderByTableId(table.id);
 
   const total = openOrder?.total ?? 0;
@@ -54,6 +54,8 @@ function StaffTableCard({ table }: { table: RestaurantTable }) {
 }
 
 export function StaffTablesList() {
+  useOrdersRealtime();
+
   const { data: tables = [], isLoading } = useGetStaffTables();
 
   if (isLoading) {
@@ -80,4 +82,3 @@ export function StaffTablesList() {
     </div>
   );
 }
-

@@ -3,10 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getTablesByRestaurantIdAction } from "../actions/table.actions";
+import { tableKeys } from "../query-keys/table.keys";
 
 export function useGetRestaurantTables() {
   return useQuery({
-    queryKey: ["restaurant-tables"],
+    queryKey: tableKeys.restaurantAll,
     queryFn: getTablesByRestaurantIdAction,
   });
 }

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { updateMenuItemAction } from "../actions/menu-item.actions";
+import { menuItemKeys } from "../query-keys/menu-item.keys";
 import type { UpdateMenuItemInput } from "../types/menu-item.types";
 
 export function useUpdateMenuItem() {
@@ -18,9 +19,14 @@ export function useUpdateMenuItem() {
         return;
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["menu-items"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.staffAll,
+        }),
+      ]);
 
       toast.success(response.success);
     },

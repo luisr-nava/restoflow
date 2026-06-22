@@ -4,7 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { createStaffTableOrderAction } from "../actions/order.actions";
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import type { CreateTableOrderInput } from "../types/order.types";
+import { orderKeys } from "../query-keys/order.keys";
 
 export function useCreateStaffTableOrder() {
   const queryClient = useQueryClient();
@@ -21,13 +23,13 @@ export function useCreateStaffTableOrder() {
 
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: ["staff-tables"],
+          queryKey: tableKeys.staffAll,
         }),
         queryClient.invalidateQueries({
-          queryKey: ["staff-open-order", input.tableId],
+          queryKey: orderKeys.staffOpen(input.tableId),
         }),
         queryClient.invalidateQueries({
-          queryKey: ["orders"],
+          queryKey: orderKeys.all,
         }),
       ]);
 

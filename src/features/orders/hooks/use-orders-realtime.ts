@@ -2,8 +2,15 @@
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 import { createClient } from "@/src/lib/supabase/client";
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
+import { orderKeys } from "../query-keys/order.keys";
+
+type OrderItemRealtimeRow = {
+  order_id: string | null;
+};
 
 export function useOrdersRealtime() {
   const queryClient = useQueryClient();
@@ -13,7 +20,7 @@ export function useOrdersRealtime() {
 
     function invalidateOrders() {
       queryClient.invalidateQueries({
-        queryKey: ["orders"],
+        queryKey: orderKeys.all,
       });
 
       queryClient.invalidateQueries({
@@ -21,27 +28,47 @@ export function useOrdersRealtime() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: tableKeys.all,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["open-order"],
+        queryKey: orderKeys.openRoot,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["staff-tables"],
+        queryKey: tableKeys.staffAll,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["staff-open-order"],
+        queryKey: orderKeys.staffOpenRoot,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["active-order"],
+        queryKey: orderKeys.activeRoot,
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["staff-orders"],
+        queryKey: orderKeys.staffAll,
+      });
+    }
+
+    function invalidateOrderItems(
+      payload: RealtimePostgresChangesPayload<OrderItemRealtimeRow>,
+    ) {
+      const orderIdFromNew =
+        "order_id" in payload.new ? payload.new.order_id : null;
+      const orderIdFromOld =
+        "order_id" in payload.old ? payload.old.order_id : null;
+      const orderId = orderIdFromNew ?? orderIdFromOld ?? null;
+
+      if (orderId) {
+        queryClient.invalidateQueries({
+          queryKey: orderKeys.items(orderId),
+        });
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: orderKeys.itemsRoot,
       });
     }
 
@@ -68,6 +95,7 @@ export function useOrdersRealtime() {
         },
         (payload) => {
           console.log("REALTIME ITEMS:", payload);
+          invalidateOrderItems(payload);
           invalidateOrders();
         },
       )
@@ -91,4 +119,3 @@ export function useOrdersRealtime() {
     };
   }, [queryClient]);
 }
-

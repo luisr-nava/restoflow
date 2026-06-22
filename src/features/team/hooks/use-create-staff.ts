@@ -3,7 +3,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { createStaffAction } from "../actions/team.actions";
+import { teamKeys } from "../query-keys/team.keys";
 import type { CreateStaffInput } from "../types/team.types";
 
 export function useCreateStaff() {
@@ -18,9 +20,14 @@ export function useCreateStaff() {
         return;
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["team"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: teamKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.restaurantAll,
+        }),
+      ]);
 
       toast.success(response.success);
     },

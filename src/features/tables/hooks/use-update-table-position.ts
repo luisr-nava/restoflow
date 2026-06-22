@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { updateTablePositionAction } from "../actions/table.actions";
+import { tableKeys } from "../query-keys/table.keys";
 import type { UpdateTablePositionInput } from "../types/table.types";
 
 export function useUpdateTablePosition() {
@@ -21,7 +22,7 @@ export function useUpdateTablePosition() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["tables"],
+        queryKey: tableKeys.all,
       });
     },
     onError: (error) => {

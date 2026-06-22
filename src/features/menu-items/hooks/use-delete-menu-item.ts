@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { deleteMenuItemAction } from "../actions/menu-item.actions";
+import { menuItemKeys } from "../query-keys/menu-item.keys";
 import type { DeleteMenuItemInput } from "../types/menu-item.types";
 
 export function useDeleteMenuItem() {
@@ -18,9 +19,14 @@ export function useDeleteMenuItem() {
         return;
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["menu-items"],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.staffAll,
+        }),
+      ]);
 
       toast.success(response.success);
     },

@@ -4,7 +4,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { closeTableAction } from "../actions/order.actions";
+import { reportKeys } from "@/src/features/reports/query-keys/report.keys";
+import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import type { CloseTableInput } from "../types/order.types";
+import { orderKeys } from "../query-keys/order.keys";
 
 export function useCloseTable() {
   const queryClient = useQueryClient();
@@ -20,13 +23,16 @@ export function useCloseTable() {
 
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: ["tables"],
+          queryKey: tableKeys.all,
         }),
         queryClient.invalidateQueries({
-          queryKey: ["orders"],
+          queryKey: orderKeys.all,
         }),
         queryClient.invalidateQueries({
-          queryKey: ["orders", "active"],
+          queryKey: orderKeys.activeRoot,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: reportKeys.all,
         }),
       ]);
 
@@ -38,4 +44,3 @@ export function useCloseTable() {
     },
   });
 }
-
