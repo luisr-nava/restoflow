@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 
-import { createClient } from "@/src/lib/supabase/server";
+import { createServiceRoleClient } from "@/src/lib/supabase/service-role";
 
 import {
   IStaffAuthRepository,
@@ -11,10 +11,6 @@ import type { StaffLoginInput, StaffSession } from "../types/staff-auth.types";
 class StaffAuthService {
   constructor(private readonly staffAuthRepository: IStaffAuthRepository) {}
 
-  private async getSupabase() {
-    return createClient();
-  }
-
   private hashPin(pin: string) {
     return createHash("sha256").update(pin).digest("hex");
   }
@@ -23,7 +19,7 @@ class StaffAuthService {
     data: StaffSession | null;
     error: string;
   }> {
-    const supabase = await this.getSupabase();
+    const supabase = createServiceRoleClient();
 
     try {
       const { data: staff, error } =
@@ -72,3 +68,4 @@ class StaffAuthService {
 }
 
 export const staffAuthService = new StaffAuthService(staffAuthRepository);
+

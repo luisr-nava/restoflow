@@ -12,3 +12,7 @@ export type StaffSession = {
   email: string;
   role: StaffRole;
 };
+
+export type StaffCookieSession = {
+  token: string;
+};

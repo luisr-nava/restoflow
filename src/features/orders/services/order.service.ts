@@ -2,7 +2,7 @@ import { restaurantService } from "@/src/features/restaurants/services/restauran
 import { menuItemRepository } from "@/src/features/menu-items/repositories/menu-item.repository";
 import { tableRepository } from "@/src/features/tables/repositories/table.repository";
 import { createClient } from "@/src/lib/supabase/server";
-
+import { createServiceRoleClient } from "@/src/lib/supabase/service-role";
 import {
   IOrderRepository,
   orderRepository,
@@ -571,7 +571,7 @@ class OrderService {
     }
   }
   async createStaffTableOrder(input: CreateTableOrderInput) {
-    const supabase = await this.getSupabase();
+    const supabase = createServiceRoleClient();
 
     try {
       const session = await getStaffSession();
@@ -774,8 +774,7 @@ class OrderService {
     }
   }
   async closeStaffTable(input: CloseTableInput) {
-    const supabase = await this.getSupabase();
-
+    const supabase = createServiceRoleClient();
     try {
       const session = await getStaffSession();
 
@@ -876,8 +875,7 @@ class OrderService {
   }
 
   async getStaffOpenOrderByTableId(tableId: string) {
-    const supabase = await this.getSupabase();
-
+    const supabase = createServiceRoleClient();
     try {
       const session = await getStaffSession();
 
@@ -919,8 +917,7 @@ class OrderService {
   }
 
   async getOrdersByStaffSession(): Promise<OrderWithTable[]> {
-    const supabase = await this.getSupabase();
-
+    const supabase = createServiceRoleClient();
     try {
       const session = await getStaffSession();
 
@@ -949,8 +946,7 @@ class OrderService {
   }
 
   async updateStaffOrderStatus(input: UpdateOrderStatusInput) {
-    const supabase = await this.getSupabase();
-
+    const supabase = createServiceRoleClient();
     try {
       const session = await getStaffSession();
 
@@ -1028,5 +1024,4 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
-
 
