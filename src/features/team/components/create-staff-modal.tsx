@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateStaffForm } from "./create-staff-form";
 
 export function CreateStaffModal() {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore((state) => state.modals.createStaff?.open ?? false);
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("createStaff")}
         className="rounded-lg border border-border px-4 py-2 text-sm font-medium">
         Agregar personal
       </button>
@@ -32,13 +33,13 @@ export function CreateStaffModal() {
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("createStaff")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
             </div>
 
-            <CreateStaffForm onSuccess={() => setOpen(false)} />
+            <CreateStaffForm onSuccess={() => closeModal("createStaff")} />
           </div>
         </div>
       )}

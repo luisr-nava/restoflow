@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteMenuItem } from "../hooks/use-delete-menu-item";
 import type { MenuItem } from "../types/menu-item.types";
 
@@ -10,8 +9,13 @@ type DeleteMenuItemButtonProps = {
 };
 
 export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
-  const [open, setOpen] = useState(false);
-
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.deleteMenuItem?.open === true &&
+      state.modals.deleteMenuItem?.payload?.menuItemId === item.id,
+  );
   const { mutate, isPending } = useDeleteMenuItem();
 
   const onDelete = () => {
@@ -25,7 +29,7 @@ export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
             return;
           }
 
-          setOpen(false);
+          closeModal("deleteMenuItem");
         },
       },
     );
@@ -35,7 +39,7 @@ export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("deleteMenuItem", { menuItemId: item.id })}
         disabled={isPending}
         className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
         Eliminar
@@ -59,7 +63,7 @@ export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("deleteMenuItem")}
                 disabled={isPending}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cancelar

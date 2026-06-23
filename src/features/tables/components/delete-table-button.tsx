@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteTable } from "../hooks/use-delete-table";
 import type { RestaurantTable } from "../types/table.types";
 
@@ -10,14 +9,19 @@ type DeleteTableButtonProps = {
 };
 
 export function DeleteTableButton({ table }: DeleteTableButtonProps) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const confirmOpen = useUiModalStore(
+    (state) =>
+      state.modals.deleteTable?.open === true &&
+      state.modals.deleteTable?.payload?.tableId === table.id,
+  );
   const { mutate, isPending } = useDeleteTable();
 
   const handleDelete = () => {
     mutate(table.id, {
       onSuccess: () => {
-        setConfirmOpen(false);
+        closeModal("deleteTable");
       },
     });
   };
@@ -27,7 +31,7 @@ export function DeleteTableButton({ table }: DeleteTableButtonProps) {
       <button
         type="button"
         disabled={table.status !== "AVAILABLE"}
-        onClick={() => setConfirmOpen(true)}
+        onClick={() => openModal("deleteTable", { tableId: table.id })}
         className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
         Eliminar
       </button>
@@ -48,7 +52,7 @@ export function DeleteTableButton({ table }: DeleteTableButtonProps) {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setConfirmOpen(false)}
+                onClick={() => closeModal("deleteTable")}
                 className="rounded-lg border border-border px-3 py-2 text-sm">
                 Cancelar
               </button>

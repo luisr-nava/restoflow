@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { MenuCategory } from "../types/menu-category.types";
 import { UpdateMenuCategoryForm } from "./update-menu-category-form";
 
@@ -12,13 +11,19 @@ type UpdateMenuCategoryModalProps = {
 export function UpdateMenuCategoryModal({
   category,
 }: UpdateMenuCategoryModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.editMenuCategory?.open === true &&
+      state.modals.editMenuCategory?.payload?.categoryId === category.id,
+  );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("editMenuCategory", { categoryId: category.id })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
         Editar
       </button>
@@ -39,7 +44,7 @@ export function UpdateMenuCategoryModal({
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("editMenuCategory")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
@@ -47,7 +52,7 @@ export function UpdateMenuCategoryModal({
 
             <UpdateMenuCategoryForm
               category={category}
-              onSuccess={() => setOpen(false)}
+              onSuccess={() => closeModal("editMenuCategory")}
             />
           </div>
         </div>
@@ -55,4 +60,3 @@ export function UpdateMenuCategoryModal({
     </>
   );
 }
-

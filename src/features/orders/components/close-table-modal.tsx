@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CloseTableForm } from "./close-table-form";
 
 type CloseTableModalProps = {
@@ -17,14 +16,21 @@ export function CloseTableModal({
   disabled = false,
   mode = "admin",
 }: CloseTableModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.closeTable?.open === true &&
+      state.modals.closeTable?.payload?.tableId === tableId &&
+      state.modals.closeTable?.payload?.mode === mode,
+  );
 
   return (
     <>
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("closeTable", { tableId, mode })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40">
         Cerrar mesa
       </button>
@@ -44,7 +50,7 @@ export function CloseTableModal({
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("closeTable")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
@@ -54,7 +60,7 @@ export function CloseTableModal({
               tableId={tableId}
               total={total}
               mode={mode}
-              onSuccess={() => setOpen(false)}
+              onSuccess={() => closeModal("closeTable")}
             />
           </div>
         </div>
@@ -62,6 +68,5 @@ export function CloseTableModal({
     </>
   );
 }
-
 
 

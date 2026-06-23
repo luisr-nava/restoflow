@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { RestaurantStaff } from "../types/team.types";
 import { UpdateStaffForm } from "./update-staff-form";
 
@@ -10,13 +9,19 @@ type UpdateStaffModalProps = {
 };
 
 export function UpdateStaffModal({ staff }: UpdateStaffModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.editStaff?.open === true &&
+      state.modals.editStaff?.payload?.staffId === staff.id,
+  );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("editStaff", { staffId: staff.id })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
         Editar
       </button>
@@ -37,13 +42,16 @@ export function UpdateStaffModal({ staff }: UpdateStaffModalProps) {
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("editStaff")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
             </div>
 
-            <UpdateStaffForm staff={staff} onSuccess={() => setOpen(false)} />
+            <UpdateStaffForm
+              staff={staff}
+              onSuccess={() => closeModal("editStaff")}
+            />
           </div>
         </div>
       )}

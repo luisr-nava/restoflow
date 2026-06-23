@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { MenuItem } from "../types/menu-item.types";
 import { UpdateMenuItemForm } from "./update-menu-item-form";
 
@@ -10,13 +9,19 @@ type UpdateMenuItemModalProps = {
 };
 
 export function UpdateMenuItemModal({ item }: UpdateMenuItemModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.editMenuItem?.open === true &&
+      state.modals.editMenuItem?.payload?.menuItemId === item.id,
+  );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("editMenuItem", { menuItemId: item.id })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
         Editar
       </button>
@@ -37,13 +42,16 @@ export function UpdateMenuItemModal({ item }: UpdateMenuItemModalProps) {
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("editMenuItem")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
             </div>
 
-            <UpdateMenuItemForm item={item} onSuccess={() => setOpen(false)} />
+            <UpdateMenuItemForm
+              item={item}
+              onSuccess={() => closeModal("editMenuItem")}
+            />
           </div>
         </div>
       )}

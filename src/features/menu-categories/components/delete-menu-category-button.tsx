@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteMenuCategory } from "../hooks/use-delete-menu-category";
 import type { MenuCategory } from "../types/menu-category.types";
 
@@ -12,7 +11,13 @@ type DeleteMenuCategoryButtonProps = {
 export function DeleteMenuCategoryButton({
   category,
 }: DeleteMenuCategoryButtonProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.deleteMenuCategory?.open === true &&
+      state.modals.deleteMenuCategory?.payload?.categoryId === category.id,
+  );
   const { mutate, isPending } = useDeleteMenuCategory();
 
   const onDelete = () => {
@@ -22,7 +27,7 @@ export function DeleteMenuCategoryButton({
           return;
         }
 
-        setOpen(false);
+        closeModal("deleteMenuCategory");
       },
     });
   };
@@ -31,7 +36,9 @@ export function DeleteMenuCategoryButton({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() =>
+          openModal("deleteMenuCategory", { categoryId: category.id })
+        }
         disabled={isPending}
         className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
         Eliminar
@@ -55,7 +62,7 @@ export function DeleteMenuCategoryButton({
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("deleteMenuCategory")}
                 disabled={isPending}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cancelar

@@ -1,26 +1,33 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateMenuItemForm } from "./create-menu-item-form";
 
 type CreateMenuItemModalProps = {
   openText?: string;
+  showTrigger?: boolean;
 };
 
 export function CreateMenuItemModal({
   openText = "Crear item",
+  showTrigger = true,
 }: CreateMenuItemModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) => state.modals.createMenuItem?.open ?? false,
+  );
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
-        {openText}
-      </button>
+      {showTrigger && (
+        <button
+          type="button"
+          onClick={() => openModal("createMenuItem")}
+          className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
+          {openText}
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
@@ -37,13 +44,13 @@ export function CreateMenuItemModal({
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("createMenuItem")}
                 className="text-sm text-muted-foreground hover:text-foreground">
                 Cerrar
               </button>
             </div>
 
-            <CreateMenuItemForm onSuccess={() => setOpen(false)} />
+            <CreateMenuItemForm onSuccess={() => closeModal("createMenuItem")} />
           </div>
         </div>
       )}

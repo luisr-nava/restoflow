@@ -1,18 +1,18 @@
 "use client";
 
+import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 import type { RestaurantFloor } from "../types/floor.types";
 
 type FloorTabsProps = {
   floors: RestaurantFloor[];
-  selectedFloorId: string | null;
-  onSelectFloor: (floorId: string) => void;
 };
 
-export function FloorTabs({
-  floors,
-  selectedFloorId,
-  onSelectFloor,
-}: FloorTabsProps) {
+export function FloorTabs({ floors }: FloorTabsProps) {
+  const selectedFloorId = useUiSelectionStore((state) => state.selectedFloorId);
+  const setSelectedFloorId = useUiSelectionStore(
+    (state) => state.setSelectedFloorId,
+  );
+
   if (floors.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -30,7 +30,7 @@ export function FloorTabs({
           <button
             key={floor.id}
             type="button"
-            onClick={() => onSelectFloor(floor.id)}
+            onClick={() => setSelectedFloorId(floor.id)}
             className={`rounded-lg border px-3 py-2 text-sm font-medium ${
               active
                 ? "border-foreground bg-foreground text-background"

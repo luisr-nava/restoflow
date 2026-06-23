@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { RestaurantTable } from "../types/table.types";
 import { EditTableForm } from "./edit-table-form";
 
@@ -10,13 +9,19 @@ type EditTableModalProps = {
 };
 
 export function EditTableModal({ table }: EditTableModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.editTable?.open === true &&
+      state.modals.editTable?.payload?.tableId === table.id,
+  );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("editTable", { tableId: table.id })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-muted">
         Editar
       </button>
@@ -36,13 +41,16 @@ export function EditTableModal({ table }: EditTableModalProps) {
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("editTable")}
                 className="text-sm text-muted-foreground hover:text-foreground">
                 Cerrar
               </button>
             </div>
 
-            <EditTableForm table={table} onSuccess={() => setOpen(false)} />
+            <EditTableForm
+              table={table}
+              onSuccess={() => closeModal("editTable")}
+            />
           </div>
         </div>
       )}

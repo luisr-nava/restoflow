@@ -27,7 +27,7 @@ export function MenuView() {
           </h1>
         </div>
 
-        {activeTab === "items" && <CreateMenuItemModal />}
+        <CreateMenuItemModal showTrigger={activeTab === "items"} />
       </div>
 
       <div className="flex gap-2 border-b border-border">

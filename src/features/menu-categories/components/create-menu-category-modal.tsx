@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateMenuCategoryForm } from "./create-menu-category-form";
 
 type CreateMenuCategoryModalProps = {
@@ -11,13 +10,17 @@ type CreateMenuCategoryModalProps = {
 export function CreateMenuCategoryModal({
   openText = "Crear categoría",
 }: CreateMenuCategoryModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) => state.modals.createMenuCategory?.open ?? false,
+  );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("createMenuCategory")}
         className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
         {openText}
       </button>
@@ -38,13 +41,15 @@ export function CreateMenuCategoryModal({
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("createMenuCategory")}
                 className="text-sm text-muted-foreground hover:text-foreground">
                 Cerrar
               </button>
             </div>
 
-            <CreateMenuCategoryForm onSuccess={() => setOpen(false)} />
+            <CreateMenuCategoryForm
+              onSuccess={() => closeModal("createMenuCategory")}
+            />
           </div>
         </div>
       )}

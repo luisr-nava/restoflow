@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteStaff } from "../hooks/use-delete-staff";
 import type { RestaurantStaff } from "../types/team.types";
 
@@ -10,7 +9,13 @@ type DeleteStaffButtonProps = {
 };
 
 export function DeleteStaffButton({ staff }: DeleteStaffButtonProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.deleteStaff?.open === true &&
+      state.modals.deleteStaff?.payload?.staffId === staff.id,
+  );
   const { mutate, isPending } = useDeleteStaff();
 
   const onDelete = () => {
@@ -24,7 +29,7 @@ export function DeleteStaffButton({ staff }: DeleteStaffButtonProps) {
             return;
           }
 
-          setOpen(false);
+          closeModal("deleteStaff");
         },
       },
     );
@@ -34,7 +39,7 @@ export function DeleteStaffButton({ staff }: DeleteStaffButtonProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("deleteStaff", { staffId: staff.id })}
         disabled={isPending}
         className="rounded-lg border border-destructive px-3 py-2 text-xs font-medium text-destructive disabled:opacity-50">
         Eliminar
@@ -58,7 +63,7 @@ export function DeleteStaffButton({ staff }: DeleteStaffButtonProps) {
             <div className="mt-6 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("deleteStaff")}
                 disabled={isPending}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cancelar

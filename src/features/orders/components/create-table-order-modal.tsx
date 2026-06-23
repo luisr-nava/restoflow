@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateTableOrderForm } from "./create-table-order-form";
 
 type CreateTableOrderModalProps = {
@@ -15,14 +14,21 @@ export function CreateTableOrderModal({
   disabled = false,
   mode = "admin",
 }: CreateTableOrderModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.createOrder?.open === true &&
+      state.modals.createOrder?.payload?.tableId === tableId &&
+      state.modals.createOrder?.payload?.mode === mode,
+  );
 
   return (
     <>
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("createOrder", { tableId, mode })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40">
         Tomar pedido
       </button>
@@ -42,7 +48,7 @@ export function CreateTableOrderModal({
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("createOrder")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
@@ -51,7 +57,7 @@ export function CreateTableOrderModal({
             <CreateTableOrderForm
               tableId={tableId}
               mode={mode}
-              onSuccess={() => setOpen(false)}
+              onSuccess={() => closeModal("createOrder")}
             />
           </div>
         </div>
@@ -59,6 +65,5 @@ export function CreateTableOrderModal({
     </>
   );
 }
-
 
 

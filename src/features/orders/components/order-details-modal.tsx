@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useGetOrderItems } from "../hooks/use-get-order-items";
 
 type OrderDetailsModalProps = {
@@ -9,7 +8,13 @@ type OrderDetailsModalProps = {
 };
 
 export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
-  const [open, setOpen] = useState(false);
+  const openModal = useUiModalStore((state) => state.openModal);
+  const closeModal = useUiModalStore((state) => state.closeModal);
+  const open = useUiModalStore(
+    (state) =>
+      state.modals.orderDetails?.open === true &&
+      state.modals.orderDetails?.payload?.orderId === orderId,
+  );
 
   const { data: items = [], isLoading } = useGetOrderItems(orderId, open);
 
@@ -17,7 +22,7 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => openModal("orderDetails", { orderId })}
         className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
         Ver detalle
       </button>
@@ -36,7 +41,7 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeModal("orderDetails")}
                 className="rounded-lg border border-border px-3 py-2 text-xs">
                 Cerrar
               </button>
