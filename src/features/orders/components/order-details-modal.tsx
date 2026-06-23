@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useGetOrderItems } from "../hooks/use-get-order-items";
 
@@ -48,13 +49,16 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
             </div>
 
             {isLoading ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                Cargando...
-              </div>
+              <LoadingState
+                label="Cargando detalle del pedido..."
+                className="rounded-none border-0 bg-transparent px-0 py-8 text-center"
+              />
             ) : items.length === 0 ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                Este pedido no tiene items.
-              </div>
+              <EmptyState
+                title="Este pedido no tiene productos"
+                description="Puede haber sido creado sin items o estar incompleto."
+                className="rounded-none border-0 bg-transparent px-0 py-8"
+              />
             ) : (
               <div className="space-y-3">
                 {items.map((item) => (

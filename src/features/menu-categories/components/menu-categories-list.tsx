@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "@/src/shared/components/states";
 import { DeleteMenuCategoryButton } from "./delete-menu-category-button";
 import { UpdateMenuCategoryModal } from "./update-menu-category-modal";
 import { useUpdateMenuCategoryStatus } from "../hooks/use-update-menu-category-status";
@@ -14,9 +15,11 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
 
   if (categories.length === 0) {
     return (
-      <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-border bg-background text-sm text-muted-foreground">
-        Todavía no hay categorías creadas.
-      </div>
+      <EmptyState
+        title="Todavía no hay categorías"
+        description="Creá categorías para ordenar mejor tu menú."
+        className="min-h-[240px] flex items-center justify-center"
+      />
     );
   }
 

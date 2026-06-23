@@ -36,7 +36,7 @@ class ReportRepository implements IReportRepository {
   ): Promise<{ data: SalesSummary; error: Error | null }> {
     const { data: orders, error } = await supabase
       .from("orders")
-      .select("id,total,status,table_id")
+      .select("total")
       .eq("restaurant_id", restaurantId)
       .eq("status", "PAID");
 
@@ -194,4 +194,3 @@ class ReportRepository implements IReportRepository {
 }
 
 export const reportRepository = new ReportRepository();
-

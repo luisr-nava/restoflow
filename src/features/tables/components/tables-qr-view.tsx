@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { useGetFloors } from "@/src/features/floors/hooks/use-get-floors";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
 import { useGetTablesByFloorId } from "../hooks/use-get-tables-by-floor-id";
 import type { TableQrPdfItem } from "../types/table-qr.types";
@@ -100,16 +101,25 @@ function FloorQrSection({
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-5">
-        <p className="text-sm text-muted-foreground">
-          Cargando mesas de {floorName}...
-        </p>
-      </div>
+      <LoadingState
+        label={`Cargando mesas de ${floorName}...`}
+        className="bg-surface"
+      />
     );
   }
 
   if (tables.length === 0) {
-    return null;
+    return (
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">{floorName}</h2>
+
+        <EmptyState
+          title="Este piso no tiene mesas"
+          description="Cuando crees mesas en este piso, vas a poder generar sus códigos QR."
+          className="bg-surface"
+        />
+      </section>
+    );
   }
 
   return (
@@ -191,11 +201,7 @@ export function TablesQrView() {
   }
 
   if (isLoading) {
-    return (
-      <div className="rounded-xl border border-border bg-surface p-6">
-        <p className="text-sm text-muted-foreground">Cargando QRs...</p>
-      </div>
-    );
+    return <LoadingState label="Cargando QRs..." className="bg-surface" />;
   }
 
   return (
@@ -229,27 +235,37 @@ export function TablesQrView() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-surface px-4 py-3">
-        <p className="text-sm text-muted-foreground">
-          Seleccionados:{" "}
-          <span className="font-medium text-foreground">
-            {selectedPdfItems.length}
-          </span>
-        </p>
-      </div>
+      {floors.length === 0 ? (
+        <EmptyState
+          title="Todavía no hay pisos ni mesas para generar QR"
+          description="Primero creá pisos y mesas en la sección Mesas."
+          className="bg-surface"
+        />
+      ) : (
+        <>
+          <div className="rounded-xl border border-border bg-surface px-4 py-3">
+            <p className="text-sm text-muted-foreground">
+              Seleccionados:{" "}
+              <span className="font-medium text-foreground">
+                {selectedPdfItems.length}
+              </span>
+            </p>
+          </div>
 
-      <div className="space-y-8">
-        {floors.map((floor) => (
-          <FloorQrSection
-            key={floor.id}
-            floorId={floor.id}
-            floorName={floor.name}
-            selectedTableIds={selectedTableIds}
-            onCheckedChange={handleCheckedChange}
-            onQrReady={handleQrReady}
-          />
-        ))}
-      </div>
+          <div className="space-y-8">
+            {floors.map((floor) => (
+              <FloorQrSection
+                key={floor.id}
+                floorId={floor.id}
+                floorName={floor.name}
+                selectedTableIds={selectedTableIds}
+                onCheckedChange={handleCheckedChange}
+                onQrReady={handleQrReady}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

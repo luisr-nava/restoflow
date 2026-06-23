@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { MenuCategoriesView } from "@/src/features/menu-categories/components/menu-categories-view";
+import { LoadingState } from "@/src/shared/components/states";
 
 import { CreateMenuItemModal } from "./create-menu-item-modal";
 import { MenuItemsList } from "./menu-items-list";
@@ -56,9 +57,10 @@ export function MenuView() {
 
       {activeTab === "items" ? (
         isLoading ? (
-          <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-border bg-background text-sm text-muted-foreground">
-            Cargando menú...
-          </div>
+          <LoadingState
+            label="Cargando productos..."
+            className="min-h-[320px] flex items-center justify-center"
+          />
         ) : (
           <MenuItemsList items={items} />
         )

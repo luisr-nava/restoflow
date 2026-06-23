@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 import { createClient } from "@/src/lib/supabase/client";
+import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.keys";
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { orderKeys } from "../query-keys/order.keys";
 
@@ -24,7 +25,7 @@ export function useOrdersRealtime() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["dashboard"],
+        queryKey: dashboardKeys.all,
       });
 
       queryClient.invalidateQueries({

@@ -27,6 +27,7 @@ export type Order = {
   id: string;
   restaurant_id: string;
   table_id: string;
+  created_at: string;
   created_by: string | null;
   source: OrderSource;
   status: OrderStatus;
@@ -83,4 +84,3 @@ export type Payment = {
 export type CloseTableInput = z.infer<typeof CloseTableSchema>;
 
 export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
-

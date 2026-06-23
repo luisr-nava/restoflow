@@ -5,6 +5,7 @@ import { useEffect, useMemo } from "react";
 import { CreateTableModal } from "@/src/features/tables/components/create-table-modal";
 import { FloorTableCanvas } from "@/src/features/tables/components/floor-table-canvas";
 import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 import { useGetFloors } from "../hooks/use-get-floors";
 import { CreateFloorModal } from "./create-floor-modal";
@@ -60,7 +61,7 @@ export function FloorPlanView() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Cargando pisos...</p>
+        <LoadingState label="Cargando pisos..." />
       ) : (
         <FloorTabs floors={floors} />
       )}
@@ -68,9 +69,11 @@ export function FloorPlanView() {
       {selectedFloorId ? (
         <FloorTableCanvas floorId={selectedFloorId} />
       ) : (
-        <div className="flex min-h-[560px] items-center justify-center rounded-2xl border border-border bg-background text-sm text-muted-foreground">
-          Creá un piso para comenzar a organizar las mesas.
-        </div>
+        <EmptyState
+          title="Todavía no tenés pisos"
+          description="Creá un piso para empezar a organizar tus mesas."
+          className="min-h-[560px] flex items-center justify-center"
+        />
       )}
     </section>
   );

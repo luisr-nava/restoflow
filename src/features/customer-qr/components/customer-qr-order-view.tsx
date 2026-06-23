@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { createQrTableOrderAction } from "@/src/features/orders/actions/order.actions";
 import { orderKeys } from "@/src/features/orders/query-keys/order.keys";
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
+import { EmptyState } from "@/src/shared/components/states";
 
 import type { CustomerQrData } from "../types/customer-qr.types";
 
@@ -131,11 +132,11 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
           <h2 className="text-xl font-semibold text-text">Menú disponible</h2>
 
           {data.menuItems.length === 0 ? (
-            <div className="rounded-xl border border-border bg-surface p-5">
-              <p className="text-sm text-text-2">
-                No hay productos disponibles en este momento.
-              </p>
-            </div>
+            <EmptyState
+              title="Por ahora no hay productos disponibles"
+              description="Probá de nuevo en unos minutos o consultá al personal."
+              className="bg-surface"
+            />
           ) : (
             <div className="grid gap-3">
               {data.menuItems.map((item) => (

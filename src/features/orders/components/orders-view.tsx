@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 import { useGetOrders } from "../hooks/use-get-orders";
 import type { OrderStatus } from "../types/order.types";
 import { OrderDetailsModal } from "./order-details-modal";
@@ -29,11 +30,16 @@ export function OrdersView() {
 
       <div className="rounded-2xl border border-border bg-background">
         {isLoading ? (
-          <div className="p-6 text-sm text-muted-foreground">Cargando...</div>
+          <LoadingState
+            label="Cargando pedidos..."
+            className="rounded-none border-0 bg-transparent"
+          />
         ) : orders.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground">
-            Todavía no hay pedidos.
-          </div>
+          <EmptyState
+            title="Todavía no hay pedidos"
+            description="Los pedidos tomados desde mesas o QR aparecerán acá."
+            className="rounded-none border-0 bg-transparent"
+          />
         ) : (
           <div className="divide-y divide-border">
             {orders.map((order) => (
@@ -69,4 +75,3 @@ export function OrdersView() {
     </div>
   );
 }
-

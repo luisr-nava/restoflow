@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingState } from "@/src/shared/components/states";
 import { CreateMenuCategoryModal } from "./create-menu-category-modal";
 import { MenuCategoriesList } from "./menu-categories-list";
 
@@ -25,9 +26,10 @@ export function MenuCategoriesView() {
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-border bg-background text-sm text-muted-foreground">
-          Cargando categorías...
-        </div>
+        <LoadingState
+          label="Cargando categorías..."
+          className="min-h-[240px] flex items-center justify-center"
+        />
       ) : (
         <MenuCategoriesList categories={categories} />
       )}

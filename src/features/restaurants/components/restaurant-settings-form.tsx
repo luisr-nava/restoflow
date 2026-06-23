@@ -10,14 +10,51 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
+import {
+  RESTAURANT_SETTINGS_CURRENCY_OPTIONS,
+  RESTAURANT_SETTINGS_TIMEZONE_OPTIONS,
+} from "../constants/restaurant-options";
 import { UpdateRestaurantSchema } from "../schemas/restaurant.schema";
 import { useGetRestaurantSettings } from "../hooks/use-get-restaurant-settings";
 import { useUpdateRestaurantSettings } from "../hooks/use-update-restaurant-settings";
 import type { UpdateRestaurantInput } from "../types/restaurant.types";
 
+function RestaurantSettingsLoadingSkeleton() {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-6">
+      <LoadingState
+        label="Cargando configuración..."
+        className="border-0 bg-transparent px-0 pt-0"
+      />
+
+      <div className="space-y-4">
+        <div className="h-10 rounded-lg border border-border bg-background" />
+        <div className="h-10 rounded-lg border border-border bg-background" />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="h-10 rounded-lg border border-border bg-background" />
+          <div className="h-10 rounded-lg border border-border bg-background" />
+        </div>
+
+        <div className="h-10 rounded-lg border border-border bg-background" />
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="h-10 rounded-lg border border-border bg-background" />
+          <div className="h-10 rounded-lg border border-border bg-background" />
+        </div>
+
+        <div className="h-10 rounded-lg border border-border bg-background" />
+
+        <div className="h-11 w-48 rounded-lg bg-foreground/10" />
+      </div>
+    </div>
+  );
+}
+
 export function RestaurantSettingsForm() {
-  const { data, isLoading } = useGetRestaurantSettings();
+  const { data, isLoading, isError } = useGetRestaurantSettings();
   const { mutateAsync } = useUpdateRestaurantSettings();
 
   const form = useForm<UpdateRestaurantInput>({
@@ -56,12 +93,24 @@ export function RestaurantSettingsForm() {
   }
 
   if (isLoading) {
+    return <RestaurantSettingsLoadingSkeleton />;
+  }
+
+  if (isError) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-6">
-        <p className="text-sm text-muted-foreground">
-          Cargando configuración...
-        </p>
-      </div>
+      <EmptyState
+        title="No se pudo cargar la configuración"
+        description="Intentá recargar la página o volver a iniciar sesión."
+      />
+    );
+  }
+
+  if (!data?.data) {
+    return (
+      <EmptyState
+        title="No encontramos la configuración del restaurante"
+        description="Si el problema continúa, revisá que tu usuario pertenezca a un restaurante."
+      />
     );
   }
 
@@ -107,15 +156,19 @@ export function RestaurantSettingsForm() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <FormSelect name="currency" label="Moneda">
-            <option value="ARS">ARS</option>
-            <option value="USD">USD</option>
+            {RESTAURANT_SETTINGS_CURRENCY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </FormSelect>
 
           <FormSelect name="timezone" label="Zona horaria">
-            <option value="America/Argentina/Buenos_Aires">
-              Argentina - Buenos Aires
-            </option>
-            <option value="UTC">UTC</option>
+            {RESTAURANT_SETTINGS_TIMEZONE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </FormSelect>
         </div>
 

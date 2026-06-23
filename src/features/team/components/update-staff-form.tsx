@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 
 import {
   Form,
@@ -10,6 +10,7 @@ import {
   FormSubmit,
   FormToggle,
 } from "@/src/shared/components/forms";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 import { useGetRestaurantTables } from "@/src/features/tables/hooks/use-get-restaurant-tables";
 
 import { useUpdateStaff } from "../hooks/use-update-staff";
@@ -22,7 +23,8 @@ type UpdateStaffFormProps = {
 };
 
 export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
-  const { data: tables = [] } = useGetRestaurantTables();
+  const { data: tables = [], isLoading: isLoadingTables } =
+    useGetRestaurantTables();
 
   const assignedTableIds = tables
     .filter((table) => table.waiter_id === staff.id)
@@ -43,7 +45,10 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
 
   const { mutate, isPending } = useUpdateStaff();
 
-  const selectedRole = form.watch("role");
+  const selectedRole = useWatch({
+    control: form.control,
+    name: "role",
+  });
 
   const onSubmit = (input: UpdateStaffInput) => {
     mutate(input, {
@@ -90,10 +95,17 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
         <div className="space-y-2 rounded-xl border border-border p-3">
           <p className="text-sm font-medium text-foreground">Mesas asignadas</p>
 
-          {tables.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Todavía no hay mesas creadas.
-            </p>
+          {isLoadingTables ? (
+            <LoadingState
+              label="Cargando mesas..."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
+          ) : tables.length === 0 ? (
+            <EmptyState
+              title="Todavía no hay mesas para asignar"
+              description="Podés crear mesas primero y después volver a asignarlas."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
           ) : (
             <div className="grid gap-2">
               {tables.map((table) => (

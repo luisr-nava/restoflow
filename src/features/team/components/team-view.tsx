@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 import { CreateStaffModal } from "./create-staff-modal";
 import { useGetStaff } from "../hooks/use-get-staff";
 import { UpdateStaffModal } from "./update-staff-modal";
@@ -35,11 +36,16 @@ export function TeamView() {
         </div>
 
         {isLoading ? (
-          <div className="p-6 text-sm text-muted-foreground">Cargando...</div>
+          <LoadingState
+            label="Cargando personal..."
+            className="rounded-none border-0 bg-transparent"
+          />
         ) : staff.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground">
-            No hay personal registrado.
-          </div>
+          <EmptyState
+            title="Todavía no cargaste personal"
+            description="Agregá mozos o cocina para empezar a operar con roles."
+            className="rounded-none border-0 bg-transparent"
+          />
         ) : (
           <div className="divide-y divide-border">
             {staff.map((member) => (
@@ -79,4 +85,3 @@ export function TeamView() {
     </div>
   );
 }
-

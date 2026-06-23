@@ -79,6 +79,7 @@ export function DashboardNavbar() {
         <div className="flex items-center gap-2">
           <button
             type="button"
+            aria-label="Abrir menú de navegación"
             onClick={toggleMobileSidebar}
             className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text lg:hidden">
             <Menu className="size-4" />
@@ -87,6 +88,7 @@ export function DashboardNavbar() {
           {primaryAction && (
             <button
               type="button"
+              aria-label={primaryAction.label}
               onClick={primaryAction.onClick}
               disabled={primaryAction.disabled}
               className="inline-flex items-center gap-2 rounded-lg bg-text px-4 py-2 text-sm font-medium text-bg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40">

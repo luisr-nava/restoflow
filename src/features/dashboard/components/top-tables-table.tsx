@@ -27,10 +27,17 @@ export function TopTablesTable({ tables }: TopTablesTableProps) {
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
+          <caption className="sr-only">
+            Mesas con mayor consumo y su total acumulado.
+          </caption>
           <thead className="border-b border-border text-muted-foreground">
             <tr>
-              <th className="py-2 pr-4 font-medium">Mesa</th>
-              <th className="py-2 pr-4 font-medium">Total</th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Mesa
+              </th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Total
+              </th>
             </tr>
           </thead>
 

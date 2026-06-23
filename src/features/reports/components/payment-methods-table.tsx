@@ -1,6 +1,7 @@
 "use client";
 
 import { usePaymentMethods } from "../hooks/use-payment-methods";
+import { ReportWidgetCard } from "./report-widget-card";
 
 const methodLabel = {
   CASH: "Efectivo",
@@ -13,32 +14,28 @@ export function PaymentMethodsTable() {
   const { data: methods = [], isLoading } = usePaymentMethods();
 
   return (
-    <div className="rounded-2xl border border-border bg-background">
-      <div className="border-b border-border px-4 py-3">
-        <h2 className="text-sm font-medium">Métodos de pago</h2>
+    <ReportWidgetCard
+      title="Métodos de pago"
+      isLoading={isLoading}
+      isEmpty={methods.length === 0}
+      loadingLabel="Cargando métodos de pago..."
+      emptyTitle="Todavía no hay pagos registrados"
+      emptyDescription="Cuando cobres mesas, acá vas a ver cómo están pagando tus clientes.">
+      <div className="divide-y divide-border">
+        {methods.map((method) => (
+          <div
+            key={method.method}
+            className="flex items-center justify-between p-4">
+            <span className="text-sm">
+              {methodLabel[method.method] ?? method.method}
+            </span>
+
+            <span className="font-mono text-sm font-medium">
+              ${method.total}
+            </span>
+          </div>
+        ))}
       </div>
-
-      {isLoading ? (
-        <div className="p-6 text-sm text-muted-foreground">Cargando...</div>
-      ) : methods.length === 0 ? (
-        <div className="p-6 text-sm text-muted-foreground">
-          No hay pagos registrados.
-        </div>
-      ) : (
-        <div className="divide-y divide-border">
-          {methods.map((method) => (
-            <div
-              key={method.method}
-              className="flex items-center justify-between p-4">
-              <span className="text-sm">{methodLabel[method.method]}</span>
-
-              <span className="font-mono text-sm font-medium">
-                ${method.total}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    </ReportWidgetCard>
   );
 }

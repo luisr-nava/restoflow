@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DndContext, type DragEndEvent, useDraggable } from "@dnd-kit/core";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
 import { FloorTablesPanel } from "./floor-tables-panel";
 import { useGetTablesByFloorId } from "../hooks/use-get-tables-by-floor-id";
@@ -125,13 +126,16 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
         <DndContext onDragEnd={handleDragEnd}>
           <div className="relative h-[520px] bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] bg-[size:24px_24px]">
             {isLoading ? (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                Cargando mesas...
-              </div>
+              <LoadingState
+                label="Cargando mesas..."
+                className="flex h-full items-center justify-center rounded-none border-0 bg-transparent text-center"
+              />
             ) : localTables.length === 0 ? (
-              <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                Todavía no hay mesas en este piso.
-              </div>
+              <EmptyState
+                title="Este piso todavía no tiene mesas"
+                description="Creá la primera mesa para empezar a operar."
+                className="flex h-full items-center justify-center rounded-none border-0 bg-transparent"
+              />
             ) : (
               localTables.map((table) => (
                 <DraggableTable key={table.id} table={table} />
@@ -145,4 +149,3 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
     </div>
   );
 }
-

@@ -4,6 +4,32 @@ type RecentOrdersTableProps = {
   orders: DashboardRecentOrder[];
 };
 
+const statusLabelByStatus: Record<string, string> = {
+  PENDING: "Pendiente",
+  ACCEPTED: "Aceptado",
+  PREPARING: "Preparando",
+  READY: "Listo",
+  SERVED: "Servido",
+  CANCELED: "Cancelado",
+  PAID: "Pagado",
+};
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+}
+
 export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
   if (orders.length === 0) {
     return (
@@ -24,12 +50,23 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
 
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
+          <caption className="sr-only">
+            Últimos pedidos registrados con mesa, estado, total y fecha.
+          </caption>
           <thead className="border-b border-border text-muted-foreground">
             <tr>
-              <th className="py-2 pr-4 font-medium">Mesa</th>
-              <th className="py-2 pr-4 font-medium">Estado</th>
-              <th className="py-2 pr-4 font-medium">Total</th>
-              <th className="py-2 pr-4 font-medium">Fecha</th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Mesa
+              </th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Estado
+              </th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Total
+              </th>
+              <th scope="col" className="py-2 pr-4 font-medium">
+                Fecha
+              </th>
             </tr>
           </thead>
 
@@ -40,13 +77,13 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                 className="border-b border-border last:border-0">
                 <td className="py-3 pr-4 text-foreground">{order.tableName}</td>
                 <td className="py-3 pr-4 text-muted-foreground">
-                  {order.status}
+                  {statusLabelByStatus[order.status] ?? order.status}
                 </td>
                 <td className="py-3 pr-4 text-foreground">
                   ${order.total.toFixed(2)}
                 </td>
                 <td className="py-3 pr-4 text-muted-foreground">
-                  {new Date(order.createdAt).toLocaleString()}
+                  {formatDateTime(order.createdAt)}
                 </td>
               </tr>
             ))}

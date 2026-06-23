@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "@/src/shared/components/states";
 import { useSalesSummary } from "../hooks/use-sales-summary";
 
 export function SalesSummaryCards() {
@@ -18,6 +19,15 @@ export function SalesSummaryCards() {
     );
   }
 
+  if (!data) {
+    return (
+      <EmptyState
+        title="Todavía no hay resumen de ventas"
+        description="Cuando cierres mesas, acá vas a ver el resumen general de ventas."
+      />
+    );
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <div className="rounded-2xl border border-border bg-background p-4">
@@ -25,7 +35,7 @@ export function SalesSummaryCards() {
           Ventas Totales
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">${data?.totalSales ?? 0}</p>
+        <p className="mt-3 text-2xl font-semibold">${data.totalSales}</p>
       </div>
 
       <div className="rounded-2xl border border-border bg-background p-4">
@@ -33,7 +43,7 @@ export function SalesSummaryCards() {
           Pedidos
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">{data?.totalOrders ?? 0}</p>
+        <p className="mt-3 text-2xl font-semibold">{data.totalOrders}</p>
       </div>
 
       <div className="rounded-2xl border border-border bg-background p-4">
@@ -41,9 +51,7 @@ export function SalesSummaryCards() {
           Ticket Promedio
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">
-          ${Math.round(data?.averageTicket ?? 0)}
-        </p>
+        <p className="mt-3 text-2xl font-semibold">${Math.round(data.averageTicket)}</p>
       </div>
 
       <div className="rounded-2xl border border-border bg-background p-4">
@@ -51,7 +59,7 @@ export function SalesSummaryCards() {
           Mesas Cerradas
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">{data?.closedTables ?? 0}</p>
+        <p className="mt-3 text-2xl font-semibold">{data.closedTables}</p>
       </div>
     </div>
   );

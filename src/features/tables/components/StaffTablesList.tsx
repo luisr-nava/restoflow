@@ -4,6 +4,7 @@ import { CloseTableModal } from "@/src/features/orders/components/close-table-mo
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetStaffOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-staff-open-order-by-table-id";
 import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
 import type { RestaurantTable } from "../types/table.types";
@@ -46,9 +47,6 @@ function StaffTableCard({ table }: { table: RestaurantTable }) {
           <CloseTableModal tableId={table.id} total={total} mode="staff" />
         )}
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Debug: openOrder={String(hasOpenOrder)} status={table.status}
-      </p>
     </div>
   );
 }
@@ -59,18 +57,16 @@ export function StaffTablesList() {
   const { data: tables = [], isLoading } = useGetStaffTables();
 
   if (isLoading) {
-    return (
-      <div className="rounded-2xl border border-border bg-surface p-6 text-sm text-muted-foreground">
-        Cargando mesas...
-      </div>
-    );
+    return <LoadingState label="Cargando tus mesas..." className="bg-surface" />;
   }
 
   if (tables.length === 0) {
     return (
-      <div className="rounded-2xl border border-border bg-surface p-6 text-sm text-muted-foreground">
-        No hay mesas disponibles.
-      </div>
+      <EmptyState
+        title="No tenés mesas asignadas por ahora"
+        description="Cuando un owner o manager te asigne mesas, van a aparecer acá para tomar pedidos."
+        className="bg-surface"
+      />
     );
   }
 

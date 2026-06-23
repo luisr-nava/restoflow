@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 
 import {
   Form,
@@ -9,6 +9,7 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
+import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
 import { useCreateStaff } from "../hooks/use-create-staff";
 import { CreateStaffSchema } from "../schemas/team.schema";
@@ -31,8 +32,12 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
   });
 
   const { mutate, isPending } = useCreateStaff();
-  const selectedRole = form.watch("role");
-  const { data: tables = [] } = useGetRestaurantTables();
+  const selectedRole = useWatch({
+    control: form.control,
+    name: "role",
+  });
+  const { data: tables = [], isLoading: isLoadingTables } =
+    useGetRestaurantTables();
   const onSubmit = (input: CreateStaffInput) => {
     mutate(input, {
       onSuccess: (response) => {
@@ -74,10 +79,17 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
         <div className="space-y-2 rounded-xl border border-border p-3">
           <p className="text-sm font-medium text-foreground">Mesas asignadas</p>
 
-          {tables.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Todavía no hay mesas creadas.
-            </p>
+          {isLoadingTables ? (
+            <LoadingState
+              label="Cargando mesas..."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
+          ) : tables.length === 0 ? (
+            <EmptyState
+              title="Todavía no hay mesas para asignar"
+              description="Podés crear mesas primero y después volver a asignarlas."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
           ) : (
             <div className="grid gap-2">
               {tables.map((table) => (
@@ -107,4 +119,3 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
     </Form>
   );
 }
-

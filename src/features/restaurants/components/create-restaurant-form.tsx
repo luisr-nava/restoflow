@@ -9,6 +9,10 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
+import {
+  CREATE_RESTAURANT_CURRENCY_OPTIONS,
+  CREATE_RESTAURANT_TIMEZONE_OPTIONS,
+} from "../constants/restaurant-options";
 
 import { useCreateRestaurant } from "../hooks/use-create-restaurant";
 import { CreateRestaurantSchema } from "../schemas/restaurant.schema";
@@ -65,14 +69,19 @@ export function CreateRestaurantForm() {
       />
 
       <FormSelect name="currency" label="Moneda">
-        <option value="ARS">Peso Argentino (ARS)</option>
-        <option value="USD">Dólar Estadounidense (USD)</option>
+        {CREATE_RESTAURANT_CURRENCY_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </FormSelect>
 
       <FormSelect name="timezone" label="Zona horaria">
-        <option value="America/Argentina/Buenos_Aires">Buenos Aires</option>
-        <option value="America/Santiago">Santiago</option>
-        <option value="America/Montevideo">Montevideo</option>
+        {CREATE_RESTAURANT_TIMEZONE_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
       </FormSelect>
 
       <FormSubmit

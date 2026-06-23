@@ -21,6 +21,8 @@ export const CreateRestaurantSchema = z.object({
     .or(z.literal("")),
 
   email: z
+    .string()
+    .trim()
     .email({ error: "El e-mail no es válido" })
     .optional()
     .or(z.literal("")),

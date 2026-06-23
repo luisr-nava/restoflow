@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "@/src/shared/components/states";
 import { DeleteMenuItemButton } from "./delete-menu-item-button";
 import { UpdateMenuItemModal } from "./update-menu-item-modal";
 import { useUpdateMenuItemAvailability } from "../hooks/use-update-menu-item-availability";
@@ -14,9 +15,11 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
 
   if (items.length === 0) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-border bg-background text-sm text-muted-foreground">
-        Todavía no hay items creados.
-      </div>
+      <EmptyState
+        title="Todavía no hay productos"
+        description="Agregá el primer producto para empezar a vender."
+        className="min-h-[320px] flex items-center justify-center"
+      />
     );
   }
 
@@ -84,4 +87,3 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
     </div>
   );
 }
-

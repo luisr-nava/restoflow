@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.keys";
 import { closeTableAction } from "../actions/order.actions";
 import { reportKeys } from "@/src/features/reports/query-keys/report.keys";
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
@@ -33,6 +34,9 @@ export function useCloseTable() {
         }),
         queryClient.invalidateQueries({
           queryKey: reportKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.all,
         }),
       ]);
 

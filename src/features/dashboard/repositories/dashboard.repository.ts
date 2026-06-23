@@ -23,12 +23,51 @@ class DashboardRepository implements IDashboardRepository {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const { data: paidOrders, error: paidOrdersError } = await supabase
-      .from("orders")
-      .select("id,total,status,table_id,created_at")
-      .eq("restaurant_id", restaurantId)
-      .eq("status", "PAID")
-      .gte("created_at", today.toISOString());
+    const [
+      { data: paidOrders, error: paidOrdersError },
+      { data: activeOrders, error: activeOrdersError },
+      { data: kitchenOrders, error: kitchenOrdersError },
+      { data: tables, error: tablesError },
+      { data: recentOrdersData, error: recentOrdersError },
+    ] = await Promise.all([
+      supabase
+        .from("orders")
+        .select("id,total,status,table_id,created_at")
+        .eq("restaurant_id", restaurantId)
+        .eq("status", "PAID")
+        .gte("created_at", today.toISOString()),
+      supabase
+        .from("orders")
+        .select("id")
+        .eq("restaurant_id", restaurantId)
+        .neq("status", "PAID")
+        .neq("status", "CANCELED"),
+      supabase
+        .from("orders")
+        .select("id")
+        .eq("restaurant_id", restaurantId)
+        .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY"]),
+      supabase
+        .from("restaurant_tables")
+        .select("id,name,status")
+        .eq("restaurant_id", restaurantId),
+      supabase
+        .from("orders")
+        .select(
+          `
+          id,
+          total,
+          status,
+          created_at,
+          restaurant_tables (
+            name
+          )
+        `,
+        )
+        .eq("restaurant_id", restaurantId)
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
     if (paidOrdersError) {
       return {
@@ -37,25 +76,12 @@ class DashboardRepository implements IDashboardRepository {
       };
     }
 
-    const { data: activeOrders, error: activeOrdersError } = await supabase
-      .from("orders")
-      .select("id")
-      .eq("restaurant_id", restaurantId)
-      .neq("status", "PAID")
-      .neq("status", "CANCELED");
-
     if (activeOrdersError) {
       return {
         data: this.getEmptyDashboardData(),
         error: activeOrdersError,
       };
     }
-
-    const { data: kitchenOrders, error: kitchenOrdersError } = await supabase
-      .from("orders")
-      .select("id")
-      .eq("restaurant_id", restaurantId)
-      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY"]);
 
     if (kitchenOrdersError) {
       return {
@@ -64,34 +90,12 @@ class DashboardRepository implements IDashboardRepository {
       };
     }
 
-    const { data: tables, error: tablesError } = await supabase
-      .from("restaurant_tables")
-      .select("id,name,status")
-      .eq("restaurant_id", restaurantId);
-
     if (tablesError) {
       return {
         data: this.getEmptyDashboardData(),
         error: tablesError,
       };
     }
-
-    const { data: recentOrdersData, error: recentOrdersError } = await supabase
-      .from("orders")
-      .select(
-        `
-        id,
-        total,
-        status,
-        created_at,
-        restaurant_tables (
-          name
-        )
-      `,
-      )
-      .eq("restaurant_id", restaurantId)
-      .order("created_at", { ascending: false })
-      .limit(5);
 
     if (recentOrdersError) {
       return {
@@ -123,6 +127,7 @@ class DashboardRepository implements IDashboardRepository {
       }),
     );
 
+    const tableById = new Map(tables.map((table) => [table.id, table]));
     const tableMap = new Map<string, DashboardTopTable>();
 
     paidOrders.forEach((order) => {
@@ -130,7 +135,7 @@ class DashboardRepository implements IDashboardRepository {
         return;
       }
 
-      const table = tables.find((item) => item.id === order.table_id);
+      const table = tableById.get(order.table_id);
 
       if (!table) {
         return;
@@ -200,5 +205,4 @@ class DashboardRepository implements IDashboardRepository {
 }
 
 export const dashboardRepository = new DashboardRepository();
-
 

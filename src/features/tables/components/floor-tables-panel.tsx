@@ -2,6 +2,7 @@
 
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
+import { EmptyState } from "@/src/shared/components/states";
 
 import { DeleteTableButton } from "./delete-table-button";
 import { EditTableModal } from "./edit-table-modal";
@@ -83,9 +84,11 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
 
       <div className="max-h-130 space-y-3 overflow-y-auto p-3">
         {tables.length === 0 ? (
-          <p className="px-1 py-6 text-center text-sm text-muted-foreground">
-            No hay mesas creadas.
-          </p>
+          <EmptyState
+            title="Sin mesas en este piso"
+            description="Las mesas creadas aparecerán acá con su estado y consumo."
+            className="rounded-none border-0 bg-transparent"
+          />
         ) : (
           tables.map((table) => <FloorTableCard key={table.id} table={table} />)
         )}
@@ -93,4 +96,3 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
     </aside>
   );
 }
-
