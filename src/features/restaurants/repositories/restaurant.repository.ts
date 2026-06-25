@@ -148,11 +148,12 @@ class RestaurantRepository implements IRestaurantRepository {
         timezone: input.timezone,
         logo_url: input.logoUrl || null,
       })
-      .eq("id", restaurantId)
-      .select("*")
-      .single();
+      .eq("id", restaurantId);
 
-    return { data, error };
+    return {
+      data: null,
+      error,
+    };
   }
 }
 

@@ -2,16 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
+
 import { RestaurantLogoFileSchema } from "../schemas/restaurant-logo.schema";
+
 type RestaurantLogoUploadFieldProps = {
   value?: File;
+  currentImageUrl?: string;
   onChange: (file?: File) => void;
+  onRemoveCurrentImage?: () => void;
   disabled?: boolean;
 };
 
 export function RestaurantLogoUploadField({
   value,
+  currentImageUrl,
   onChange,
+  onRemoveCurrentImage,
   disabled = false,
 }: RestaurantLogoUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +37,8 @@ export function RestaurantLogoUploadField({
     return () => URL.revokeObjectURL(url);
   }, [value]);
 
+  const imageUrl = preview ?? currentImageUrl;
+
   const handleSelect = (file?: File) => {
     if (!file) {
       onChange(undefined);
@@ -44,6 +52,18 @@ export function RestaurantLogoUploadField({
     }
 
     onChange(result.data);
+  };
+
+  const handleRemove = () => {
+    onChange(undefined);
+
+    if (currentImageUrl && !preview) {
+      onRemoveCurrentImage?.();
+    }
+
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -67,11 +87,15 @@ export function RestaurantLogoUploadField({
       <div
         onDragOver={(event) => event.preventDefault()}
         onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          if (!disabled) {
+            inputRef.current?.click();
+          }
+        }}
         className="flex min-h-56 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition hover:bg-muted/40">
-        {preview ? (
+        {imageUrl ? (
           <img
-            src={preview}
+            src={imageUrl}
             alt="Logo del restaurante"
             className="max-h-48 max-w-full rounded-md object-contain"
           />
@@ -94,11 +118,12 @@ export function RestaurantLogoUploadField({
         onChange={(event) => handleSelect(event.target.files?.[0])}
       />
 
-      {value && (
+      {imageUrl && (
         <button
           type="button"
-          onClick={() => onChange(undefined)}
-          className="inline-flex items-center gap-2 text-sm text-destructive">
+          disabled={disabled}
+          onClick={handleRemove}
+          className="inline-flex items-center gap-2 text-sm text-destructive disabled:cursor-not-allowed disabled:opacity-50">
           <Trash2 className="size-4" />
           Quitar logo
         </button>
@@ -106,4 +131,3 @@ export function RestaurantLogoUploadField({
     </div>
   );
 }
-

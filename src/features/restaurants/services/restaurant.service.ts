@@ -2,6 +2,7 @@ import { createClient } from "@/src/lib/supabase/server";
 import { createServiceRoleClient } from "@/src/lib/supabase/service-role";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getStaffSession } from "@/src/features/team/lib/staff-session";
+import { restaurantLogoService } from "./restaurant-logo.service";
 
 import {
   IRestaurantRepository,
@@ -227,17 +228,43 @@ class RestaurantService {
       };
     }
 
-    const { error } = await this.restaurantRepository.updateRestaurant(
-      supabase,
-      member.restaurant_id,
-      input,
-    );
+    const { data: currentRestaurant, error: currentRestaurantError } =
+      await this.restaurantRepository.findRestaurantById(
+        supabase,
+        member.restaurant_id,
+      );
+
+    if (currentRestaurantError || !currentRestaurant) {
+      return {
+        error:
+          currentRestaurantError?.message || "No se encontró el restaurante",
+        success: "",
+      };
+    }
+
+    const previousLogoUrl = currentRestaurant.logo_url;
+    const nextLogoUrl = input.logoUrl || null;
+
+    const { data: updatedRestaurant, error } =
+      await this.restaurantRepository.updateRestaurant(
+        supabase,
+        member.restaurant_id,
+        input,
+      );
 
     if (error) {
       return {
         error: error.message,
         success: "",
       };
+    }
+
+    if (previousLogoUrl && previousLogoUrl !== nextLogoUrl) {
+      try {
+        await restaurantLogoService.deleteLogo({
+          publicUrl: previousLogoUrl,
+        });
+      } catch (error) {}
     }
 
     return {
@@ -248,3 +275,4 @@ class RestaurantService {
 }
 
 export const restaurantService = new RestaurantService(restaurantRepository);
+

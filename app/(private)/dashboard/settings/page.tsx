@@ -3,3 +3,4 @@ import { RestaurantSettingsView } from "@/src/features/restaurants/components/re
 export default function SettingsPage() {
   return <RestaurantSettingsView />;
 }
+

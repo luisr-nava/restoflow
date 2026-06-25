@@ -37,3 +37,21 @@ export async function uploadRestaurantLogoAction(file?: File) {
     };
   }
 }
+
+export async function deleteRestaurantLogoAction(publicUrl: string) {
+  try {
+    await restaurantLogoService.deleteLogo({
+      publicUrl,
+    });
+
+    return {
+      error: "",
+    };
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error ? error.message : "No se pudo eliminar el logo",
+    };
+  }
+
+}

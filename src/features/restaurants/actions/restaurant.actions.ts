@@ -39,5 +39,5 @@ export async function updateRestaurantSettingsAction(
   }
 
   return restaurantService.updateRestaurantSettings(data.data);
-
 }
+

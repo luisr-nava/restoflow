@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { RestaurantLogoUploadField } from "./restaurant-logo-upload-field";
+import { useUploadRestaurantLogo } from "../hooks/use-upload-restaurant-logo";
 
 import {
   Form,
@@ -55,7 +57,11 @@ function RestaurantSettingsLoadingSkeleton() {
 
 export function RestaurantSettingsForm() {
   const { data, isLoading, isError } = useGetRestaurantSettings();
-  const { mutateAsync } = useUpdateRestaurantSettings();
+  const { mutateAsync, isPending: isUpdatingSettings } =
+    useUpdateRestaurantSettings();
+
+  const { mutateAsync: uploadRestaurantLogo, isPending: isUploadingLogo } =
+    useUploadRestaurantLogo();
 
   const form = useForm<UpdateRestaurantInput>({
     resolver: zodResolver(UpdateRestaurantSchema),
@@ -89,7 +95,24 @@ export function RestaurantSettingsForm() {
   }, [data?.data, form]);
 
   async function onSubmit(input: UpdateRestaurantInput) {
-    await mutateAsync(input);
+    const { logoFile, ...restaurantData } = input;
+
+    let logoUrl = restaurantData.logoUrl;
+
+    if (logoFile) {
+      const result = await uploadRestaurantLogo(logoFile);
+
+      if (!result) {
+        return;
+      }
+
+      logoUrl = result.publicUrl;
+    }
+
+    await mutateAsync({
+      ...restaurantData,
+      logoUrl,
+    });
   }
 
   if (isLoading) {
@@ -127,13 +150,11 @@ export function RestaurantSettingsForm() {
 
       <Form form={form} onSubmit={onSubmit} className="space-y-4">
         <FormInput name="name" label="Nombre" placeholder="Restoflow" />
-
         <FormInput
           name="address"
           label="Dirección"
           placeholder="Av. Corrientes 1234"
         />
-
         <div className="grid gap-4 md:grid-cols-2">
           <FormInput
             name="phone"
@@ -147,13 +168,11 @@ export function RestaurantSettingsForm() {
             placeholder="restaurante@email.com"
           />
         </div>
-
         <FormInput
           name="taxId"
           label="CUIT / Tax ID"
           placeholder="20-12345678-9"
         />
-
         <div className="grid gap-4 md:grid-cols-2">
           <FormSelect name="currency" label="Moneda">
             {RESTAURANT_SETTINGS_CURRENCY_OPTIONS.map((option) => (
@@ -171,11 +190,34 @@ export function RestaurantSettingsForm() {
             ))}
           </FormSelect>
         </div>
-
-        <FormInput name="logoUrl" label="Logo URL" placeholder="https://..." />
-
-        <FormSubmit value="Guardar configuración" loadingText="Guardando..." />
+        <RestaurantLogoUploadField
+          value={form.watch("logoFile")}
+          currentImageUrl={form.watch("logoUrl")}
+          disabled={isUploadingLogo || isUpdatingSettings}
+          onChange={(file) => {
+            form.setValue("logoFile", file, {
+              shouldDirty: true,
+              shouldValidate: true,
+            });
+          }}
+          onRemoveCurrentImage={() => {
+            form.setValue("logoUrl", "", {
+              shouldDirty: true,
+              shouldValidate: true,
+            });
+            form.setValue("logoFile", undefined, {
+              shouldDirty: true,
+              shouldValidate: true,
+            });
+          }}
+        />
+        <FormSubmit
+          value="Guardar configuración"
+          loadingText="Guardando..."
+          disabled={isUploadingLogo || isUpdatingSettings}
+        />{" "}
       </Form>
     </div>
   );
 }
+

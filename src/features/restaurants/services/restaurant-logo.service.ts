@@ -7,6 +7,7 @@ import {
   type IRestaurantLogoRepository,
 } from "../repositories/restaurant-logo.repository";
 import type {
+  DeleteRestaurantLogoInput,
   UploadRestaurantLogoInput,
   UploadRestaurantLogoResult,
 } from "../types/restaurant-logo.types";
@@ -55,6 +56,29 @@ class RestaurantLogoService {
       path: uploadResult.path,
       publicUrl,
     };
+  }
+  async deleteLogo(input: DeleteRestaurantLogoInput) {
+    const supabase = await createClient();
+
+    const path = this.getPathFromPublicUrl(input.publicUrl);
+
+    if (!path) {
+      return;
+    }
+
+    const result = await this.restaurantLogoRepository.remove(supabase, path);
+
+    if (result.error) {
+      throw result.error;
+    }
+  }
+
+  private getPathFromPublicUrl(publicUrl: string) {
+    const marker = "/object/public/restaurant-logos/";
+
+    const [, path] = publicUrl.split(marker);
+
+    return path ?? "";
   }
 }
 
