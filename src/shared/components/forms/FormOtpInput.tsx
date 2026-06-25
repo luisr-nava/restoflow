@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { FormError } from "./FormError";
 import { FormLabel } from "./FormLabel";
@@ -17,16 +17,20 @@ export function FormOtpInput({ name, label, length = 6 }: Props) {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const {
     setValue,
-    watch,
     formState: { errors },
   } = useFormContext();
 
-  const value = String(watch(name) ?? "");
+  const rawValue = String(useWatch({ name }) ?? "");
+  const value = rawValue.slice(0, length);
   const error = errors[name]?.message;
 
   useEffect(() => {
-    setValue(name, value.slice(0, length));
-  }, [length]);
+    if (rawValue === value) {
+      return;
+    }
+
+    setValue(name, value);
+  }, [length, name, rawValue, setValue, value]);
 
   function updateValue(nextValue: string) {
     setValue(name, nextValue, {
@@ -105,4 +109,3 @@ export function FormOtpInput({ name, label, length = 6 }: Props) {
     </div>
   );
 }
-

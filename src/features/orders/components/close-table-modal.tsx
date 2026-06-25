@@ -2,6 +2,7 @@
 
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CloseTableForm } from "./close-table-form";
 
@@ -96,36 +97,27 @@ export function CloseTableModal({
         Cerrar mesa
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-lg">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  Cobro
-                </p>
-                <h2 className="mt-1 text-lg font-medium text-foreground">
-                  Cerrar mesa
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => closeModal("closeTable")}
-                className="rounded-lg border border-border px-3 py-2 text-xs">
-                Cerrar
-              </button>
-            </div>
-
-            <CloseTableFormContent
-              tableId={tableId}
-              total={total}
-              mode={mode}
-              onSuccess={() => closeModal("closeTable")}
-            />
-          </div>
-        </div>
-      )}
+      <AppDialog
+        open={open}
+        onClose={() => closeModal("closeTable")}
+        title={
+          <>
+            <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Cobro
+            </span>
+            <span className="mt-1 block text-lg font-medium text-foreground">
+              Cerrar mesa
+            </span>
+          </>
+        }
+        size="md">
+        <CloseTableFormContent
+          tableId={tableId}
+          total={total}
+          mode={mode}
+          onSuccess={() => closeModal("closeTable")}
+        />
+      </AppDialog>
     </>
   );
 }

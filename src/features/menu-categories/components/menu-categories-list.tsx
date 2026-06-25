@@ -1,6 +1,11 @@
 "use client";
 
+import {
+  ActionMenu,
+  ActionMenuItem,
+} from "@/src/shared/components/ui/ActionMenu";
 import { EmptyState } from "@/src/shared/components/states";
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { DeleteMenuCategoryButton } from "./delete-menu-category-button";
 import { UpdateMenuCategoryModal } from "./update-menu-category-modal";
 import { useUpdateMenuCategoryStatus } from "../hooks/use-update-menu-category-status";
@@ -12,6 +17,7 @@ type MenuCategoriesListProps = {
 
 export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
   const { mutate, isPending } = useUpdateMenuCategoryStatus();
+  const openModal = useUiModalStore((state) => state.openModal);
 
   if (categories.length === 0) {
     return (
@@ -58,9 +64,29 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
                 {category.is_active ? "Activa" : "Inactiva"}
               </button>
 
-              <UpdateMenuCategoryModal category={category} />
+              <ActionMenu ariaLabel={`Acciones de ${category.name}`}>
+                <ActionMenuItem
+                  onClick={() =>
+                    openModal("editMenuCategory", { categoryId: category.id })
+                  }>
+                  Editar
+                </ActionMenuItem>
 
-              <DeleteMenuCategoryButton category={category} />
+                <ActionMenuItem
+                  onClick={() =>
+                    openModal("deleteMenuCategory", { categoryId: category.id })
+                  }
+                  tone="danger">
+                  Eliminar
+                </ActionMenuItem>
+              </ActionMenu>
+
+              <UpdateMenuCategoryModal category={category} showTrigger={false} />
+
+              <DeleteMenuCategoryButton
+                category={category}
+                showTrigger={false}
+              />
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { MenuItem } from "../types/menu-item.types";
 import { UpdateMenuItemForm } from "./update-menu-item-form";
@@ -26,35 +27,25 @@ export function UpdateMenuItemModal({ item }: UpdateMenuItemModalProps) {
         Editar
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-lg">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  Menú
-                </p>
-
-                <h2 className="mt-1 text-lg font-medium text-foreground">
-                  Editar item
-                </h2>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => closeModal("editMenuItem")}
-                className="rounded-lg border border-border px-3 py-2 text-xs">
-                Cerrar
-              </button>
-            </div>
-
-            <UpdateMenuItemForm
-              item={item}
-              onSuccess={() => closeModal("editMenuItem")}
-            />
-          </div>
-        </div>
-      )}
+      <AppDialog
+        open={open}
+        onClose={() => closeModal("editMenuItem")}
+        title={
+          <>
+            <span className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Menú
+            </span>
+            <span className="mt-1 block text-lg font-medium text-foreground">
+              Editar item
+            </span>
+          </>
+        }
+        size="md">
+        <UpdateMenuItemForm
+          item={item}
+          onSuccess={() => closeModal("editMenuItem")}
+        />
+      </AppDialog>
     </>
   );
 }

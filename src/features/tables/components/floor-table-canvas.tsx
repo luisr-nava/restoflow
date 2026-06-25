@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { DndContext, type DragEndEvent, useDraggable } from "@dnd-kit/core";
 import { EmptyState, LoadingState } from "@/src/shared/components/states";
 
@@ -50,15 +50,27 @@ function clamp(value: number, min: number, max: number) {
 }
 export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
   const { data, isLoading } = useGetTablesByFloorId({ floorId });
-  const tables = data ?? [];
   const { mutate } = useUpdateTablePosition();
-  const [localTables, setLocalTables] = useState<RestaurantTable[]>(tables);
+  const [localTablePositions, setLocalTablePositions] = useState<
+    Record<string, Pick<RestaurantTable, "x" | "y">>
+  >({});
 
-  useEffect(() => {
-    if (data) {
-      setLocalTables(data);
-    }
-  }, [data]);
+  const localTables = useMemo(
+    () =>
+      (data ?? []).map((table) => {
+        const localPosition = localTablePositions[table.id];
+
+        if (!localPosition) {
+          return table;
+        }
+
+        return {
+          ...table,
+          ...localPosition,
+        };
+      }),
+    [data, localTablePositions],
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const tableId = String(event.active.id);
@@ -84,17 +96,13 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
       canvasHeight - table.height,
     );
 
-    setLocalTables((currentTables) =>
-      currentTables.map((currentTable) =>
-        currentTable.id === table.id
-          ? {
-              ...currentTable,
-              x: nextX,
-              y: nextY,
-            }
-          : currentTable,
-      ),
-    );
+    setLocalTablePositions((currentPositions) => ({
+      ...currentPositions,
+      [table.id]: {
+        x: nextX,
+        y: nextY,
+      },
+    }));
 
     mutate({
       tableId: table.id,

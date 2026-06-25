@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { useDeleteFloor } from "../hooks/use-delete-floor";
 import type { RestaurantFloor } from "../types/floor.types";
 
@@ -50,77 +51,70 @@ export function DeleteFloorButton({
         Eliminar piso
       </button>
 
-      {confirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-foreground">
-              Eliminar piso
-            </h2>
+      <AppDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title="Eliminar piso"
+        size="md"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(false)}
+              className="rounded-lg border border-border px-3 py-2 text-sm">
+              Cancelar
+            </button>
 
-            <p className="mt-2 text-sm text-muted-foreground">
-              ¿Querés eliminar el piso <strong>{floor.name}</strong>?
-            </p>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => handleDelete(false)}
+              className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+              {isPending ? "Eliminando..." : "Eliminar"}
+            </button>
+          </>
+        }>
+        <p className="text-sm text-muted-foreground">
+          ¿Querés eliminar el piso <strong>{floor.name}</strong>?
+        </p>
 
-            <p className="mt-2 text-xs text-muted-foreground">
-              También se eliminarán todas las mesas de este piso.
-            </p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          También se eliminarán todas las mesas de este piso.
+        </p>
+      </AppDialog>
 
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirmOpen(false)}
-                className="rounded-lg border border-border px-3 py-2 text-sm">
-                Cancelar
-              </button>
+      <AppDialog
+        open={forceConfirmOpen}
+        onClose={() => setForceConfirmOpen(false)}
+        title="Confirmar eliminación"
+        size="md"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setForceConfirmOpen(false)}
+              className="rounded-lg border border-border px-3 py-2 text-sm">
+              Cancelar
+            </button>
 
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => handleDelete(false)}
-                className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
-                {isPending ? "Eliminando..." : "Eliminar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => handleDelete(true)}
+              className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+              {isPending ? "Eliminando..." : "Confirmar y eliminar"}
+            </button>
+          </>
+        }>
+        <p className="text-sm text-muted-foreground">
+          Este piso tiene mesas ocupadas o reservadas.
+        </p>
 
-      {forceConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-foreground">
-              Confirmar eliminación
-            </h2>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Este piso tiene mesas ocupadas o reservadas.
-            </p>
-
-            <p className="mt-2 text-xs text-muted-foreground">
-              Si confirmás, esas mesas pasarán a estado cerrada y después se
-              eliminarán junto con el piso.
-            </p>
-
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setForceConfirmOpen(false)}
-                className="rounded-lg border border-border px-3 py-2 text-sm">
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                disabled={isPending}
-                onClick={() => handleDelete(true)}
-                className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
-                {isPending ? "Eliminando..." : "Confirmar y eliminar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Si confirmás, esas mesas pasarán a estado cerrada y después se
+          eliminarán junto con el piso.
+        </p>
+      </AppDialog>
     </>
   );
 }
-

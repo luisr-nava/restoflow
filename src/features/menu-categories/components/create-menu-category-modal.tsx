@@ -1,5 +1,6 @@
 "use client";
 
+import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateMenuCategoryForm } from "./create-menu-category-form";
 
@@ -25,34 +26,16 @@ export function CreateMenuCategoryModal({
         {openText}
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-xl">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  Crear categoría
-                </h2>
-
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Agregá una categoría para organizar el menú.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => closeModal("createMenuCategory")}
-                className="text-sm text-muted-foreground hover:text-foreground">
-                Cerrar
-              </button>
-            </div>
-
-            <CreateMenuCategoryForm
-              onSuccess={() => closeModal("createMenuCategory")}
-            />
-          </div>
-        </div>
-      )}
+      <AppDialog
+        open={open}
+        onClose={() => closeModal("createMenuCategory")}
+        title="Crear categoría"
+        description="Agregá una categoría para organizar el menú."
+        size="md">
+        <CreateMenuCategoryForm
+          onSuccess={() => closeModal("createMenuCategory")}
+        />
+      </AppDialog>
     </>
   );
 }

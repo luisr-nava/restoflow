@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { EmptyState } from "@/src/shared/components/states";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import { DeleteMenuItemButton } from "./delete-menu-item-button";
@@ -33,9 +35,12 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex gap-3">
               {item.image_url && (
-                <img
+                <Image
                   src={item.image_url}
                   alt={item.name}
+                  width={56}
+                  height={56}
+                  unoptimized
                   className="h-14 w-14 rounded-xl border border-border object-cover"
                 />
               )}

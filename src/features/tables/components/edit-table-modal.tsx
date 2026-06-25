@@ -1,5 +1,6 @@
 "use client";
 
+import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { RestaurantTable } from "../types/table.types";
 import { EditTableForm } from "./edit-table-form";
@@ -26,34 +27,17 @@ export function EditTableModal({ table }: EditTableModalProps) {
         Editar
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-background p-6 shadow-xl">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  Editar mesa
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Modificá los datos de la mesa seleccionada.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => closeModal("editTable")}
-                className="text-sm text-muted-foreground hover:text-foreground">
-                Cerrar
-              </button>
-            </div>
-
-            <EditTableForm
-              table={table}
-              onSuccess={() => closeModal("editTable")}
-            />
-          </div>
-        </div>
-      )}
+      <AppDialog
+        open={open}
+        onClose={() => closeModal("editTable")}
+        title="Editar mesa"
+        description="Modificá los datos de la mesa seleccionada."
+        size="md">
+        <EditTableForm
+          table={table}
+          onSuccess={() => closeModal("editTable")}
+        />
+      </AppDialog>
     </>
   );
 }

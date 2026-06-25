@@ -1,10 +1,15 @@
 "use client";
 
 import {
+  ActionMenu,
+  ActionMenuItem,
+} from "@/src/shared/components/ui/ActionMenu";
+import {
   EmptyState,
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateStaffModal } from "./create-staff-modal";
 import { useGetStaff } from "../hooks/use-get-staff";
 import { UpdateStaffModal } from "./update-staff-modal";
@@ -17,6 +22,7 @@ const roleLabel = {
 
 export function TeamView() {
   const { data: staff = [], error, isError, isLoading } = useGetStaff();
+  const openModal = useUiModalStore((state) => state.openModal);
 
   return (
     <div className="space-y-6">
@@ -84,8 +90,25 @@ export function TeamView() {
                     {member.is_active ? "Activo" : "Inactivo"}
                   </span>
 
-                  <UpdateStaffModal staff={member} />
-                  <DeleteStaffButton staff={member} />
+                  <ActionMenu ariaLabel={`Acciones de ${member.name}`}>
+                    <ActionMenuItem
+                      onClick={() =>
+                        openModal("editStaff", { staffId: member.id })
+                      }>
+                      Editar
+                    </ActionMenuItem>
+
+                    <ActionMenuItem
+                      onClick={() =>
+                        openModal("deleteStaff", { staffId: member.id })
+                      }
+                      tone="danger">
+                      Eliminar
+                    </ActionMenuItem>
+                  </ActionMenu>
+
+                  <UpdateStaffModal staff={member} showTrigger={false} />
+                  <DeleteStaffButton staff={member} showTrigger={false} />
                 </div>
               </div>
             ))}
