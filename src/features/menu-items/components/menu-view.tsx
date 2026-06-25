@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { MenuCategoriesView } from "@/src/features/menu-categories/components/menu-categories-view";
-import { LoadingState } from "@/src/shared/components/states";
+import { ErrorState, LoadingState } from "@/src/shared/components/states";
 
 import { CreateMenuItemModal } from "./create-menu-item-modal";
 import { MenuItemsList } from "./menu-items-list";
@@ -13,7 +13,7 @@ type MenuTab = "items" | "categories";
 
 export function MenuView() {
   const [activeTab, setActiveTab] = useState<MenuTab>("items");
-  const { data: items = [], isLoading } = useGetMenuItems();
+  const { data: items = [], error, isError, isLoading } = useGetMenuItems();
 
   return (
     <section className="space-y-4">
@@ -59,6 +59,12 @@ export function MenuView() {
         isLoading ? (
           <LoadingState
             label="Cargando productos..."
+            className="min-h-[320px] flex items-center justify-center"
+          />
+        ) : isError ? (
+          <ErrorState
+            title="No se pudieron cargar los productos"
+            description={error.message}
             className="min-h-[320px] flex items-center justify-center"
           />
         ) : (

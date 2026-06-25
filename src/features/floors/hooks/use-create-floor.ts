@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { createFloorAction } from "../actions/floor.actions";
+import { floorKeys } from "../query-keys/floor.keys";
 import type { CreateFloorInput } from "../types/floor.types";
 
 export function useCreateFloor() {
@@ -20,7 +21,7 @@ export function useCreateFloor() {
       return result;
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["floors"] });
+      queryClient.invalidateQueries({ queryKey: floorKeys.all });
       toast.success(result.success);
     },
     onError: (error) => {

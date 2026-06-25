@@ -20,13 +20,16 @@ export function useCreateTable() {
 
       return result;
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result, input) => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: tableKeys.all,
         }),
         queryClient.invalidateQueries({
           queryKey: tableKeys.restaurantAll,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.byFloor(input.floorId),
         }),
       ]);
 

@@ -1,14 +1,19 @@
+import { formatMoney } from "@/src/shared/utils/format-money";
 import type { DashboardSummary } from "../types/dashboard.types";
 
 type DashboardSummaryCardsProps = {
   summary: DashboardSummary;
+  currency?: string | null;
 };
 
-export function DashboardSummaryCards({ summary }: DashboardSummaryCardsProps) {
+export function DashboardSummaryCards({
+  summary,
+  currency,
+}: DashboardSummaryCardsProps) {
   const cards = [
     {
       label: "Ventas hoy",
-      value: `$${summary.todaySales.toFixed(2)}`,
+      value: formatMoney(summary.todaySales, currency),
     },
     {
       label: "Pedidos activos",

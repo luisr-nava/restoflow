@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { deleteFloorAction } from "../actions/floor.actions";
+import { floorKeys } from "../query-keys/floor.keys";
 import type { DeleteFloorInput, RestaurantFloor } from "../types/floor.types";
 
 export function useDeleteFloor() {
@@ -26,7 +27,7 @@ export function useDeleteFloor() {
       }
 
       queryClient.setQueryData<RestaurantFloor[]>(
-        ["floors"],
+        floorKeys.all,
         (currentFloors) =>
           currentFloors?.filter((floor) => floor.id !== input.floorId) ?? [],
       );
@@ -36,7 +37,7 @@ export function useDeleteFloor() {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["floors"],
+        queryKey: floorKeys.all,
       });
 
       queryClient.invalidateQueries({

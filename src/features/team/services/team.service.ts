@@ -21,6 +21,14 @@ class TeamService {
     return createClient();
   }
 
+  private toError(error: unknown, fallback: string) {
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new Error(fallback);
+  }
+
   private hashPin(pin: string) {
     return createHash("sha256").update(pin).digest("hex");
   }
@@ -102,17 +110,21 @@ class TeamService {
       const member = await restaurantService.getCurrentUserRestaurantMember();
 
       if (!member) {
-        return [];
+        throw new Error("No se pudo obtener la membresía del restaurante");
       }
 
-      const { data } = await this.teamRepository.getStaffByRestaurantId(
+      const { data, error } = await this.teamRepository.getStaffByRestaurantId(
         supabase,
         member.restaurant_id,
       );
 
+      if (error) {
+        throw new Error(error.message);
+      }
+
       return data ?? [];
-    } catch {
-      return [];
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el personal");
     }
   }
 
@@ -277,5 +289,4 @@ class TeamService {
 }
 
 export const teamService = new TeamService(teamRepository);
-
 

@@ -64,7 +64,8 @@ class CustomerQrRepository implements ICustomerQrRepository {
         *,
         menu_categories (
           id,
-          name
+          name,
+          is_active
         )
       `,
       )
@@ -84,7 +85,9 @@ class CustomerQrRepository implements ICustomerQrRepository {
         table,
         restaurant,
         waiter,
-        menuItems: menuItems ?? [],
+        menuItems: (menuItems ?? []).filter(
+          (item) => item.menu_categories?.is_active !== false,
+        ),
       },
       error: null,
     };

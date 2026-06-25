@@ -1,7 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
-  CreateMenuCategoryInput,
   MenuCategory,
   UpdateMenuCategoryInput,
 } from "../types/menu-category.types";
@@ -181,5 +180,3 @@ class MenuCategoryRepository implements IMenuCategoryRepository {
 }
 
 export const menuCategoryRepository = new MenuCategoryRepository();
-
-

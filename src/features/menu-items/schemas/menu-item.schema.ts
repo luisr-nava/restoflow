@@ -20,9 +20,12 @@ export const CreateMenuItemSchema = z.object({
 
   imageUrl: z
     .string()
-    .url({ error: "La imagen debe ser una URL válida" })
-    .optional()
-    .or(z.literal("")),
+    .trim()
+    .refine(
+      (value) => value === "" || z.url().safeParse(value).success,
+      { error: "La imagen debe ser una URL válida" },
+    )
+    .optional(),
 
   isAvailable: z.boolean().default(true),
 });

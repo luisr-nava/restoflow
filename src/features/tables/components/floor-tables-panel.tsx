@@ -2,7 +2,9 @@
 
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
-import { EmptyState } from "@/src/shared/components/states";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { EmptyState, ErrorState } from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 
 import { DeleteTableButton } from "./delete-table-button";
 import { EditTableModal } from "./edit-table-modal";
@@ -14,6 +16,7 @@ type FloorTablesPanelProps = {
 
 type FloorTableCardProps = {
   table: RestaurantTable;
+  currency?: string | null;
 };
 
 const statusLabel: Record<RestaurantTable["status"], string> = {
@@ -23,8 +26,9 @@ const statusLabel: Record<RestaurantTable["status"], string> = {
   CLOSED: "Cerrada",
 };
 
-function FloorTableCard({ table }: FloorTableCardProps) {
-  const { data: activeOrder } = useGetOpenOrderByTableId(table.id);
+function FloorTableCard({ table, currency }: FloorTableCardProps) {
+  const { data: activeOrder, error, isError, isLoading } =
+    useGetOpenOrderByTableId(table.id);
 
   const consumption = activeOrder?.total ?? 0;
   const hasActiveOrder = Boolean(activeOrder);
@@ -44,16 +48,30 @@ function FloorTableCard({ table }: FloorTableCardProps) {
         </span>
       </div>
 
-      <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            Consumo
-          </p>
-          <p className="mt-1 text-sm font-medium">${consumption}</p>
-        </div>
+      <div className="mt-4 border-t border-border pt-3">
+        {isError ? (
+          <ErrorState
+            title="No se pudo cargar el consumo"
+            description={error.message}
+            className="rounded-xl px-4 py-3 text-left"
+          />
+        ) : (
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                Consumo
+              </p>
+              <p className="mt-1 text-sm font-medium">
+                {isLoading
+                  ? "Cargando..."
+                  : formatMoney(consumption, currency)}
+              </p>
+            </div>
 
-        {hasActiveOrder && (
-          <CloseTableModal tableId={table.id} total={consumption} />
+            {hasActiveOrder && (
+              <CloseTableModal tableId={table.id} total={consumption} />
+            )}
+          </div>
         )}
       </div>
 
@@ -71,6 +89,9 @@ function FloorTableCard({ table }: FloorTableCardProps) {
 }
 
 export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
+  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const currency = restaurantSettings?.data?.currency;
+
   return (
     <aside className="rounded-2xl border border-border bg-background">
       <div className="border-b border-border px-4 py-3">
@@ -90,7 +111,9 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
             className="rounded-none border-0 bg-transparent"
           />
         ) : (
-          tables.map((table) => <FloorTableCard key={table.id} table={table} />)
+          tables.map((table) => (
+            <FloorTableCard key={table.id} table={table} currency={currency} />
+          ))
         )}
       </div>
     </aside>

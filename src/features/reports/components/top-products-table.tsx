@@ -1,15 +1,22 @@
 "use client";
 
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useTopProducts } from "../hooks/use-top-products";
 import { ReportWidgetCard } from "./report-widget-card";
 
-export function TopProductsTable() {
-  const { data: products = [], isLoading } = useTopProducts();
+type TopProductsTableProps = {
+  currency?: string | null;
+};
+
+export function TopProductsTable({ currency }: TopProductsTableProps) {
+  const { data: products = [], error, isError, isLoading } = useTopProducts();
 
   return (
     <ReportWidgetCard
       title="Productos más vendidos"
       isLoading={isLoading}
+      isError={isError}
+      errorMessage={error?.message}
       isEmpty={products.length === 0}
       loadingLabel="Cargando productos vendidos..."
       emptyTitle="Todavía no hay productos vendidos"
@@ -26,7 +33,9 @@ export function TopProductsTable() {
               </p>
             </div>
 
-            <p className="font-mono text-sm font-medium">${product.total}</p>
+            <p className="font-mono text-sm font-medium">
+              {formatMoney(product.total, currency)}
+            </p>
           </div>
         ))}
       </div>

@@ -1,15 +1,23 @@
 "use client";
 
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useTopCategories } from "../hooks/use-top-categories";
 import { ReportWidgetCard } from "./report-widget-card";
 
-export function TopCategoriesTable() {
-  const { data: categories = [], isLoading } = useTopCategories();
+type TopCategoriesTableProps = {
+  currency?: string | null;
+};
+
+export function TopCategoriesTable({ currency }: TopCategoriesTableProps) {
+  const { data: categories = [], error, isError, isLoading } =
+    useTopCategories();
 
   return (
     <ReportWidgetCard
       title="Categorías más vendidas"
       isLoading={isLoading}
+      isError={isError}
+      errorMessage={error?.message}
       isEmpty={categories.length === 0}
       loadingLabel="Cargando categorías vendidas..."
       emptyTitle="Todavía no hay categorías vendidas"
@@ -27,7 +35,9 @@ export function TopCategoriesTable() {
               </p>
             </div>
 
-            <p className="font-mono text-sm font-medium">${category.total}</p>
+            <p className="font-mono text-sm font-medium">
+              {formatMoney(category.total, currency)}
+            </p>
           </div>
         ))}
       </div>

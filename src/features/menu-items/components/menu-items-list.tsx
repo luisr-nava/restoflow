@@ -1,13 +1,14 @@
 "use client";
 
 import { EmptyState } from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { DeleteMenuItemButton } from "./delete-menu-item-button";
 import { UpdateMenuItemModal } from "./update-menu-item-modal";
 import { useUpdateMenuItemAvailability } from "../hooks/use-update-menu-item-availability";
-import type { MenuItem } from "../types/menu-item.types";
+import type { MenuItemWithCategory } from "../types/menu-item.types";
 
 type MenuItemsListProps = {
-  items: MenuItem[];
+  items: MenuItemWithCategory[];
 };
 
 export function MenuItemsList({ items }: MenuItemsListProps) {
@@ -57,7 +58,9 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <p className="font-mono text-sm font-medium">${item.price}</p>
+              <p className="font-mono text-sm font-medium">
+                {formatMoney(item.price)}
+              </p>
 
               <button
                 type="button"

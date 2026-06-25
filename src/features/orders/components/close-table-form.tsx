@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 
 import {
   Form,
@@ -10,6 +10,7 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useCloseStaffTable } from "../hooks/use-close-staff-table";
 import { useCloseTable } from "../hooks/use-close-table";
 import { CloseTableSchema } from "../schemas/order.schema";
@@ -18,6 +19,7 @@ import type { CloseTableInput } from "../types/order.types";
 type CloseTableFormProps = {
   tableId: string;
   total: number;
+  currency?: string | null;
   onSuccess?: () => void;
   mode?: "admin" | "staff";
 };
@@ -25,6 +27,7 @@ type CloseTableFormProps = {
 export function CloseTableForm({
   tableId,
   total,
+  currency,
   onSuccess,
   mode = "admin",
 }: CloseTableFormProps) {
@@ -47,7 +50,10 @@ export function CloseTableForm({
   const isPending =
     mode === "staff" ? staffCloseTable.isPending : adminCloseTable.isPending;
 
-  const paidAmount = form.watch("paidAmount");
+  const paidAmount = useWatch({
+    control: form.control,
+    name: "paidAmount",
+  });
 
   useEffect(() => {
     if (!paidAmount || paidAmount < total) {
@@ -83,7 +89,9 @@ export function CloseTableForm({
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
           Total a cobrar
         </p>
-        <p className="mt-1 text-lg font-medium">${total}</p>
+        <p className="mt-1 text-lg font-medium">
+          {formatMoney(total, currency)}
+        </p>
       </div>
 
       <FormInput
@@ -108,4 +116,3 @@ export function CloseTableForm({
     </Form>
   );
 }
-

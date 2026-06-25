@@ -1,6 +1,12 @@
 "use client";
 
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useGetOrders } from "../hooks/use-get-orders";
 import type { OrderStatus } from "../types/order.types";
 import { OrderDetailsModal } from "./order-details-modal";
@@ -16,7 +22,9 @@ const statusLabel: Record<OrderStatus, string> = {
 };
 
 export function OrdersView() {
-  const { data: orders = [], isLoading } = useGetOrders();
+  const { data: orders = [], error, isError, isLoading } = useGetOrders();
+  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const currency = restaurantSettings?.data?.currency;
 
   return (
     <div className="space-y-6">
@@ -32,6 +40,12 @@ export function OrdersView() {
         {isLoading ? (
           <LoadingState
             label="Cargando pedidos..."
+            className="rounded-none border-0 bg-transparent"
+          />
+        ) : isError ? (
+          <ErrorState
+            title="No se pudieron cargar los pedidos"
+            description={error.message}
             className="rounded-none border-0 bg-transparent"
           />
         ) : orders.length === 0 ? (
@@ -62,10 +76,10 @@ export function OrdersView() {
                   </span>
 
                   <p className="font-mono text-sm font-medium">
-                    ${order.total}
+                    {formatMoney(order.total, currency)}
                   </p>
 
-                  <OrderDetailsModal orderId={order.id} />
+                  <OrderDetailsModal orderId={order.id} currency={currency} />
                 </div>
               </div>
             ))}

@@ -13,72 +13,112 @@ class ReportService {
     return createClient();
   }
 
+  private toError(error: unknown, fallback: string) {
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new Error(fallback);
+  }
+
   async getSalesSummary() {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return null;
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.reportRepository.getSalesSummary(
+        supabase,
+        member.restaurant_id,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el resumen de ventas");
     }
-
-    const { data } = await this.reportRepository.getSalesSummary(
-      supabase,
-      member.restaurant_id,
-    );
-
-    return data;
   }
 
   async getTopProducts() {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return [];
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.reportRepository.getTopProducts(
+        supabase,
+        member.restaurant_id,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar los productos vendidos");
     }
-
-    const { data } = await this.reportRepository.getTopProducts(
-      supabase,
-      member.restaurant_id,
-    );
-
-    return data;
   }
 
   async getTopCategories() {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return [];
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.reportRepository.getTopCategories(
+        supabase,
+        member.restaurant_id,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar las categorías vendidas");
     }
-
-    const { data } = await this.reportRepository.getTopCategories(
-      supabase,
-      member.restaurant_id,
-    );
-
-    return data;
   }
 
   async getPaymentMethods() {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return [];
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.reportRepository.getPaymentMethods(
+        supabase,
+        member.restaurant_id,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar los métodos de pago");
     }
-
-    const { data } = await this.reportRepository.getPaymentMethods(
-      supabase,
-      member.restaurant_id,
-    );
-
-    return data;
   }
 }
 

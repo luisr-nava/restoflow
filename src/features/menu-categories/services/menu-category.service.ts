@@ -98,11 +98,15 @@ class MenuCategoryService {
       return [];
     }
 
-    const { data } =
+    const { data, error } =
       await this.menuCategoryRepository.findCategoriesByRestaurantId(
         supabase,
         member.restaurant_id,
       );
+
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return data ?? [];
   }
@@ -143,6 +147,20 @@ class MenuCategoryService {
       if (category.restaurant_id !== member.restaurant_id) {
         return {
           error: "No tenés permisos para modificar esta categoría",
+          success: "",
+        };
+      }
+
+      const { data: existingCategory } =
+        await this.menuCategoryRepository.findCategoryByName(
+          supabase,
+          member.restaurant_id,
+          input.name,
+        );
+
+      if (existingCategory && existingCategory.id !== input.categoryId) {
+        return {
+          error: "Ya existe una categoría con ese nombre",
           success: "",
         };
       }
@@ -321,5 +339,3 @@ class MenuCategoryService {
 export const menuCategoryService = new MenuCategoryService(
   menuCategoryRepository,
 );
-
-

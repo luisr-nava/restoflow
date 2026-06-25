@@ -22,11 +22,7 @@ export function DeleteMenuCategoryButton({
 
   const onDelete = () => {
     mutate(category.id, {
-      onSuccess: (response) => {
-        if (response.error) {
-          return;
-        }
-
+      onSuccess: () => {
         closeModal("deleteMenuCategory");
       },
     });

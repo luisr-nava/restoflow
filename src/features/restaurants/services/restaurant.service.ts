@@ -1,5 +1,7 @@
 import { createClient } from "@/src/lib/supabase/server";
+import { createServiceRoleClient } from "@/src/lib/supabase/service-role";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getStaffSession } from "@/src/features/team/lib/staff-session";
 
 import {
   IRestaurantRepository,
@@ -171,6 +173,37 @@ class RestaurantService {
 
     return {
       data,
+      error: "",
+    };
+  }
+
+  async getStaffRestaurantCurrency() {
+    const supabase = createServiceRoleClient();
+    const session = await getStaffSession();
+
+    if (!session) {
+      return {
+        data: null,
+        error: "No hay sesión de personal activa",
+      };
+    }
+
+    const { data, error } = await this.restaurantRepository.findRestaurantById(
+      supabase,
+      session.restaurantId,
+    );
+
+    if (error || !data) {
+      return {
+        data: null,
+        error: error?.message || "No se encontró el restaurante",
+      };
+    }
+
+    return {
+      data: {
+        currency: data.currency,
+      },
       error: "",
     };
   }

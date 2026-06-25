@@ -3,7 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import { menuItemKeys } from "@/src/features/menu-items/query-keys/menu-item.keys";
+
 import { updateMenuCategoryStatusAction } from "../actions/menu-category.actions";
+import { menuCategoryKeys } from "../query-keys/menu-category.keys";
 
 type UpdateMenuCategoryStatusInput = {
   categoryId: string;
@@ -14,24 +17,37 @@ export function useUpdateMenuCategoryStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateMenuCategoryStatusInput) =>
-      updateMenuCategoryStatusAction(input.categoryId, input.isActive),
+    mutationFn: async (input: UpdateMenuCategoryStatusInput) => {
+      const result = await updateMenuCategoryStatusAction(
+        input.categoryId,
+        input.isActive,
+      );
 
-    onSuccess: async (response) => {
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["menu-categories"],
-      });
-
-      toast.success(response.success);
+      return result;
     },
 
-    onError: () => {
-      toast.error("No se pudo actualizar el estado");
+    onSuccess: async (result) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: menuCategoryKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.all,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: menuItemKeys.staffAll,
+        }),
+      ]);
+
+      toast.success(result.success);
+    },
+
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 }

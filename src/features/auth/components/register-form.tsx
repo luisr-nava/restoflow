@@ -34,9 +34,7 @@ export function RestaurantForm() {
     },
   });
 
-  const onSubmit = async (data: RestaurantInput) => {
-    console.log(data);
-  };
+  const onSubmit = async () => {};
 
   return (
     <Form form={form} onSubmit={onSubmit}>
@@ -68,4 +66,3 @@ export function RestaurantForm() {
     </Form>
   );
 }
-

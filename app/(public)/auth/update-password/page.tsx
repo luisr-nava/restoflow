@@ -1,8 +1,6 @@
 import { AuthShowcase } from "@/src/features/auth/components/auth-showcase";
 import { SetPasswordForm } from "@/src/features/auth/components/set-password-form";
-import { createClient } from "@/src/lib/supabase/server";
 import { Heading } from "@/src/shared/components/ui/Heading";
-import { redirect } from "next/navigation";
 
 export default async function UpdatePasswordPage() {
   return (
@@ -20,4 +18,3 @@ export default async function UpdatePasswordPage() {
     </>
   );
 }
-

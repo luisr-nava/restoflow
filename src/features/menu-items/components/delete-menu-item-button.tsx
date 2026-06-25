@@ -24,11 +24,7 @@ export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
         menuItemId: item.id,
       },
       {
-        onSuccess: (response) => {
-          if (response.error) {
-            return;
-          }
-
+        onSuccess: () => {
           closeModal("deleteMenuItem");
         },
       },

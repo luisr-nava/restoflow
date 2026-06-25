@@ -1,7 +1,7 @@
 import { transporter } from "@/src/lib/mailer";
 
 export async function sendOtpEmail(email: string, code: string) {
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     from: '"RestoFlow" <no-reply@restoflow.com>',
     to: email,
     subject: "Código de verificación",
@@ -68,4 +68,3 @@ export async function sendOtpEmail(email: string, code: string) {
     `,
   });
 }
-

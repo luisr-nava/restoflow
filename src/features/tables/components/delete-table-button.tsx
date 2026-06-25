@@ -19,11 +19,17 @@ export function DeleteTableButton({ table }: DeleteTableButtonProps) {
   const { mutate, isPending } = useDeleteTable();
 
   const handleDelete = () => {
-    mutate(table.id, {
+    mutate(
+      {
+        tableId: table.id,
+        floorId: table.floor_id,
+      },
+      {
       onSuccess: () => {
         closeModal("deleteTable");
       },
-    });
+      },
+    );
   };
 
   return (

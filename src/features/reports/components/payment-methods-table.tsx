@@ -1,5 +1,6 @@
 "use client";
 
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { usePaymentMethods } from "../hooks/use-payment-methods";
 import { ReportWidgetCard } from "./report-widget-card";
 
@@ -10,13 +11,22 @@ const methodLabel = {
   ACCOUNT: "Cuenta corriente",
 };
 
-export function PaymentMethodsTable() {
-  const { data: methods = [], isLoading } = usePaymentMethods();
+type PaymentMethodsTableProps = {
+  currency?: string | null;
+};
+
+export function PaymentMethodsTable({
+  currency,
+}: PaymentMethodsTableProps) {
+  const { data: methods = [], error, isError, isLoading } =
+    usePaymentMethods();
 
   return (
     <ReportWidgetCard
       title="Métodos de pago"
       isLoading={isLoading}
+      isError={isError}
+      errorMessage={error?.message}
       isEmpty={methods.length === 0}
       loadingLabel="Cargando métodos de pago..."
       emptyTitle="Todavía no hay pagos registrados"
@@ -31,7 +41,7 @@ export function PaymentMethodsTable() {
             </span>
 
             <span className="font-mono text-sm font-medium">
-              ${method.total}
+              {formatMoney(method.total, currency)}
             </span>
           </div>
         ))}

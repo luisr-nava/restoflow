@@ -22,6 +22,10 @@ export async function getRestaurantSettingsAction() {
   return restaurantService.getRestaurantSettings();
 }
 
+export async function getStaffRestaurantCurrencyAction() {
+  return restaurantService.getStaffRestaurantCurrency();
+}
+
 export async function updateRestaurantSettingsAction(
   input: UpdateRestaurantInput,
 ) {

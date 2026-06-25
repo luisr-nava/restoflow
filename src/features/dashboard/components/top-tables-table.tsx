@@ -1,10 +1,12 @@
+import { formatMoney } from "@/src/shared/utils/format-money";
 import type { DashboardTopTable } from "../types/dashboard.types";
 
 type TopTablesTableProps = {
   tables: DashboardTopTable[];
+  currency?: string | null;
 };
 
-export function TopTablesTable({ tables }: TopTablesTableProps) {
+export function TopTablesTable({ tables, currency }: TopTablesTableProps) {
   if (tables.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-surface p-4">
@@ -49,7 +51,7 @@ export function TopTablesTable({ tables }: TopTablesTableProps) {
                 <td className="py-3 pr-4 text-foreground">{table.tableName}</td>
 
                 <td className="py-3 pr-4 text-foreground">
-                  ${table.total.toFixed(2)}
+                  {formatMoney(table.total, currency)}
                 </td>
               </tr>
             ))}

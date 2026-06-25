@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useDashboardData } from "../hooks/use-dashboard-data";
 import { DashboardSalesChart } from "./dashboard-sales-chart";
 import { DashboardSummaryCards } from "./dashboard-summary-cards";
@@ -33,6 +34,8 @@ function DashboardLoadingSkeleton() {
 
 export function DashboardView() {
   const { data, isLoading, isError } = useDashboardData();
+  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const currency = restaurantSettings?.data?.currency;
 
   if (isLoading) {
     return <DashboardLoadingSkeleton />;
@@ -50,13 +53,16 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6">
-      <DashboardSummaryCards summary={data.data.summary} />
+      <DashboardSummaryCards summary={data.data.summary} currency={currency} />
 
       <DashboardSalesChart data={data.data.salesChart} />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <RecentOrdersTable orders={data.data.recentOrders} />
-        <TopTablesTable tables={data.data.topTables} />
+        <RecentOrdersTable
+          orders={data.data.recentOrders}
+          currency={currency}
+        />
+        <TopTablesTable tables={data.data.topTables} currency={currency} />
       </div>
     </div>
   );

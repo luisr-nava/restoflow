@@ -10,7 +10,11 @@ import {
   FormSubmit,
   FormToggle,
 } from "@/src/shared/components/forms";
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 import { useGetRestaurantTables } from "@/src/features/tables/hooks/use-get-restaurant-tables";
 
 import { useUpdateStaff } from "../hooks/use-update-staff";
@@ -23,8 +27,12 @@ type UpdateStaffFormProps = {
 };
 
 export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
-  const { data: tables = [], isLoading: isLoadingTables } =
-    useGetRestaurantTables();
+  const {
+    data: tables = [],
+    error: tablesError,
+    isError: isTablesError,
+    isLoading: isLoadingTables,
+  } = useGetRestaurantTables();
 
   const assignedTableIds = tables
     .filter((table) => table.waiter_id === staff.id)
@@ -98,6 +106,12 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
           {isLoadingTables ? (
             <LoadingState
               label="Cargando mesas..."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
+          ) : isTablesError ? (
+            <ErrorState
+              title="No se pudieron cargar las mesas"
+              description={tablesError.message}
               className="rounded-none border-0 bg-transparent p-0 text-left"
             />
           ) : tables.length === 0 ? (

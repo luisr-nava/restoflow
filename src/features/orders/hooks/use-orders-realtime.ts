@@ -9,9 +9,9 @@ import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.key
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { orderKeys } from "../query-keys/order.keys";
 
-type OrderItemRealtimeRow = {
-  order_id: string | null;
-};
+type OrderItemRealtimePayload = RealtimePostgresChangesPayload<
+  Record<string, unknown>
+>;
 
 export function useOrdersRealtime() {
   const queryClient = useQueryClient();
@@ -53,13 +53,15 @@ export function useOrdersRealtime() {
       });
     }
 
-    function invalidateOrderItems(
-      payload: RealtimePostgresChangesPayload<OrderItemRealtimeRow>,
-    ) {
+    function invalidateOrderItems(payload: OrderItemRealtimePayload) {
       const orderIdFromNew =
-        "order_id" in payload.new ? payload.new.order_id : null;
+        "order_id" in payload.new && typeof payload.new.order_id === "string"
+          ? payload.new.order_id
+          : null;
       const orderIdFromOld =
-        "order_id" in payload.old ? payload.old.order_id : null;
+        "order_id" in payload.old && typeof payload.old.order_id === "string"
+          ? payload.old.order_id
+          : null;
       const orderId = orderIdFromNew ?? orderIdFromOld ?? null;
 
       if (orderId) {
@@ -82,8 +84,7 @@ export function useOrdersRealtime() {
           schema: "public",
           table: "orders",
         },
-        (payload) => {
-          console.log("REALTIME ORDERS:", payload);
+        () => {
           invalidateOrders();
         },
       )
@@ -95,7 +96,6 @@ export function useOrdersRealtime() {
           table: "order_items",
         },
         (payload) => {
-          console.log("REALTIME ITEMS:", payload);
           invalidateOrderItems(payload);
           invalidateOrders();
         },
@@ -111,9 +111,7 @@ export function useOrdersRealtime() {
           invalidateOrders();
         },
       )
-      .subscribe((status) => {
-        console.log("REALTIME STATUS:", status);
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);

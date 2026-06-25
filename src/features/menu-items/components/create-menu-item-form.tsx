@@ -86,9 +86,8 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
       <FormSubmit
         value="Crear item"
         loadingText="Creando..."
-        disabled={isPending || categories.length === 0}
+        disabled={isPending}
       />
     </Form>
   );
 }
-

@@ -1,10 +1,16 @@
 import type { ReactNode } from "react";
 
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 
 type ReportWidgetCardProps = {
   title: string;
   isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
   isEmpty: boolean;
   loadingLabel: string;
   emptyTitle: string;
@@ -15,6 +21,8 @@ type ReportWidgetCardProps = {
 export function ReportWidgetCard({
   title,
   isLoading,
+  isError,
+  errorMessage,
   isEmpty,
   loadingLabel,
   emptyTitle,
@@ -30,6 +38,12 @@ export function ReportWidgetCard({
       {isLoading ? (
         <LoadingState
           label={loadingLabel}
+          className="rounded-none border-0 bg-transparent"
+        />
+      ) : isError ? (
+        <ErrorState
+          title={`No se pudo cargar ${title.toLowerCase()}`}
+          description={errorMessage}
           className="rounded-none border-0 bg-transparent"
         />
       ) : isEmpty ? (

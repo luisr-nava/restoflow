@@ -81,6 +81,7 @@ export function TableQrPdfDocument({ items }: TableQrPdfDocumentProps) {
               <Text style={styles.floorName}>{item.floorName}</Text>
               <Text style={styles.tableName}>{item.tableName}</Text>
 
+              {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image does not support alt */}
               <Image src={item.qrImage} style={styles.qrImage} />
 
               <Text style={styles.helperText}>Escaneá para ver el menú</Text>

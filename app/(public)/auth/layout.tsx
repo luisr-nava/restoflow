@@ -1,5 +1,3 @@
-import { Heading } from "@/src/shared/components/ui/Heading";
-
 type Props = {
   children: React.ReactNode;
 };
@@ -9,4 +7,3 @@ export default function AuthLayout({ children }: Props) {
     <section className="min-h-[calc(100vh-64px)] pt-10">{children}</section>
   );
 }
-

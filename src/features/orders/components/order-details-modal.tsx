@@ -1,14 +1,23 @@
 "use client";
 
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useGetOrderItems } from "../hooks/use-get-order-items";
 
 type OrderDetailsModalProps = {
   orderId: string;
+  currency?: string | null;
 };
 
-export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
+export function OrderDetailsModal({
+  orderId,
+  currency,
+}: OrderDetailsModalProps) {
   const openModal = useUiModalStore((state) => state.openModal);
   const closeModal = useUiModalStore((state) => state.closeModal);
   const open = useUiModalStore(
@@ -17,7 +26,10 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
       state.modals.orderDetails?.payload?.orderId === orderId,
   );
 
-  const { data: items = [], isLoading } = useGetOrderItems(orderId, open);
+  const { data: items = [], error, isError, isLoading } = useGetOrderItems(
+    orderId,
+    open,
+  );
 
   return (
     <>
@@ -53,6 +65,12 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
                 label="Cargando detalle del pedido..."
                 className="rounded-none border-0 bg-transparent px-0 py-8 text-center"
               />
+            ) : isError ? (
+              <ErrorState
+                title="No se pudo cargar el detalle del pedido"
+                description={error.message}
+                className="rounded-none border-0 bg-transparent px-0 py-8"
+              />
             ) : items.length === 0 ? (
               <EmptyState
                 title="Este pedido no tiene productos"
@@ -69,12 +87,12 @@ export function OrderDetailsModal({ orderId }: OrderDetailsModalProps) {
                       <h3 className="text-sm font-medium">{item.name}</h3>
 
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {item.quantity} x ${item.unit_price}
+                        {item.quantity} x {formatMoney(item.unit_price, currency)}
                       </p>
                     </div>
 
                     <p className="font-mono text-sm font-medium">
-                      ${item.total}
+                      {formatMoney(item.total, currency)}
                     </p>
                   </div>
                 ))}

@@ -72,10 +72,37 @@ class MenuItemService {
       return [];
     }
 
-    const { data } = await this.menuItemRepository.findMenuItemsByRestaurantId(
-      supabase,
-      member.restaurant_id,
-    );
+    const { data, error } =
+      await this.menuItemRepository.findMenuItemsByRestaurantId(
+        supabase,
+        member.restaurant_id,
+      );
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data ?? [];
+  }
+
+  async getMenuItemsByStaffSession() {
+    const supabase = await this.getSupabase();
+
+    const session = await getStaffSession();
+
+    if (!session) {
+      return [];
+    }
+
+    const { data, error } =
+      await this.menuItemRepository.findMenuItemsByRestaurantId(
+        supabase,
+        session.restaurantId,
+      );
+
+    if (error) {
+      throw new Error(error.message);
+    }
 
     return data ?? [];
   }
@@ -269,23 +296,6 @@ class MenuItemService {
       };
     }
   }
-  async getMenuItemsByStaffSession() {
-    const supabase = await this.getSupabase();
-
-    const session = await getStaffSession();
-
-    if (!session) {
-      return [];
-    }
-
-    const { data } = await this.menuItemRepository.findMenuItemsByRestaurantId(
-      supabase,
-      session.restaurantId,
-    );
-
-    return data ?? [];
-  }
 }
 
 export const menuItemService = new MenuItemService(menuItemRepository);
-

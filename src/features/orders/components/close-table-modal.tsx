@@ -1,5 +1,7 @@
 "use client";
 
+import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CloseTableForm } from "./close-table-form";
 
@@ -9,6 +11,65 @@ type CloseTableModalProps = {
   disabled?: boolean;
   mode?: "admin" | "staff";
 };
+
+type CloseTableFormContentProps = Omit<CloseTableModalProps, "disabled"> & {
+  onSuccess?: () => void;
+};
+
+function AdminCloseTableForm(props: CloseTableFormContentProps) {
+  const { data: restaurantSettings } = useGetRestaurantSettings();
+
+  return (
+    <CloseTableForm
+      tableId={props.tableId}
+      total={props.total}
+      mode={props.mode}
+      currency={restaurantSettings?.data?.currency}
+      onSuccess={props.onSuccess}
+    />
+  );
+}
+
+function StaffCloseTableForm(props: CloseTableFormContentProps) {
+  const { data: staffRestaurantCurrency } = useGetStaffRestaurantCurrency();
+
+  return (
+    <CloseTableForm
+      tableId={props.tableId}
+      total={props.total}
+      mode={props.mode}
+      currency={staffRestaurantCurrency?.data?.currency}
+      onSuccess={props.onSuccess}
+    />
+  );
+}
+
+function CloseTableFormContent({
+  tableId,
+  total,
+  mode,
+  onSuccess,
+}: CloseTableFormContentProps) {
+  if (mode === "staff") {
+    return (
+      <StaffCloseTableForm
+        tableId={tableId}
+        total={total}
+        mode={mode}
+        onSuccess={onSuccess}
+      />
+    );
+  }
+
+  return (
+    <AdminCloseTableForm
+      tableId={tableId}
+      total={total}
+      mode={mode}
+      onSuccess={onSuccess}
+    />
+  );
+}
 
 export function CloseTableModal({
   tableId,
@@ -56,7 +117,7 @@ export function CloseTableModal({
               </button>
             </div>
 
-            <CloseTableForm
+            <CloseTableFormContent
               tableId={tableId}
               total={total}
               mode={mode}
@@ -68,5 +129,3 @@ export function CloseTableModal({
     </>
   );
 }
-
-

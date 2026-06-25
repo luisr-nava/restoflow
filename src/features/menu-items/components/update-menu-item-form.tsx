@@ -46,11 +46,7 @@ export function UpdateMenuItemForm({
 
   const onSubmit = (input: UpdateMenuItemInput) => {
     mutate(input, {
-      onSuccess: (response) => {
-        if (response.error) {
-          return;
-        }
-
+      onSuccess: () => {
         onSuccess?.();
       },
     });

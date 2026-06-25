@@ -4,13 +4,25 @@ import { CloseTableModal } from "@/src/features/orders/components/close-table-mo
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetStaffOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-staff-open-order-by-table-id";
 import { useOrdersRealtime } from "@/src/features/orders/hooks/use-orders-realtime";
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
 import type { RestaurantTable } from "../types/table.types";
 
-function StaffTableCard({ table }: { table: RestaurantTable }) {
-  const { data: openOrder } = useGetStaffOpenOrderByTableId(table.id);
+type StaffTableCardProps = {
+  table: RestaurantTable;
+  currency?: string | null;
+};
+
+function StaffTableCard({ table, currency }: StaffTableCardProps) {
+  const { data: openOrder, error, isError, isLoading } =
+    useGetStaffOpenOrderByTableId(table.id);
 
   const total = openOrder?.total ?? 0;
   const hasOpenOrder = Boolean(openOrder);
@@ -26,11 +38,21 @@ function StaffTableCard({ table }: { table: RestaurantTable }) {
             {table.seats} lugares
           </p>
 
-          {hasOpenOrder && (
+          {isError ? (
+            <div className="mt-3">
+              <ErrorState
+                title="No se pudo cargar el consumo"
+                description={error.message}
+                className="rounded-xl px-4 py-3 text-left"
+              />
+            </div>
+          ) : hasOpenOrder ? (
             <p className="mt-2 text-sm font-medium text-foreground">
-              Consumo: ${total}
+              Consumo: {formatMoney(total, currency)}
             </p>
-          )}
+          ) : isLoading ? (
+            <p className="mt-2 text-sm text-muted-foreground">Cargando consumo...</p>
+          ) : null}
         </div>
 
         <span className="text-xs text-muted-foreground">{table.status}</span>
@@ -54,10 +76,22 @@ function StaffTableCard({ table }: { table: RestaurantTable }) {
 export function StaffTablesList() {
   useOrdersRealtime();
 
-  const { data: tables = [], isLoading } = useGetStaffTables();
+  const { data: tables = [], error, isError, isLoading } = useGetStaffTables();
+  const { data: staffRestaurantCurrency } = useGetStaffRestaurantCurrency();
+  const currency = staffRestaurantCurrency?.data?.currency;
 
   if (isLoading) {
     return <LoadingState label="Cargando tus mesas..." className="bg-surface" />;
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="No se pudieron cargar tus mesas"
+        description={error.message}
+        className="bg-surface"
+      />
+    );
   }
 
   if (tables.length === 0) {
@@ -73,7 +107,7 @@ export function StaffTablesList() {
   return (
     <div className="grid gap-3">
       {tables.map((table) => (
-        <StaffTableCard key={table.id} table={table} />
+        <StaffTableCard key={table.id} table={table} currency={currency} />
       ))}
     </div>
   );

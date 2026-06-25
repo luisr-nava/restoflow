@@ -41,11 +41,17 @@ export function EditTableForm({ table, onSuccess }: EditTableFormProps) {
     }));
 
   const onSubmit = (input: UpdateTableInput) => {
-    mutate(input, {
+    mutate(
+      {
+        ...input,
+        floorId: table.floor_id,
+      },
+      {
       onSuccess: () => {
         onSuccess?.();
       },
-    });
+      },
+    );
   };
 
   return (
@@ -74,4 +80,3 @@ export function EditTableForm({ table, onSuccess }: EditTableFormProps) {
     </Form>
   );
 }
-

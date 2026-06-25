@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { logoutAction } from "@/src/features/auth/actions/auth.actions";
-
 export function UserNavigation() {
   return (
     <nav className="flex items-center gap-3">
@@ -24,4 +22,3 @@ export function UserNavigation() {
     </nav>
   );
 }
-

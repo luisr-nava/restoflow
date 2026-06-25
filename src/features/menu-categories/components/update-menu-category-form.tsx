@@ -35,11 +35,7 @@ export function UpdateMenuCategoryForm({
 
   const onSubmit = (input: UpdateMenuCategoryInput) => {
     mutate(input, {
-      onSuccess: (response) => {
-        if (response.error) {
-          return;
-        }
-
+      onSuccess: () => {
         onSuccess?.();
       },
     });

@@ -1,6 +1,10 @@
 "use client";
 
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 import { CreateStaffModal } from "./create-staff-modal";
 import { useGetStaff } from "../hooks/use-get-staff";
 import { UpdateStaffModal } from "./update-staff-modal";
@@ -12,7 +16,7 @@ const roleLabel = {
 } as const;
 
 export function TeamView() {
-  const { data: staff = [], isLoading } = useGetStaff();
+  const { data: staff = [], error, isError, isLoading } = useGetStaff();
 
   return (
     <div className="space-y-6">
@@ -38,6 +42,12 @@ export function TeamView() {
         {isLoading ? (
           <LoadingState
             label="Cargando personal..."
+            className="rounded-none border-0 bg-transparent"
+          />
+        ) : isError ? (
+          <ErrorState
+            title="No se pudo cargar el personal"
+            description={error.message}
             className="rounded-none border-0 bg-transparent"
           />
         ) : staff.length === 0 ? (

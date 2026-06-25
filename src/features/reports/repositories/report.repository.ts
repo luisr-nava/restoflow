@@ -46,7 +46,7 @@ class ReportRepository implements IReportRepository {
           totalSales: 0,
           totalOrders: 0,
           averageTicket: 0,
-          closedTables: 0,
+          paidOrders: 0,
         },
         error,
       };
@@ -63,7 +63,7 @@ class ReportRepository implements IReportRepository {
         totalSales,
         totalOrders,
         averageTicket: totalOrders > 0 ? totalSales / totalOrders : 0,
-        closedTables: totalOrders,
+        paidOrders: totalOrders,
       },
       error: null,
     };

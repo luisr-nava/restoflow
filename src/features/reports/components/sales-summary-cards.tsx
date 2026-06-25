@@ -1,10 +1,15 @@
 "use client";
 
-import { EmptyState } from "@/src/shared/components/states";
+import { EmptyState, ErrorState } from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 import { useSalesSummary } from "../hooks/use-sales-summary";
 
-export function SalesSummaryCards() {
-  const { data, isLoading } = useSalesSummary();
+type SalesSummaryCardsProps = {
+  currency?: string | null;
+};
+
+export function SalesSummaryCards({ currency }: SalesSummaryCardsProps) {
+  const { data, error, isError, isLoading } = useSalesSummary();
 
   if (isLoading) {
     return (
@@ -16,6 +21,15 @@ export function SalesSummaryCards() {
           />
         ))}
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="No se pudo cargar el resumen de ventas"
+        description={error.message}
+      />
     );
   }
 
@@ -35,7 +49,9 @@ export function SalesSummaryCards() {
           Ventas Totales
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">${data.totalSales}</p>
+        <p className="mt-3 text-2xl font-semibold">
+          {formatMoney(data.totalSales, currency)}
+        </p>
       </div>
 
       <div className="rounded-2xl border border-border bg-background p-4">
@@ -51,15 +67,17 @@ export function SalesSummaryCards() {
           Ticket Promedio
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">${Math.round(data.averageTicket)}</p>
+        <p className="mt-3 text-2xl font-semibold">
+          {formatMoney(Math.round(data.averageTicket), currency)}
+        </p>
       </div>
 
       <div className="rounded-2xl border border-border bg-background p-4">
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-          Mesas Cerradas
+          Pedidos Pagados
         </p>
 
-        <p className="mt-3 text-2xl font-semibold">{data.closedTables}</p>
+        <p className="mt-3 text-2xl font-semibold">{data.paidOrders}</p>
       </div>
     </div>
   );

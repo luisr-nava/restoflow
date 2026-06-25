@@ -4,7 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 import { useGetFloors } from "@/src/features/floors/hooks/use-get-floors";
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 
 import { useGetTablesByFloorId } from "../hooks/use-get-tables-by-floor-id";
 import type { TableQrPdfItem } from "../types/table-qr.types";
@@ -96,7 +100,7 @@ function FloorQrSection({
   onCheckedChange: (tableId: string, checked: boolean) => void;
   onQrReady: (item: TableQrPdfItem) => void;
 }) {
-  const { data, isLoading } = useGetTablesByFloorId({ floorId });
+  const { data, error, isError, isLoading } = useGetTablesByFloorId({ floorId });
   const tables = data ?? [];
 
   if (isLoading) {
@@ -105,6 +109,20 @@ function FloorQrSection({
         label={`Cargando mesas de ${floorName}...`}
         className="bg-surface"
       />
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">{floorName}</h2>
+
+        <ErrorState
+          title="No se pudieron cargar las mesas de este piso"
+          description={error.message}
+          className="bg-surface"
+        />
+      </section>
     );
   }
 

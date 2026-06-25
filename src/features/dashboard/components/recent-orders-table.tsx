@@ -1,7 +1,9 @@
+import { formatMoney } from "@/src/shared/utils/format-money";
 import type { DashboardRecentOrder } from "../types/dashboard.types";
 
 type RecentOrdersTableProps = {
   orders: DashboardRecentOrder[];
+  currency?: string | null;
 };
 
 const statusLabelByStatus: Record<string, string> = {
@@ -30,7 +32,10 @@ function formatDateTime(value: string) {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
+export function RecentOrdersTable({
+  orders,
+  currency,
+}: RecentOrdersTableProps) {
   if (orders.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-surface p-4">
@@ -80,7 +85,7 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                   {statusLabelByStatus[order.status] ?? order.status}
                 </td>
                 <td className="py-3 pr-4 text-foreground">
-                  ${order.total.toFixed(2)}
+                  {formatMoney(order.total, currency)}
                 </td>
                 <td className="py-3 pr-4 text-muted-foreground">
                   {formatDateTime(order.createdAt)}

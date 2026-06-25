@@ -9,7 +9,11 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+} from "@/src/shared/components/states";
 
 import { useCreateStaff } from "../hooks/use-create-staff";
 import { CreateStaffSchema } from "../schemas/team.schema";
@@ -36,8 +40,12 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
     control: form.control,
     name: "role",
   });
-  const { data: tables = [], isLoading: isLoadingTables } =
-    useGetRestaurantTables();
+  const {
+    data: tables = [],
+    error: tablesError,
+    isError: isTablesError,
+    isLoading: isLoadingTables,
+  } = useGetRestaurantTables();
   const onSubmit = (input: CreateStaffInput) => {
     mutate(input, {
       onSuccess: (response) => {
@@ -82,6 +90,12 @@ export function CreateStaffForm({ onSuccess }: CreateStaffFormProps) {
           {isLoadingTables ? (
             <LoadingState
               label="Cargando mesas..."
+              className="rounded-none border-0 bg-transparent p-0 text-left"
+            />
+          ) : isTablesError ? (
+            <ErrorState
+              title="No se pudieron cargar las mesas"
+              description={tablesError.message}
               className="rounded-none border-0 bg-transparent p-0 text-left"
             />
           ) : tables.length === 0 ? (

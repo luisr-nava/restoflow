@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { createMenuCategoryAction } from "../actions/menu-category.actions";
+import { menuCategoryKeys } from "../query-keys/menu-category.keys";
 import type { CreateMenuCategoryInput } from "../types/menu-category.types";
 
 export function useCreateMenuCategory() {
@@ -21,7 +22,7 @@ export function useCreateMenuCategory() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({
-        queryKey: ["menu-categories"],
+        queryKey: menuCategoryKeys.all,
       });
 
       toast.success(result.success);

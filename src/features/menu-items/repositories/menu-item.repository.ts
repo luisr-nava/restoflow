@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   CreateMenuItemInput,
   MenuItem,
+  MenuItemWithCategory,
   UpdateMenuItemInput,
 } from "../types/menu-item.types";
 
@@ -16,12 +17,12 @@ export interface IMenuItemRepository {
   findMenuItemsByRestaurantId(
     supabase: SupabaseClient,
     restaurantId: string,
-  ): Promise<{ data: MenuItem[] | null; error: Error | null }>;
+  ): Promise<{ data: MenuItemWithCategory[] | null; error: Error | null }>;
 
   findMenuItemById(
     supabase: SupabaseClient,
     menuItemId: string,
-  ): Promise<{ data: MenuItem | null; error: Error | null }>;
+  ): Promise<{ data: MenuItemWithCategory | null; error: Error | null }>;
 
   countItemsByCategoryId(
     supabase: SupabaseClient,
@@ -71,7 +72,7 @@ class MenuItemRepository implements IMenuItemRepository {
   async findMenuItemsByRestaurantId(
     supabase: SupabaseClient,
     restaurantId: string,
-  ): Promise<{ data: MenuItem[] | null; error: Error | null }> {
+  ): Promise<{ data: MenuItemWithCategory[] | null; error: Error | null }> {
     const { data, error } = await supabase
       .from("menu_items")
       .select(
@@ -79,7 +80,8 @@ class MenuItemRepository implements IMenuItemRepository {
       *,
       menu_categories (
         id,
-        name
+        name,
+        is_active
       )
     `,
       )
@@ -92,10 +94,19 @@ class MenuItemRepository implements IMenuItemRepository {
   async findMenuItemById(
     supabase: SupabaseClient,
     menuItemId: string,
-  ): Promise<{ data: MenuItem | null; error: Error | null }> {
+  ): Promise<{ data: MenuItemWithCategory | null; error: Error | null }> {
     const { data, error } = await supabase
       .from("menu_items")
-      .select("*")
+      .select(
+        `
+      *,
+      menu_categories (
+        id,
+        name,
+        is_active
+      )
+    `,
+      )
       .eq("id", menuItemId)
       .maybeSingle();
 
@@ -165,5 +176,3 @@ class MenuItemRepository implements IMenuItemRepository {
 }
 
 export const menuItemRepository = new MenuItemRepository();
-
-

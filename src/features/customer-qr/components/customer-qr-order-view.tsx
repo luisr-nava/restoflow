@@ -4,10 +4,12 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.keys";
 import { createQrTableOrderAction } from "@/src/features/orders/actions/order.actions";
 import { orderKeys } from "@/src/features/orders/query-keys/order.keys";
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { EmptyState } from "@/src/shared/components/states";
+import { formatMoney } from "@/src/shared/utils/format-money";
 
 import type { CustomerQrData } from "../types/customer-qr.types";
 
@@ -26,6 +28,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  const currency = data.restaurant.currency;
   const total = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
     [cartItems],
@@ -88,8 +91,6 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
 
     setIsSubmitting(false);
 
-    console.log("QR order response:", response);
-
     if (response.error) {
       toast.error(response.error);
       return;
@@ -103,7 +104,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
         queryKey: tableKeys.all,
       }),
       queryClient.invalidateQueries({
-        queryKey: ["dashboard"],
+        queryKey: dashboardKeys.all,
       }),
     ]);
 
@@ -160,7 +161,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
 
                     <div className="text-right">
                       <p className="font-semibold text-text">
-                        ${Number(item.price).toFixed(2)}
+                        {formatMoney(item.price, currency)}
                       </p>
 
                       <button
@@ -184,7 +185,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
             <div>
               <p className="text-sm text-text-3">Total</p>
               <p className="text-xl font-semibold text-text">
-                ${total.toFixed(2)}
+                {formatMoney(total, currency)}
               </p>
             </div>
 
@@ -206,7 +207,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
                   <div>
                     <p className="font-medium text-text">{item.name}</p>
                     <p className="text-xs text-text-3">
-                      {item.quantity} x ${item.price.toFixed(2)}
+                      {item.quantity} x {formatMoney(item.price, currency)}
                     </p>
                   </div>
 

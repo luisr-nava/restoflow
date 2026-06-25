@@ -19,6 +19,14 @@ class TableService {
     return createClient();
   }
 
+  private toError(error: unknown, fallback: string) {
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new Error(fallback);
+  }
+
   async createTable(input: CreateTableInput) {
     const supabase = await this.getSupabase();
 
@@ -130,18 +138,26 @@ class TableService {
   async getTablesByFloorId(floorId: string) {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return [];
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.tableRepository.findTablesByFloorId(
+        supabase,
+        floorId,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar las mesas del piso");
     }
-
-    const { data } = await this.tableRepository.findTablesByFloorId(
-      supabase,
-      floorId,
-    );
-
-    return data ?? [];
   }
 
   async updateTable(input: UpdateTableInput) {
@@ -286,41 +302,56 @@ class TableService {
   async getTablesByRestaurantId() {
     const supabase = await this.getSupabase();
 
-    const member = await restaurantService.getCurrentUserRestaurantMember();
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
 
-    if (!member) {
-      return [];
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data, error } = await this.tableRepository.findTablesByRestaurantId(
+        supabase,
+        member.restaurant_id,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar las mesas");
     }
-
-    const { data } = await this.tableRepository.findTablesByRestaurantId(
-      supabase,
-      member.restaurant_id,
-    );
-
-    return data ?? [];
   }
 
   async getTablesByStaffSession() {
     const supabase = await this.getSupabase();
 
-    const session = await getStaffSession();
+    try {
+      const session = await getStaffSession();
 
-    if (!session) {
-      return [];
+      if (!session) {
+        throw new Error("No hay sesión de personal activa");
+      }
+
+      if (session.role !== "WAITER") {
+        throw new Error("Sólo los mozos pueden ver sus mesas");
+      }
+
+      const { data, error } = await this.tableRepository.findTablesByRestaurantId(
+        supabase,
+        session.restaurantId,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ?? [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar las mesas");
     }
-
-    if (session.role !== "WAITER") {
-      return [];
-    }
-
-    const { data } = await this.tableRepository.findTablesByRestaurantId(
-      supabase,
-      session.restaurantId,
-    );
-
-    return data ?? [];
   }
 }
 
 export const tableService = new TableService(tableRepository);
-

@@ -23,6 +23,25 @@ class OrderService {
     return createClient();
   }
 
+  private toError(error: unknown, fallback: string) {
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new Error(fallback);
+  }
+
+  private belongsToInactiveCategory(menuItem: {
+    category_id: string | null;
+    menu_categories: {
+      is_active: boolean;
+    } | null;
+  }) {
+    return (
+      menuItem.category_id !== null && menuItem.menu_categories?.is_active === false
+    );
+  }
+
   async createTableOrder(input: CreateTableOrderInput) {
     const supabase = await this.getSupabase();
 
@@ -95,8 +114,6 @@ class OrderService {
           });
 
         if (orderError || !createdOrder) {
-          console.log("CREATE ORDER ERROR:", orderError);
-
           return {
             error: orderError?.message || "No se pudo crear el pedido",
             success: "",
@@ -120,6 +137,13 @@ class OrderService {
         if (menuItem.restaurant_id !== member.restaurant_id) {
           return {
             error: "Un item del menú no pertenece al restaurante",
+            success: "",
+          };
+        }
+
+        if (this.belongsToInactiveCategory(menuItem)) {
+          return {
+            error: `El item ${menuItem.name} pertenece a una categoría inactiva`,
             success: "",
           };
         }
@@ -202,23 +226,27 @@ class OrderService {
         await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
-        return null;
+        throw new Error("No se pudo obtener la membresía del restaurante");
       }
 
       const { data: order, error } =
         await this.orderRepository.findActiveOrderByTableId(supabase, tableId);
 
-      if (error || !order) {
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!order) {
         return null;
       }
 
       if (order.restaurant_id !== member.restaurant_id) {
-        return null;
+        throw new Error("No tenés permisos para ver este pedido");
       }
 
       return order;
-    } catch {
-      return null;
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el pedido activo");
     }
   }
 
@@ -347,16 +375,24 @@ class OrderService {
         await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
-        return [];
+        throw new Error("No se pudo obtener la membresía del restaurante");
       }
 
-      const { data: order } = await this.orderRepository.findOrderById(
+      const { data: order, error: orderError } = await this.orderRepository.findOrderById(
         supabase,
         orderId,
       );
 
-      if (!order || order.restaurant_id !== member.restaurant_id) {
-        return [];
+      if (orderError) {
+        throw new Error(orderError.message);
+      }
+
+      if (!order) {
+        throw new Error("El pedido no existe");
+      }
+
+      if (order.restaurant_id !== member.restaurant_id) {
+        throw new Error("No tenés permisos para ver este pedido");
       }
 
       const { data, error } = await this.orderRepository.findOrderItems(
@@ -365,12 +401,12 @@ class OrderService {
       );
 
       if (error) {
-        return [];
+        throw new Error(error.message);
       }
 
       return data ?? [];
-    } catch {
-      return [];
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el detalle del pedido");
     }
   }
 
@@ -498,6 +534,13 @@ class OrderService {
         if (menuItem.restaurant_id !== table.restaurant_id) {
           return {
             error: "Un item del menú no pertenece al restaurante",
+            success: "",
+          };
+        }
+
+        if (this.belongsToInactiveCategory(menuItem)) {
+          return {
+            error: `El item ${menuItem.name} pertenece a una categoría inactiva`,
             success: "",
           };
         }
@@ -664,6 +707,13 @@ class OrderService {
           };
         }
 
+        if (this.belongsToInactiveCategory(menuItem)) {
+          return {
+            error: `El item ${menuItem.name} pertenece a una categoría inactiva`,
+            success: "",
+          };
+        }
+
         if (!menuItem.is_available) {
           return {
             error: `El item ${menuItem.name} no está disponible`,
@@ -742,13 +792,17 @@ class OrderService {
         await restaurantService.getCurrentUserRestaurantMember(supabase);
 
       if (!member) {
-        return null;
+        throw new Error("No se pudo obtener la membresía del restaurante");
       }
 
       const { data: orders, error } =
         await this.orderRepository.findOpenOrdersByTableId(supabase, tableId);
 
-      if (error || !orders || orders.length === 0) {
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!orders || orders.length === 0) {
         return null;
       }
 
@@ -757,7 +811,7 @@ class OrderService {
       );
 
       if (validOrders.length === 0) {
-        return null;
+        throw new Error("No tenés permisos para ver los pedidos de esta mesa");
       }
 
       const total = validOrders.reduce(
@@ -769,8 +823,8 @@ class OrderService {
         ...validOrders[0],
         total,
       };
-    } catch {
-      return null;
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el pedido abierto");
     }
   }
   async closeStaffTable(input: CloseTableInput) {
@@ -880,17 +934,21 @@ class OrderService {
       const session = await getStaffSession();
 
       if (!session) {
-        return null;
+        throw new Error("No hay sesión de personal activa");
       }
 
       if (session.role !== "WAITER") {
-        return null;
+        throw new Error("Sólo los mozos pueden ver pedidos de mesas");
       }
 
       const { data: orders, error } =
         await this.orderRepository.findOpenOrdersByTableId(supabase, tableId);
 
-      if (error || !orders || orders.length === 0) {
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!orders || orders.length === 0) {
         return null;
       }
 
@@ -899,7 +957,7 @@ class OrderService {
       );
 
       if (validOrders.length === 0) {
-        return null;
+        throw new Error("No tenés permisos para ver los pedidos de esta mesa");
       }
 
       const total = validOrders.reduce(
@@ -911,8 +969,8 @@ class OrderService {
         ...validOrders[0],
         total,
       };
-    } catch {
-      return null;
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el pedido abierto");
     }
   }
 
@@ -922,11 +980,11 @@ class OrderService {
       const session = await getStaffSession();
 
       if (!session) {
-        return [];
+        throw new Error("No hay sesión de personal activa");
       }
 
       if (session.role !== "KITCHEN") {
-        return [];
+        throw new Error("Sólo cocina puede ver los pedidos");
       }
 
       const { data, error } =
@@ -936,12 +994,12 @@ class OrderService {
         );
 
       if (error) {
-        return [];
+        throw new Error(error.message);
       }
 
       return data ?? [];
-    } catch {
-      return [];
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar los pedidos");
     }
   }
 
@@ -1024,4 +1082,3 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
-

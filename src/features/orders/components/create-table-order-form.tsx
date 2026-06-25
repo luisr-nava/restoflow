@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm, type Resolver } from "react-hook-form";
+import { useFieldArray, useForm, useWatch, type Resolver } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import {
@@ -39,6 +39,9 @@ export function CreateTableOrderForm({
     mode === "staff"
       ? (staffMenuItems.data ?? [])
       : (adminMenuItems.data ?? []);
+  const visibleMenuItems = menuItems.filter(
+    (item) => item.menu_categories?.is_active !== false,
+  );
 
   const form = useForm<CreateTableOrderInput>({
     resolver: zodResolver(
@@ -71,7 +74,10 @@ export function CreateTableOrderForm({
   const isPending =
     mode === "staff" ? staffCreateOrder.isPending : adminCreateOrder.isPending;
 
-  const items = form.watch("items");
+  const items = useWatch({
+    control: form.control,
+    name: "items",
+  });
 
   const onAddItem = async () => {
     const lastIndex = fields.length - 1;
@@ -109,7 +115,7 @@ export function CreateTableOrderForm({
       <div className="max-h-[420px] space-y-3 overflow-y-auto pr-1">
         {fields.map((field, index) => {
           const currentItem = items[index];
-          const menuItem = menuItems.find(
+          const menuItem = visibleMenuItems.find(
             (item) => item.id === currentItem?.menuItemId,
           );
           const isCompleted = Boolean(
@@ -143,7 +149,7 @@ export function CreateTableOrderForm({
                     defaultValue="">
                     <option value="">Seleccionar item</option>
 
-                    {menuItems.map((item) => (
+                    {visibleMenuItems.map((item) => (
                       <option
                         key={item.id}
                         value={item.id}
@@ -214,4 +220,3 @@ export function CreateTableOrderForm({
     </Form>
   );
 }
-

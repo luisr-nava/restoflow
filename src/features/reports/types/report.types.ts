@@ -2,7 +2,7 @@ export type SalesSummary = {
   totalSales: number;
   totalOrders: number;
   averageTicket: number;
-  closedTables: number;
+  paidOrders: number;
 };
 
 export type TopProduct = {

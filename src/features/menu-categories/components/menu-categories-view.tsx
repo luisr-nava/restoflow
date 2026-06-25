@@ -1,13 +1,14 @@
 "use client";
 
-import { LoadingState } from "@/src/shared/components/states";
+import { ErrorState, LoadingState } from "@/src/shared/components/states";
 import { CreateMenuCategoryModal } from "./create-menu-category-modal";
 import { MenuCategoriesList } from "./menu-categories-list";
 
 import { useGetMenuCategories } from "../hooks/use-get-menu-categories";
 
 export function MenuCategoriesView() {
-  const { data: categories = [], isLoading } = useGetMenuCategories();
+  const { data: categories = [], error, isError, isLoading } =
+    useGetMenuCategories();
 
   return (
     <section className="space-y-4">
@@ -28,6 +29,12 @@ export function MenuCategoriesView() {
       {isLoading ? (
         <LoadingState
           label="Cargando categorías..."
+          className="min-h-[240px] flex items-center justify-center"
+        />
+      ) : isError ? (
+        <ErrorState
+          title="No se pudieron cargar las categorías"
+          description={error.message}
           className="min-h-[240px] flex items-center justify-center"
         />
       ) : (

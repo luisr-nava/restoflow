@@ -11,14 +11,17 @@ export function useUpdateMenuItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateMenuItemInput) => updateMenuItemAction(input),
+    mutationFn: async (input: UpdateMenuItemInput) => {
+      const result = await updateMenuItemAction(input);
 
-    onSuccess: async (response) => {
-      if (response.error) {
-        toast.error(response.error);
-        return;
+      if (result.error) {
+        throw new Error(result.error);
       }
 
+      return result;
+    },
+
+    onSuccess: async (result) => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: menuItemKeys.all,
@@ -28,11 +31,11 @@ export function useUpdateMenuItem() {
         }),
       ]);
 
-      toast.success(response.success);
+      toast.success(result.success);
     },
 
-    onError: () => {
-      toast.error("No se pudo actualizar el item");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 }
