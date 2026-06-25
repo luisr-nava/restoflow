@@ -4,7 +4,9 @@ import {
   CreateRestaurantSchema,
   UpdateRestaurantSchema,
 } from "../schemas/restaurant.schema";
-export type CreateRestaurantInput = z.infer<typeof CreateRestaurantSchema>;
+export type CreateRestaurantInput = z.infer<typeof CreateRestaurantSchema> & {
+  logoFile?: File;
+};
 export type UpdateRestaurantInput = z.infer<typeof UpdateRestaurantSchema>;
 
 export type RestaurantRole = "OWNER" | "MANAGER" | "WAITER" | "KITCHEN";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { OptionalRestaurantLogoFileSchema } from "./restaurant-logo.schema";
 export const CreateRestaurantSchema = z.object({
   name: z
     .string()
@@ -42,7 +42,8 @@ export const CreateRestaurantSchema = z.object({
     .min(1, { error: "La zona horaria es obligatoria" }),
 
   logoUrl: z.string().optional().or(z.literal("")),
+  logoFile: OptionalRestaurantLogoFileSchema,
 });
 
-
 export const UpdateRestaurantSchema = CreateRestaurantSchema;
+

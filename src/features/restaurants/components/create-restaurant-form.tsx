@@ -2,6 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { RestaurantLogoUploadField } from "./restaurant-logo-upload-field";
+import { useUploadRestaurantLogo } from "../hooks/use-upload-restaurant-logo";
 
 import {
   Form,
@@ -31,13 +33,32 @@ export function CreateRestaurantForm() {
       currency: "ARS",
       timezone: "America/Argentina/Buenos_Aires",
       logoUrl: "",
+      logoFile: undefined,
     },
   });
-
+  const { mutateAsync: uploadRestaurantLogo, isPending: isUploadingLogo } =
+    useUploadRestaurantLogo();
   const { mutate: createRestaurant } = useCreateRestaurant();
 
-  const onSubmit = (data: CreateRestaurantInput) => {
-    createRestaurant(data);
+  const onSubmit = async (data: CreateRestaurantInput) => {
+    const { logoFile, ...restaurantData } = data;
+
+    let logoUrl = restaurantData.logoUrl;
+
+    if (logoFile) {
+      const result = await uploadRestaurantLogo(logoFile);
+
+      if (!result) {
+        return;
+      }
+
+      logoUrl = result.publicUrl;
+    }
+
+    createRestaurant({
+      ...restaurantData,
+      logoUrl,
+    });
   };
 
   return (
@@ -83,11 +104,22 @@ export function CreateRestaurantForm() {
           </option>
         ))}
       </FormSelect>
-
+      <RestaurantLogoUploadField
+        value={form.watch("logoFile")}
+        disabled={isUploadingLogo}
+        onChange={(file) => {
+          form.setValue("logoFile", file, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      />
       <FormSubmit
         value="Crear restaurante"
         loadingText="Creando restaurante..."
+        disabled={isUploadingLogo}
       />
     </Form>
   );
 }
+
