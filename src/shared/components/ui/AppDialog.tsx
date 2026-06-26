@@ -46,7 +46,7 @@ export function AppDialog({
 }: AppDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} className={clsx("relative z-50", className)}>
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 overflow-y-auto px-4 py-4">
         <div className="flex min-h-full items-center justify-center">
