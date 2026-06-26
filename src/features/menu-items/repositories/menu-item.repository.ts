@@ -6,7 +6,7 @@ import type {
   MenuItemWithCategory,
   UpdateMenuItemInput,
 } from "../types/menu-item.types";
-
+export const MENU_ITEM_IMAGES_BUCKET = "menu-item-images";
 export interface IMenuItemRepository {
   createMenuItem(
     supabase: SupabaseClient,
@@ -43,6 +43,19 @@ export interface IMenuItemRepository {
   deleteMenuItem(
     supabase: SupabaseClient,
     menuItemId: string,
+  ): Promise<{ error: Error | null }>;
+
+  uploadImage(
+    supabase: SupabaseClient,
+    path: string,
+    file: File,
+  ): Promise<{ path: string; error: Error | null }>;
+
+  getImagePublicUrl(supabase: SupabaseClient, path: string): string;
+
+  removeImage(
+    supabase: SupabaseClient,
+    path: string,
   ): Promise<{ error: Error | null }>;
 }
 
@@ -173,6 +186,41 @@ class MenuItemRepository implements IMenuItemRepository {
 
     return { error };
   }
+
+  async uploadImage(
+    supabase: SupabaseClient,
+    path: string,
+    file: File,
+  ): Promise<{ path: string; error: Error | null }> {
+    const { data, error } = await supabase.storage
+      .from(MENU_ITEM_IMAGES_BUCKET)
+      .upload(path, file);
+
+    return {
+      path: data?.path ?? "",
+      error,
+    };
+  }
+
+  getImagePublicUrl(supabase: SupabaseClient, path: string) {
+    const { data } = supabase.storage
+      .from(MENU_ITEM_IMAGES_BUCKET)
+      .getPublicUrl(path);
+
+    return data.publicUrl;
+  }
+
+  async removeImage(
+    supabase: SupabaseClient,
+    path: string,
+  ): Promise<{ error: Error | null }> {
+    const { error } = await supabase.storage
+      .from(MENU_ITEM_IMAGES_BUCKET)
+      .remove([path]);
+
+    return { error };
+  }
 }
 
 export const menuItemRepository = new MenuItemRepository();
+

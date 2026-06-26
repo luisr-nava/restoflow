@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
-
+import { RestaurantLogoUploadField } from "@/src/features/restaurants/components/restaurant-logo-upload-field";
+import { useUploadRestaurantLogo } from "@/src/features/restaurants/hooks/use-upload-restaurant-logo";
 import {
   Form,
   FormInput,
@@ -33,26 +34,49 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
       categoryId: "",
       imageUrl: "",
       isAvailable: true,
+      imageFile: undefined,
     },
   });
 
   const { mutate, isPending } = useCreateMenuItem();
+  const { mutateAsync: uploadMenuItemImage, isPending: isUploadingImage } =
+    useUploadRestaurantLogo();
+  const onSubmit = async (input: CreateMenuItemInput) => {
+    const { imageFile, ...menuItemData } = input;
 
-  const onSubmit = (input: CreateMenuItemInput) => {
-    mutate(input, {
-      onSuccess: () => {
-        form.reset({
-          name: "",
-          description: "",
-          price: 0,
-          categoryId: "",
-          imageUrl: "",
-          isAvailable: true,
-        });
+    let imageUrl = menuItemData.imageUrl;
 
-        onSuccess?.();
+    if (imageFile) {
+      const result = await uploadMenuItemImage(imageFile);
+
+      if (!result) {
+        return;
+      }
+
+      imageUrl = result.publicUrl;
+    }
+
+    mutate(
+      {
+        ...menuItemData,
+        imageUrl,
       },
-    });
+      {
+        onSuccess: () => {
+          form.reset({
+            name: "",
+            description: "",
+            price: 0,
+            categoryId: "",
+            imageUrl: "",
+            imageFile: undefined,
+            isAvailable: true,
+          });
+
+          onSuccess?.();
+        },
+      },
+    );
   };
 
   return (
@@ -81,13 +105,33 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
         ))}
       </FormSelect>
 
-      <FormInput name="imageUrl" label="Imagen URL" placeholder="https://..." />
-
+      <RestaurantLogoUploadField
+        value={form.watch("imageFile")}
+        currentImageUrl={form.watch("imageUrl")}
+        disabled={isUploadingImage || isPending}
+        onChange={(file) => {
+          form.setValue("imageFile", file, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+        onRemoveCurrentImage={() => {
+          form.setValue("imageUrl", "", {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+          form.setValue("imageFile", undefined, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      />
       <FormSubmit
         value="Crear item"
         loadingText="Creando..."
-        disabled={isPending}
+        disabled={isPending || isUploadingImage}
       />
     </Form>
   );
 }
+

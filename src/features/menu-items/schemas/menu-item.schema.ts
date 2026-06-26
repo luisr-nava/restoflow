@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+const MENU_ITEM_IMAGE_MAX_SIZE = 2 * 1024 * 1024;
+
+const MENU_ITEM_IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+const OptionalMenuItemImageSchema = z
+  .instanceof(File)
+  .refine((file) => file.size <= MENU_ITEM_IMAGE_MAX_SIZE, {
+    error: "La imagen no puede superar los 2 MB",
+  })
+  .refine((file) => MENU_ITEM_IMAGE_ALLOWED_TYPES.includes(file.type), {
+    error: "La imagen debe ser JPG, PNG o WEBP",
+  })
+  .optional();
+
 export const CreateMenuItemSchema = z.object({
   name: z
     .string()
@@ -21,11 +35,12 @@ export const CreateMenuItemSchema = z.object({
   imageUrl: z
     .string()
     .trim()
-    .refine(
-      (value) => value === "" || z.url().safeParse(value).success,
-      { error: "La imagen debe ser una URL válida" },
-    )
+    .refine((value) => value === "" || z.url().safeParse(value).success, {
+      error: "La imagen debe ser una URL válida",
+    })
     .optional(),
+
+  imageFile: OptionalMenuItemImageSchema,
 
   isAvailable: z.boolean().default(true),
 });
@@ -36,5 +51,4 @@ export const UpdateMenuItemSchema = CreateMenuItemSchema.extend({
 
 export const DeleteMenuItemSchema = z.object({
   menuItemId: z.string().uuid({ error: "El item es obligatorio" }),
-
 });

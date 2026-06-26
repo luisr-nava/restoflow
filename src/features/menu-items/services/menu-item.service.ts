@@ -1,6 +1,6 @@
 import { restaurantService } from "@/src/features/restaurants/services/restaurant.service";
 import { createClient } from "@/src/lib/supabase/server";
-
+import { extname } from "path";
 import {
   IMenuItemRepository,
   menuItemRepository,
@@ -37,14 +37,33 @@ class MenuItemService {
           success: "",
         };
       }
+      let imageUrl = input.imageUrl;
 
+      if (input.imageFile) {
+        imageUrl = await this.uploadImage(
+          supabase,
+          member.restaurant_id,
+          input.imageFile,
+        );
+      }
       const { error } = await this.menuItemRepository.createMenuItem(
         supabase,
         member.restaurant_id,
-        input,
+        {
+          ...input,
+          imageUrl,
+        },
       );
 
       if (error) {
+        if (imageUrl) {
+          try {
+            await this.deleteImage(supabase, imageUrl);
+          } catch {
+            // No bloqueamos la respuesta si falla la limpieza de la imagen subida.
+          }
+        }
+
         return {
           error: error.message,
           success: "",
@@ -147,16 +166,37 @@ class MenuItemService {
         };
       }
 
-      const { error } = await this.menuItemRepository.updateMenuItem(
-        supabase,
-        input,
-      );
+      let imageUrl = input.imageUrl;
+
+      if (input.imageFile) {
+        imageUrl = await this.uploadImage(
+          supabase,
+          member.restaurant_id,
+          input.imageFile,
+        );
+      }
+
+      const { error } = await this.menuItemRepository.updateMenuItem(supabase, {
+        ...input,
+        imageUrl,
+      });
 
       if (error) {
         return {
           error: error.message,
           success: "",
         };
+      }
+
+      const previousImageUrl = menuItem.image_url;
+      const nextImageUrl = imageUrl || null;
+
+      if (previousImageUrl && previousImageUrl !== nextImageUrl) {
+        try {
+          await this.deleteImage(supabase, previousImageUrl);
+        } catch {
+          // No bloqueamos la actualización si falla la limpieza del archivo anterior.
+        }
       }
 
       return {
@@ -285,6 +325,14 @@ class MenuItemService {
         };
       }
 
+      if (menuItem.image_url) {
+        try {
+          await this.deleteImage(supabase, menuItem.image_url);
+        } catch {
+          // No bloqueamos la eliminación del item si falla la limpieza de la imagen.
+        }
+      }
+
       return {
         error: "",
         success: "Item eliminado correctamente",
@@ -296,6 +344,62 @@ class MenuItemService {
       };
     }
   }
+
+  private createMenuItemImagePath(restaurantId: string, file: File) {
+    const extension = extname(file.name);
+    const fileName = `${crypto.randomUUID()}${extension}`;
+
+    return `restaurants/${restaurantId}/menu-items/${fileName}`;
+  }
+
+  private getPathFromPublicUrl(publicUrl: string) {
+    const marker = "/object/public/menu-item-images/";
+
+    const [, path] = publicUrl.split(marker);
+
+    return path ?? "";
+  }
+
+  private async uploadImage(
+    supabase: Awaited<ReturnType<MenuItemService["getSupabase"]>>,
+    restaurantId: string,
+    file: File,
+  ) {
+    const storagePath = this.createMenuItemImagePath(restaurantId, file);
+
+    const uploadResult = await this.menuItemRepository.uploadImage(
+      supabase,
+      storagePath,
+      file,
+    );
+
+    if (uploadResult.error) {
+      throw uploadResult.error;
+    }
+
+    return this.menuItemRepository.getImagePublicUrl(
+      supabase,
+      uploadResult.path,
+    );
+  }
+
+  private async deleteImage(
+    supabase: Awaited<ReturnType<MenuItemService["getSupabase"]>>,
+    publicUrl: string,
+  ) {
+    const path = this.getPathFromPublicUrl(publicUrl);
+
+    if (!path) {
+      return;
+    }
+
+    const result = await this.menuItemRepository.removeImage(supabase, path);
+
+    if (result.error) {
+      throw result.error;
+    }
+  }
 }
 
 export const menuItemService = new MenuItemService(menuItemRepository);
+
