@@ -7,9 +7,13 @@ import { UpdateMenuItemForm } from "./update-menu-item-form";
 
 type UpdateMenuItemModalProps = {
   item: MenuItem;
+  showTrigger?: boolean;
 };
 
-export function UpdateMenuItemModal({ item }: UpdateMenuItemModalProps) {
+export function UpdateMenuItemModal({
+  item,
+  showTrigger = true,
+}: UpdateMenuItemModalProps) {
   const openModal = useUiModalStore((state) => state.openModal);
   const closeModal = useUiModalStore((state) => state.closeModal);
   const open = useUiModalStore(
@@ -20,12 +24,14 @@ export function UpdateMenuItemModal({ item }: UpdateMenuItemModalProps) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => openModal("editMenuItem", { menuItemId: item.id })}
-        className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
-        Editar
-      </button>
+      {showTrigger && (
+        <button
+          type="button"
+          onClick={() => openModal("editMenuItem", { menuItemId: item.id })}
+          className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
+          Editar
+        </button>
+      )}
 
       <AppDialog
         open={open}

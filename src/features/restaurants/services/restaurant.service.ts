@@ -245,12 +245,11 @@ class RestaurantService {
     const previousLogoUrl = currentRestaurant.logo_url;
     const nextLogoUrl = input.logoUrl || null;
 
-    const { data: updatedRestaurant, error } =
-      await this.restaurantRepository.updateRestaurant(
-        supabase,
-        member.restaurant_id,
-        input,
-      );
+    const { error } = await this.restaurantRepository.updateRestaurant(
+      supabase,
+      member.restaurant_id,
+      input,
+    );
 
     if (error) {
       return {
@@ -264,7 +263,7 @@ class RestaurantService {
         await restaurantLogoService.deleteLogo({
           publicUrl: previousLogoUrl,
         });
-      } catch (error) {}
+      } catch {}
     }
 
     return {
@@ -275,4 +274,3 @@ class RestaurantService {
 }
 
 export const restaurantService = new RestaurantService(restaurantRepository);
-

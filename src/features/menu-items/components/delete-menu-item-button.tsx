@@ -7,9 +7,13 @@ import type { MenuItem } from "../types/menu-item.types";
 
 type DeleteMenuItemButtonProps = {
   item: MenuItem;
+  showTrigger?: boolean;
 };
 
-export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
+export function DeleteMenuItemButton({
+  item,
+  showTrigger = true,
+}: DeleteMenuItemButtonProps) {
   const openModal = useUiModalStore((state) => state.openModal);
   const closeModal = useUiModalStore((state) => state.closeModal);
   const open = useUiModalStore(
@@ -34,13 +38,15 @@ export function DeleteMenuItemButton({ item }: DeleteMenuItemButtonProps) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => openModal("deleteMenuItem", { menuItemId: item.id })}
-        disabled={isPending}
-        className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
-        Eliminar
-      </button>
+      {showTrigger && (
+        <button
+          type="button"
+          onClick={() => openModal("deleteMenuItem", { menuItemId: item.id })}
+          disabled={isPending}
+          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+          Eliminar
+        </button>
+      )}
 
       <AppDialog
         open={open}

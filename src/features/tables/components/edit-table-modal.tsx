@@ -7,9 +7,13 @@ import { EditTableForm } from "./edit-table-form";
 
 type EditTableModalProps = {
   table: RestaurantTable;
+  showTrigger?: boolean;
 };
 
-export function EditTableModal({ table }: EditTableModalProps) {
+export function EditTableModal({
+  table,
+  showTrigger = true,
+}: EditTableModalProps) {
   const openModal = useUiModalStore((state) => state.openModal);
   const closeModal = useUiModalStore((state) => state.closeModal);
   const open = useUiModalStore(
@@ -20,12 +24,14 @@ export function EditTableModal({ table }: EditTableModalProps) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => openModal("editTable", { tableId: table.id })}
-        className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-muted">
-        Editar
-      </button>
+      {showTrigger && (
+        <button
+          type="button"
+          onClick={() => openModal("editTable", { tableId: table.id })}
+          className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-muted">
+          Editar
+        </button>
+      )}
 
       <AppDialog
         open={open}

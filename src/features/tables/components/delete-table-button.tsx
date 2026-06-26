@@ -7,9 +7,13 @@ import type { RestaurantTable } from "../types/table.types";
 
 type DeleteTableButtonProps = {
   table: RestaurantTable;
+  showTrigger?: boolean;
 };
 
-export function DeleteTableButton({ table }: DeleteTableButtonProps) {
+export function DeleteTableButton({
+  table,
+  showTrigger = true,
+}: DeleteTableButtonProps) {
   const openModal = useUiModalStore((state) => state.openModal);
   const closeModal = useUiModalStore((state) => state.closeModal);
   const confirmOpen = useUiModalStore(
@@ -35,13 +39,15 @@ export function DeleteTableButton({ table }: DeleteTableButtonProps) {
 
   return (
     <>
-      <button
-        type="button"
-        disabled={table.status !== "AVAILABLE"}
-        onClick={() => openModal("deleteTable", { tableId: table.id })}
-        className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
-        Eliminar
-      </button>
+      {showTrigger && (
+        <button
+          type="button"
+          disabled={table.status !== "AVAILABLE"}
+          onClick={() => openModal("deleteTable", { tableId: table.id })}
+          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+          Eliminar
+        </button>
+      )}
 
       <AppDialog
         open={confirmOpen}

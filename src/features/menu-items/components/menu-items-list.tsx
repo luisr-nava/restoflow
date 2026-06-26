@@ -3,6 +3,11 @@
 import Image from "next/image";
 
 import { EmptyState } from "@/src/shared/components/states";
+import {
+  ActionMenu,
+  ActionMenuItem,
+} from "@/src/shared/components/ui/ActionMenu";
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import { DeleteMenuItemButton } from "./delete-menu-item-button";
 import { UpdateMenuItemModal } from "./update-menu-item-modal";
@@ -15,6 +20,7 @@ type MenuItemsListProps = {
 
 export function MenuItemsList({ items }: MenuItemsListProps) {
   const { mutate, isPending } = useUpdateMenuItemAvailability();
+  const openModal = useUiModalStore((state) => state.openModal);
 
   if (items.length === 0) {
     return (
@@ -84,10 +90,26 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
                 {item.is_available ? "Disponible" : "No disponible"}
               </button>
 
-              <div className="flex gap-2">
-                <UpdateMenuItemModal item={item} />
-                <DeleteMenuItemButton item={item} />
-              </div>
+              <ActionMenu ariaLabel={`Acciones de ${item.name}`}>
+                <ActionMenuItem
+                  onClick={() =>
+                    openModal("editMenuItem", { menuItemId: item.id })
+                  }>
+                  Editar
+                </ActionMenuItem>
+
+                <ActionMenuItem
+                  onClick={() =>
+                    openModal("deleteMenuItem", { menuItemId: item.id })
+                  }
+                  tone="danger">
+                  Eliminar
+                </ActionMenuItem>
+              </ActionMenu>
+
+              <UpdateMenuItemModal item={item} showTrigger={false} />
+
+              <DeleteMenuItemButton item={item} showTrigger={false} />
             </div>
           </div>
         </div>

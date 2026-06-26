@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { RestaurantLogoUploadField } from "./restaurant-logo-upload-field";
 import { useUploadRestaurantLogo } from "../hooks/use-upload-restaurant-logo";
 
@@ -39,6 +39,10 @@ export function CreateRestaurantForm() {
   const { mutateAsync: uploadRestaurantLogo, isPending: isUploadingLogo } =
     useUploadRestaurantLogo();
   const { mutate: createRestaurant } = useCreateRestaurant();
+  const logoFile = useWatch({
+    control: form.control,
+    name: "logoFile",
+  });
 
   const onSubmit = async (data: CreateRestaurantInput) => {
     const { logoFile, ...restaurantData } = data;
@@ -105,7 +109,7 @@ export function CreateRestaurantForm() {
         ))}
       </FormSelect>
       <RestaurantLogoUploadField
-        value={form.watch("logoFile")}
+        value={logoFile}
         disabled={isUploadingLogo}
         onChange={(file) => {
           form.setValue("logoFile", file, {
@@ -122,4 +126,3 @@ export function CreateRestaurantForm() {
     </Form>
   );
 }
-

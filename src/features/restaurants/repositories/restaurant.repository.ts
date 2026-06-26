@@ -136,7 +136,7 @@ class RestaurantRepository implements IRestaurantRepository {
     restaurantId: string,
     input: UpdateRestaurantInput,
   ): Promise<{ data: Restaurant | null; error: Error | null }> {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("restaurants")
       .update({
         name: input.name,
@@ -158,4 +158,3 @@ class RestaurantRepository implements IRestaurantRepository {
 }
 
 export const restaurantRepository = new RestaurantRepository();
-

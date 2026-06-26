@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import { ImagePlus, Trash2 } from "lucide-react";
 
 import { RestaurantLogoFileSchema } from "../schemas/restaurant-logo.schema";
@@ -21,21 +22,18 @@ export function RestaurantLogoUploadField({
   disabled = false,
 }: RestaurantLogoUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const [preview, setPreview] = useState<string>();
+  const preview = useMemo(
+    () => (value ? URL.createObjectURL(value) : undefined),
+    [value],
+  );
 
   useEffect(() => {
-    if (!value) {
-      setPreview(undefined);
-      return;
-    }
-
-    const url = URL.createObjectURL(value);
-
-    setPreview(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [value]);
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
 
   const imageUrl = preview ?? currentImageUrl;
 
@@ -94,11 +92,16 @@ export function RestaurantLogoUploadField({
         }}
         className="flex min-h-56 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition hover:bg-muted/40">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="Logo del restaurante"
-            className="max-h-48 max-w-full rounded-md object-contain"
-          />
+          <div className="relative h-48 w-full">
+            <Image
+              src={imageUrl}
+              alt="Logo del restaurante"
+              fill
+              unoptimized
+              sizes="100vw"
+              className="rounded-md object-contain"
+            />
+          </div>
         ) : (
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <ImagePlus className="size-8" />

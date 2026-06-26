@@ -4,6 +4,11 @@ import { CreateTableOrderModal } from "@/src/features/orders/components/create-t
 import { useGetOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { EmptyState, ErrorState } from "@/src/shared/components/states";
+import {
+  ActionMenu,
+  ActionMenuItem,
+} from "@/src/shared/components/ui/ActionMenu";
+import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { formatMoney } from "@/src/shared/utils/format-money";
 
 import { DeleteTableButton } from "./delete-table-button";
@@ -29,6 +34,7 @@ const statusLabel: Record<RestaurantTable["status"], string> = {
 function FloorTableCard({ table, currency }: FloorTableCardProps) {
   const { data: activeOrder, error, isError, isLoading } =
     useGetOpenOrderByTableId(table.id);
+  const openModal = useUiModalStore((state) => state.openModal);
 
   const consumption = activeOrder?.total ?? 0;
   const hasActiveOrder = Boolean(activeOrder);
@@ -81,8 +87,22 @@ function FloorTableCard({ table, currency }: FloorTableCardProps) {
           disabled={table.status === "CLOSED"}
         />
 
-        <EditTableModal table={table} />
-        <DeleteTableButton table={table} />
+        <ActionMenu ariaLabel={`Acciones de ${table.name}`}>
+          <ActionMenuItem
+            onClick={() => openModal("editTable", { tableId: table.id })}>
+            Editar
+          </ActionMenuItem>
+
+          <ActionMenuItem
+            onClick={() => openModal("deleteTable", { tableId: table.id })}
+            disabled={table.status !== "AVAILABLE"}
+            tone="danger">
+            Eliminar
+          </ActionMenuItem>
+        </ActionMenu>
+
+        <EditTableModal table={table} showTrigger={false} />
+        <DeleteTableButton table={table} showTrigger={false} />
       </div>
     </div>
   );

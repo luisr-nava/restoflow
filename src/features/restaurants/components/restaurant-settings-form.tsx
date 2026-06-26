@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RestaurantLogoUploadField } from "./restaurant-logo-upload-field";
 import { useUploadRestaurantLogo } from "../hooks/use-upload-restaurant-logo";
@@ -75,6 +75,14 @@ export function RestaurantSettingsForm() {
       timezone: "America/Argentina/Buenos_Aires",
       logoUrl: "",
     },
+  });
+  const logoFile = useWatch({
+    control: form.control,
+    name: "logoFile",
+  });
+  const logoUrl = useWatch({
+    control: form.control,
+    name: "logoUrl",
   });
 
   useEffect(() => {
@@ -191,8 +199,8 @@ export function RestaurantSettingsForm() {
           </FormSelect>
         </div>
         <RestaurantLogoUploadField
-          value={form.watch("logoFile")}
-          currentImageUrl={form.watch("logoUrl")}
+          value={logoFile}
+          currentImageUrl={logoUrl}
           disabled={isUploadingLogo || isUpdatingSettings}
           onChange={(file) => {
             form.setValue("logoFile", file, {
@@ -220,4 +228,3 @@ export function RestaurantSettingsForm() {
     </div>
   );
 }
-
