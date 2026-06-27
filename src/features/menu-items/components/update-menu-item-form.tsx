@@ -82,8 +82,8 @@ export function UpdateMenuItemForm({
       </FormSelect>
 
       <RestaurantLogoUploadField
-        value={form.watch("imageFile")}
-        currentImageUrl={form.watch("imageUrl")}
+        value={form.getValues("imageFile")}
+        currentImageUrl={form.getValues("imageUrl")}
         disabled={isPending}
         onChange={(file) => {
           form.setValue("imageFile", file, {
@@ -110,6 +110,7 @@ export function UpdateMenuItemForm({
     </Form>
   );
 }
+
 
 
 

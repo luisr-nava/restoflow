@@ -9,70 +9,131 @@ import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.key
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { orderKeys } from "../query-keys/order.keys";
 
+const REALTIME_INVALIDATION_DELAY_MS = 120;
+
 type OrderItemRealtimePayload = RealtimePostgresChangesPayload<
   Record<string, unknown>
 >;
+type OrderRealtimePayload = RealtimePostgresChangesPayload<Record<string, unknown>>;
+type RestaurantTableRealtimePayload = RealtimePostgresChangesPayload<
+  Record<string, unknown>
+>;
+
+function getStringValue(
+  record: Record<string, unknown> | Partial<Record<string, unknown>>,
+  field: string,
+) {
+  const value = record[field];
+
+  return typeof value === "string" ? value : null;
+}
+
+function getStringField(
+  payload: RealtimePostgresChangesPayload<Record<string, unknown>>,
+  field: string,
+) {
+  return getStringValue(payload.new, field) ?? getStringValue(payload.old, field);
+}
 
 export function useOrdersRealtime() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const supabase = createClient();
+    const pendingInvalidations = new Map<string, readonly unknown[]>();
+    let invalidateTimer: ReturnType<typeof setTimeout> | null = null;
+    let isDisposed = false;
 
-    function invalidateOrders() {
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.all,
-      });
+    function enqueueInvalidation(queryKey: readonly unknown[]) {
+      pendingInvalidations.set(JSON.stringify(queryKey), queryKey);
 
-      queryClient.invalidateQueries({
-        queryKey: dashboardKeys.all,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.all,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.openRoot,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.staffAll,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.staffOpenRoot,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.activeRoot,
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.staffAll,
-      });
-    }
-
-    function invalidateOrderItems(payload: OrderItemRealtimePayload) {
-      const orderIdFromNew =
-        "order_id" in payload.new && typeof payload.new.order_id === "string"
-          ? payload.new.order_id
-          : null;
-      const orderIdFromOld =
-        "order_id" in payload.old && typeof payload.old.order_id === "string"
-          ? payload.old.order_id
-          : null;
-      const orderId = orderIdFromNew ?? orderIdFromOld ?? null;
-
-      if (orderId) {
-        queryClient.invalidateQueries({
-          queryKey: orderKeys.items(orderId),
-        });
+      if (invalidateTimer !== null) {
+        return;
       }
 
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.itemsRoot,
-      });
+      invalidateTimer = setTimeout(() => {
+        invalidateTimer = null;
+
+        if (isDisposed || pendingInvalidations.size === 0) {
+          pendingInvalidations.clear();
+          return;
+        }
+
+        const queuedQueryKeys = [...pendingInvalidations.values()];
+        pendingInvalidations.clear();
+
+        void Promise.all(
+          queuedQueryKeys.map((queuedQueryKey) =>
+            queryClient.invalidateQueries({
+              queryKey: queuedQueryKey,
+            }),
+          ),
+        );
+      }, REALTIME_INVALIDATION_DELAY_MS);
+    }
+
+    function enqueueOrderLists() {
+      enqueueInvalidation(orderKeys.all);
+      enqueueInvalidation(orderKeys.staffAll);
+      enqueueInvalidation(dashboardKeys.all);
+    }
+
+    function enqueueTableOrderQueries(tableId: string | null) {
+      if (!tableId) {
+        enqueueInvalidation(orderKeys.openRoot);
+        enqueueInvalidation(orderKeys.staffOpenRoot);
+        enqueueInvalidation(orderKeys.activeRoot);
+        return;
+      }
+
+      enqueueInvalidation(orderKeys.open(tableId));
+      enqueueInvalidation(orderKeys.staffOpen(tableId));
+      enqueueInvalidation(orderKeys.active(tableId));
+    }
+
+    function enqueueOrderInvalidations(payload: OrderRealtimePayload) {
+      const orderId = getStringField(payload, "id");
+      const tableId = getStringField(payload, "table_id");
+
+      enqueueOrderLists();
+      enqueueTableOrderQueries(tableId);
+
+      if (orderId) {
+        enqueueInvalidation(orderKeys.items(orderId));
+      } else {
+        enqueueInvalidation(orderKeys.itemsRoot);
+      }
+    }
+
+    function enqueueOrderItemInvalidations(payload: OrderItemRealtimePayload) {
+      const orderId = getStringField(payload, "order_id");
+
+      if (orderId) {
+        enqueueInvalidation(orderKeys.items(orderId));
+      } else {
+        enqueueInvalidation(orderKeys.itemsRoot);
+      }
+
+      enqueueOrderLists();
+      enqueueInvalidation(orderKeys.openRoot);
+      enqueueInvalidation(orderKeys.staffOpenRoot);
+      enqueueInvalidation(orderKeys.activeRoot);
+    }
+
+    function enqueueTableInvalidations(payload: RestaurantTableRealtimePayload) {
+      const tableId = getStringField(payload, "id");
+      const floorId = getStringField(payload, "floor_id");
+
+      enqueueInvalidation(dashboardKeys.all);
+      enqueueInvalidation(tableKeys.staffAll);
+
+      if (floorId) {
+        enqueueInvalidation(tableKeys.byFloor(floorId));
+      } else {
+        enqueueInvalidation(tableKeys.all);
+      }
+
+      enqueueTableOrderQueries(tableId);
     }
 
     const channel = supabase
@@ -84,8 +145,8 @@ export function useOrdersRealtime() {
           schema: "public",
           table: "orders",
         },
-        () => {
-          invalidateOrders();
+        (payload) => {
+          enqueueOrderInvalidations(payload);
         },
       )
       .on(
@@ -96,8 +157,7 @@ export function useOrdersRealtime() {
           table: "order_items",
         },
         (payload) => {
-          invalidateOrderItems(payload);
-          invalidateOrders();
+          enqueueOrderItemInvalidations(payload);
         },
       )
       .on(
@@ -107,13 +167,19 @@ export function useOrdersRealtime() {
           schema: "public",
           table: "restaurant_tables",
         },
-        () => {
-          invalidateOrders();
+        (payload) => {
+          enqueueTableInvalidations(payload);
         },
       )
       .subscribe();
 
     return () => {
+      isDisposed = true;
+
+      if (invalidateTimer !== null) {
+        clearTimeout(invalidateTimer);
+      }
+
       supabase.removeChannel(channel);
     };
   }, [queryClient]);

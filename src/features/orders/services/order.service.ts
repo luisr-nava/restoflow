@@ -10,6 +10,7 @@ import {
 import type {
   CloseTableInput,
   CreateTableOrderInput,
+  Order,
   OrderItemDetail,
   OrderWithTable,
   UpdateOrderStatusInput,
@@ -29,6 +30,27 @@ class OrderService {
     }
 
     return new Error(fallback);
+  }
+
+  private groupOpenOrdersByTable(orders: Order[]) {
+    return orders.reduce<Record<string, Order>>((acc, order) => {
+      const currentOrder = acc[order.table_id];
+
+      if (!currentOrder) {
+        acc[order.table_id] = {
+          ...order,
+          total: Number(order.total),
+        };
+        return acc;
+      }
+
+      acc[order.table_id] = {
+        ...currentOrder,
+        total: Number(currentOrder.total) + Number(order.total),
+      };
+
+      return acc;
+    }, {});
   }
 
   private belongsToInactiveCategory(menuItem: {
@@ -827,6 +849,33 @@ class OrderService {
       throw this.toError(error, "No se pudo cargar el pedido abierto");
     }
   }
+  async getOpenOrdersByTableIds(tableIds: string[]) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member =
+        await restaurantService.getCurrentUserRestaurantMember(supabase);
+
+      if (!member) {
+        throw new Error("No se pudo obtener la membresía del restaurante");
+      }
+
+      const { data: orders, error } =
+        await this.orderRepository.findOpenOrdersByTableIds(supabase, tableIds);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const validOrders = (orders ?? []).filter(
+        (order) => order.restaurant_id === member.restaurant_id,
+      );
+
+      return this.groupOpenOrdersByTable(validOrders);
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar los pedidos abiertos");
+    }
+  }
   async closeStaffTable(input: CloseTableInput) {
     const supabase = createServiceRoleClient();
     try {
@@ -971,6 +1020,36 @@ class OrderService {
       };
     } catch (error) {
       throw this.toError(error, "No se pudo cargar el pedido abierto");
+    }
+  }
+  async getStaffOpenOrdersByTableIds(tableIds: string[]) {
+    const supabase = createServiceRoleClient();
+
+    try {
+      const session = await getStaffSession();
+
+      if (!session) {
+        throw new Error("No hay sesión de personal activa");
+      }
+
+      if (session.role !== "WAITER") {
+        throw new Error("Sólo los mozos pueden ver pedidos de mesas");
+      }
+
+      const { data: orders, error } =
+        await this.orderRepository.findOpenOrdersByTableIds(supabase, tableIds);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const validOrders = (orders ?? []).filter(
+        (order) => order.restaurant_id === session.restaurantId,
+      );
+
+      return this.groupOpenOrdersByTable(validOrders);
+    } catch (error) {
+      throw this.toError(error, "No se pudieron cargar los pedidos abiertos");
     }
   }
 

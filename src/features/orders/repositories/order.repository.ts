@@ -95,6 +95,10 @@ export interface IOrderRepository {
     supabase: SupabaseClient,
     tableId: string,
   ): Promise<{ data: Order[] | null; error: Error | null }>;
+  findOpenOrdersByTableIds(
+    supabase: SupabaseClient,
+    tableIds: string[],
+  ): Promise<{ data: Order[] | null; error: Error | null }>;
 
   markOrdersAsPaid(
     supabase: SupabaseClient,
@@ -314,6 +318,27 @@ class OrderRepository implements IOrderRepository {
     return { data, error };
   }
 
+  async findOpenOrdersByTableIds(
+    supabase: SupabaseClient,
+    tableIds: string[],
+  ): Promise<{ data: Order[] | null; error: Error | null }> {
+    if (tableIds.length === 0) {
+      return {
+        data: [],
+        error: null,
+      };
+    }
+
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .in("table_id", tableIds)
+      .in("status", ["PENDING", "ACCEPTED", "PREPARING", "READY", "SERVED"])
+      .order("created_at", { ascending: true });
+
+    return { data, error };
+  }
+
   async markOrdersAsPaid(
     supabase: SupabaseClient,
     orderIds: string[],
@@ -331,7 +356,6 @@ class OrderRepository implements IOrderRepository {
 }
 
 export const orderRepository = new OrderRepository();
-
 
 
 

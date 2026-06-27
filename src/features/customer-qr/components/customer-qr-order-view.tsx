@@ -1,13 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 import toast from "react-hot-toast";
 
-import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.keys";
 import { createQrTableOrderAction } from "@/src/features/orders/actions/order.actions";
-import { orderKeys } from "@/src/features/orders/query-keys/order.keys";
-import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
 import { EmptyState } from "@/src/shared/components/states";
 import { formatMoney } from "@/src/shared/utils/format-money";
 
@@ -27,7 +24,6 @@ type CustomerQrOrderViewProps = {
 export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const queryClient = useQueryClient();
   const currency = data.restaurant.currency;
   const total = useMemo(
     () => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
@@ -96,18 +92,6 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
       return;
     }
 
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: orderKeys.all,
-      }),
-      queryClient.invalidateQueries({
-        queryKey: tableKeys.all,
-      }),
-      queryClient.invalidateQueries({
-        queryKey: dashboardKeys.all,
-      }),
-    ]);
-
     toast.success(response.success);
     setCartItems([]);
   }
@@ -144,34 +128,55 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
                 <article
                   key={item.id}
                   className="rounded-xl border border-border bg-surface p-4">
-                  <div className="flex justify-between gap-4">
-                    <div>
-                      <p className="font-medium text-text">{item.name}</p>
+                  <div className="flex gap-4">
+                    {item.image_url ? (
+                      <Image
+                        src={item.image_url}
+                        alt={item.name}
+                        width={96}
+                        height={96}
+                        unoptimized
+                        className="h-24 w-24 shrink-0 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl border border-border text-xs text-text-3">
+                        Sin foto
+                      </div>
+                    )}
 
-                      {item.description && (
-                        <p className="mt-1 text-sm text-text-2">
-                          {item.description}
+                    <div className="flex min-w-0 flex-1 items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="font-medium text-text">{item.name}</p>
+
+                        {item.description && (
+                          <p className="mt-1 text-sm text-text-2">
+                            {item.description}
+                          </p>
+                        )}
+
+                        <p className="mt-2 text-xs text-text-3">
+                          {item.menu_categories?.name ?? "Sin categoría"}
                         </p>
-                      )}
+                      </div>
 
-                      <p className="mt-2 text-xs text-text-3">
-                        {item.menu_categories?.name ?? "Sin categoría"}
-                      </p>
-                    </div>
+                      <div className="shrink-0 text-right">
+                        <p className="font-semibold text-text">
+                          {formatMoney(item.price, currency)}
+                        </p>
 
-                    <div className="text-right">
-                      <p className="font-semibold text-text">
-                        {formatMoney(item.price, currency)}
-                      </p>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleAddItem(item.id, item.name, Number(item.price))
-                        }
-                        className="mt-3 rounded-lg bg-text px-3 py-2 text-xs font-medium text-bg">
-                        Agregar
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAddItem(
+                              item.id,
+                              item.name,
+                              Number(item.price),
+                            )
+                          }
+                          className="mt-3 rounded-lg bg-text px-3 py-2 text-xs font-medium text-bg">
+                          Agregar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </article>

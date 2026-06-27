@@ -48,11 +48,13 @@ export function CreateTableOrderModal({
           </>
         }
         size="xl">
-        <CreateTableOrderForm
-          tableId={tableId}
-          mode={mode}
-          onSuccess={() => closeModal("createOrder")}
-        />
+        {open ? (
+          <CreateTableOrderForm
+            tableId={tableId}
+            mode={mode}
+            onSuccess={() => closeModal("createOrder")}
+          />
+        ) : null}
       </AppDialog>
     </>
   );

@@ -111,12 +111,14 @@ export function CloseTableModal({
           </>
         }
         size="md">
-        <CloseTableFormContent
-          tableId={tableId}
-          total={total}
-          mode={mode}
-          onSuccess={() => closeModal("closeTable")}
-        />
+        {open ? (
+          <CloseTableFormContent
+            tableId={tableId}
+            total={total}
+            mode={mode}
+            onSuccess={() => closeModal("closeTable")}
+          />
+        ) : null}
       </AppDialog>
     </>
   );

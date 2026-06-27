@@ -47,10 +47,12 @@ export function UpdateMenuItemModal({
           </>
         }
         size="md">
-        <UpdateMenuItemForm
-          item={item}
-          onSuccess={() => closeModal("editMenuItem")}
-        />
+        {open ? (
+          <UpdateMenuItemForm
+            item={item}
+            onSuccess={() => closeModal("editMenuItem")}
+          />
+        ) : null}
       </AppDialog>
     </>
   );

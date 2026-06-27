@@ -2,7 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getOpenOrderByTableIdAction } from "../actions/order.actions";
+import {
+  getOpenOrderByTableIdAction,
+  getOpenOrdersByTableIdsAction,
+} from "../actions/order.actions";
 import { orderKeys } from "../query-keys/order.keys";
 
 export function useGetOpenOrderByTableId(tableId: string) {
@@ -10,5 +13,15 @@ export function useGetOpenOrderByTableId(tableId: string) {
     queryKey: orderKeys.open(tableId),
     queryFn: () => getOpenOrderByTableIdAction(tableId),
     enabled: Boolean(tableId),
+  });
+}
+
+export function useGetOpenOrdersByTableIds(tableIds: string[]) {
+  const normalizedTableIds = [...tableIds].sort();
+
+  return useQuery({
+    queryKey: orderKeys.openMany(normalizedTableIds),
+    queryFn: () => getOpenOrdersByTableIdsAction(normalizedTableIds),
+    enabled: normalizedTableIds.length > 0,
   });
 }

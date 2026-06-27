@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus } from "lucide-react";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm, type Resolver } from "react-hook-form";
@@ -8,6 +9,7 @@ import toast from "react-hot-toast";
 
 import { useGetStaffMenuItems } from "@/src/features/menu-items/hooks/use-get-staff-menu-items";
 import { useGetMenuItems } from "@/src/features/menu-items/hooks/use-get-menu-items";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
 import { Form, FormInput, FormSubmit } from "@/src/shared/components/forms";
 import { formatMoney } from "@/src/shared/utils/format-money";
@@ -28,15 +30,20 @@ export function CreateTableOrderForm({
   onSuccess,
   mode = "admin",
 }: CreateTableOrderFormProps) {
-  const adminMenuItems = useGetMenuItems();
-  const staffMenuItems = useGetStaffMenuItems();
-  const { data: staffRestaurantCurrency } = useGetStaffRestaurantCurrency();
+  const isStaffMode = mode === "staff";
+  const adminMenuItems = useGetMenuItems(!isStaffMode);
+  const staffMenuItems = useGetStaffMenuItems(isStaffMode);
+  const { data: restaurantSettings } = useGetRestaurantSettings(!isStaffMode);
+  const { data: staffRestaurantCurrency } =
+    useGetStaffRestaurantCurrency(isStaffMode);
   const [search, setSearch] = useState("");
 
-  const currency = staffRestaurantCurrency?.data?.currency;
+  const currency = isStaffMode
+    ? staffRestaurantCurrency?.data?.currency
+    : restaurantSettings?.data?.currency;
 
   const menuItems =
-    mode === "staff"
+    isStaffMode
       ? (staffMenuItems.data ?? [])
       : (adminMenuItems.data ?? []);
 
@@ -69,10 +76,10 @@ export function CreateTableOrderForm({
   const staffCreateOrder = useCreateStaffTableOrder();
 
   const mutate =
-    mode === "staff" ? staffCreateOrder.mutate : adminCreateOrder.mutate;
+    isStaffMode ? staffCreateOrder.mutate : adminCreateOrder.mutate;
 
   const isPending =
-    mode === "staff" ? staffCreateOrder.isPending : adminCreateOrder.isPending;
+    isStaffMode ? staffCreateOrder.isPending : adminCreateOrder.isPending;
 
   const quantitiesByItemId = useMemo(() => {
     return fields.reduce<Record<string, number>>((acc, item) => {
@@ -179,22 +186,19 @@ export function CreateTableOrderForm({
     });
   };
 
-  const groupedMenuItems = useMemo(() => {
-    return visibleMenuItems.reduce<Record<string, typeof visibleMenuItems>>(
-      (groups, item) => {
-        const category = item.menu_categories?.name ?? "Sin categoría";
+  const groupedMenuItems = visibleMenuItems.reduce<
+    Record<string, typeof visibleMenuItems>
+  >((groups, item) => {
+    const category = item.menu_categories?.name ?? "Sin categoría";
 
-        if (!groups[category]) {
-          groups[category] = [];
-        }
+    if (!groups[category]) {
+      groups[category] = [];
+    }
 
-        groups[category].push(item);
+    groups[category].push(item);
 
-        return groups;
-      },
-      {},
-    );
-  }, [visibleMenuItems]);
+    return groups;
+  }, {});
 
   return (
     <Form form={form} onSubmit={onSubmit} className="space-y-4">
@@ -224,9 +228,12 @@ export function CreateTableOrderForm({
                   <div className="flex items-center gap-3">
                     <div className="relative h-16 w-16 shrink-0">
                       {item.image_url ? (
-                        <img
+                        <Image
                           src={item.image_url}
                           alt={item.name}
+                          width={64}
+                          height={64}
+                          unoptimized
                           className="h-16 w-16 rounded-lg object-cover"
                         />
                       ) : (
@@ -335,5 +342,4 @@ export function CreateTableOrderForm({
     </Form>
   );
 }
-
 

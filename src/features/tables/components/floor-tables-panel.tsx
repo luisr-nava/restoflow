@@ -1,7 +1,7 @@
 "use client";
 
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
-import { useGetOpenOrderByTableId } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
+import { useGetOpenOrdersByTableIds } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { EmptyState, ErrorState } from "@/src/shared/components/states";
 import {
@@ -15,6 +15,7 @@ import { DeleteTableButton } from "./delete-table-button";
 import { EditTableModal } from "./edit-table-modal";
 import type { RestaurantTable } from "../types/table.types";
 import { CloseTableModal } from "../../orders/components/close-table-modal";
+import type { Order } from "../../orders/types/order.types";
 type FloorTablesPanelProps = {
   tables: RestaurantTable[];
 };
@@ -22,6 +23,9 @@ type FloorTablesPanelProps = {
 type FloorTableCardProps = {
   table: RestaurantTable;
   currency?: string | null;
+  openOrder: Order | null;
+  openOrdersErrorMessage?: string;
+  isOpenOrdersLoading: boolean;
 };
 
 const statusLabel: Record<RestaurantTable["status"], string> = {
@@ -31,13 +35,17 @@ const statusLabel: Record<RestaurantTable["status"], string> = {
   CLOSED: "Cerrada",
 };
 
-function FloorTableCard({ table, currency }: FloorTableCardProps) {
-  const { data: activeOrder, error, isError, isLoading } =
-    useGetOpenOrderByTableId(table.id);
+function FloorTableCard({
+  table,
+  currency,
+  openOrder,
+  openOrdersErrorMessage,
+  isOpenOrdersLoading,
+}: FloorTableCardProps) {
   const openModal = useUiModalStore((state) => state.openModal);
 
-  const consumption = activeOrder?.total ?? 0;
-  const hasActiveOrder = Boolean(activeOrder);
+  const consumption = openOrder?.total ?? 0;
+  const hasActiveOrder = Boolean(openOrder);
 
   return (
     <div className="rounded-xl border border-border bg-background p-3">
@@ -55,10 +63,10 @@ function FloorTableCard({ table, currency }: FloorTableCardProps) {
       </div>
 
       <div className="mt-4 border-t border-border pt-3">
-        {isError ? (
+        {openOrdersErrorMessage ? (
           <ErrorState
             title="No se pudo cargar el consumo"
-            description={error.message}
+            description={openOrdersErrorMessage}
             className="rounded-xl px-4 py-3 text-left"
           />
         ) : (
@@ -68,7 +76,7 @@ function FloorTableCard({ table, currency }: FloorTableCardProps) {
                 Consumo
               </p>
               <p className="mt-1 text-sm font-medium">
-                {isLoading
+                {isOpenOrdersLoading
                   ? "Cargando..."
                   : formatMoney(consumption, currency)}
               </p>
@@ -110,6 +118,12 @@ function FloorTableCard({ table, currency }: FloorTableCardProps) {
 
 export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
   const { data: restaurantSettings } = useGetRestaurantSettings();
+  const tableIds = tables.map((table) => table.id);
+  const {
+    data: openOrdersByTable = {},
+    error: openOrdersError,
+    isLoading: isOpenOrdersLoading,
+  } = useGetOpenOrdersByTableIds(tableIds);
   const currency = restaurantSettings?.data?.currency;
 
   return (
@@ -132,7 +146,14 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
           />
         ) : (
           tables.map((table) => (
-            <FloorTableCard key={table.id} table={table} currency={currency} />
+            <FloorTableCard
+              key={table.id}
+              table={table}
+              currency={currency}
+              openOrder={openOrdersByTable[table.id] ?? null}
+              openOrdersErrorMessage={openOrdersError?.message}
+              isOpenOrdersLoading={isOpenOrdersLoading}
+            />
           ))
         )}
       </div>

@@ -105,6 +105,13 @@ export async function getOpenOrderByTableIdAction(tableId: string) {
 
   return orderService.getOpenOrderByTableId(tableId);
 }
+export async function getOpenOrdersByTableIdsAction(tableIds: string[]) {
+  if (tableIds.length === 0) {
+    return {};
+  }
+
+  return orderService.getOpenOrdersByTableIds(tableIds);
+}
 
 export async function closeStaffTableAction(input: CloseTableInput) {
   const data = CloseTableSchema.safeParse(input);
@@ -125,6 +132,13 @@ export async function getStaffOpenOrderByTableIdAction(tableId: string) {
 
   return orderService.getStaffOpenOrderByTableId(tableId);
 }
+export async function getStaffOpenOrdersByTableIdsAction(tableIds: string[]) {
+  if (tableIds.length === 0) {
+    return {};
+  }
+
+  return orderService.getStaffOpenOrdersByTableIds(tableIds);
+}
 export async function getStaffOrdersAction() {
   return orderService.getOrdersByStaffSession();
 }
@@ -143,4 +157,3 @@ export async function updateStaffOrderStatusAction(
 
   return orderService.updateStaffOrderStatus(data.data);
 }
-
