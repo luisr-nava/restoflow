@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
 import { RestaurantLogoUploadField } from "@/src/features/restaurants/components/restaurant-logo-upload-field";
-import { useUploadRestaurantLogo } from "@/src/features/restaurants/hooks/use-upload-restaurant-logo";
+
 import {
   Form,
   FormInput,
@@ -39,44 +39,23 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
   });
 
   const { mutate, isPending } = useCreateMenuItem();
-  const { mutateAsync: uploadMenuItemImage, isPending: isUploadingImage } =
-    useUploadRestaurantLogo();
-  const onSubmit = async (input: CreateMenuItemInput) => {
-    const { imageFile, ...menuItemData } = input;
 
-    let imageUrl = menuItemData.imageUrl;
+  const onSubmit = (input: CreateMenuItemInput) => {
+    mutate(input, {
+      onSuccess: () => {
+        form.reset({
+          name: "",
+          description: "",
+          price: 0,
+          categoryId: "",
+          imageUrl: "",
+          imageFile: undefined,
+          isAvailable: true,
+        });
 
-    if (imageFile) {
-      const result = await uploadMenuItemImage(imageFile);
-
-      if (!result) {
-        return;
-      }
-
-      imageUrl = result.publicUrl;
-    }
-
-    mutate(
-      {
-        ...menuItemData,
-        imageUrl,
+        onSuccess?.();
       },
-      {
-        onSuccess: () => {
-          form.reset({
-            name: "",
-            description: "",
-            price: 0,
-            categoryId: "",
-            imageUrl: "",
-            imageFile: undefined,
-            isAvailable: true,
-          });
-
-          onSuccess?.();
-        },
-      },
-    );
+    });
   };
 
   return (
@@ -108,7 +87,7 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
       <RestaurantLogoUploadField
         value={form.watch("imageFile")}
         currentImageUrl={form.watch("imageUrl")}
-        disabled={isUploadingImage || isPending}
+        disabled={isPending}
         onChange={(file) => {
           form.setValue("imageFile", file, {
             shouldDirty: true,
@@ -129,7 +108,7 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
       <FormSubmit
         value="Crear item"
         loadingText="Creando..."
-        disabled={isPending || isUploadingImage}
+        disabled={isPending}
       />
     </Form>
   );

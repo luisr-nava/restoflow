@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
-
+import { RestaurantLogoUploadField } from "@/src/features/restaurants/components/restaurant-logo-upload-field";
 import {
   Form,
   FormInput,
@@ -38,6 +38,7 @@ export function UpdateMenuItemForm({
       price: item.price,
       categoryId: item.category_id ?? "",
       imageUrl: item.image_url ?? "",
+      imageFile: undefined,
       isAvailable: item.is_available,
     },
   });
@@ -80,8 +81,27 @@ export function UpdateMenuItemForm({
         ))}
       </FormSelect>
 
-      <FormInput name="imageUrl" label="Imagen URL" placeholder="https://..." />
-
+      <RestaurantLogoUploadField
+        value={form.watch("imageFile")}
+        currentImageUrl={form.watch("imageUrl")}
+        disabled={isPending}
+        onChange={(file) => {
+          form.setValue("imageFile", file, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+        onRemoveCurrentImage={() => {
+          form.setValue("imageUrl", "", {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+          form.setValue("imageFile", undefined, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
+      />
       <FormSubmit
         value="Guardar cambios"
         loadingText="Guardando..."
@@ -90,3 +110,6 @@ export function UpdateMenuItemForm({
     </Form>
   );
 }
+
+
+
