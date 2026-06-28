@@ -78,6 +78,7 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
 
     const response = await createQrTableOrderAction({
       tableId: data.table.id,
+      qrToken: data.table.qr_token,
       items: cartItems.map((item) => ({
         menuItemId: item.menuItemId,
         quantity: item.quantity,
@@ -244,3 +245,4 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
     </main>
   );
 }
+

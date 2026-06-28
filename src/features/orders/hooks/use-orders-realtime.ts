@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
-
 import { createClient } from "@/src/lib/supabase/client";
 import { dashboardKeys } from "@/src/features/dashboard/query-keys/dashboard.keys";
 import { tableKeys } from "@/src/features/tables/query-keys/table.keys";
@@ -14,7 +13,9 @@ const REALTIME_INVALIDATION_DELAY_MS = 120;
 type OrderItemRealtimePayload = RealtimePostgresChangesPayload<
   Record<string, unknown>
 >;
-type OrderRealtimePayload = RealtimePostgresChangesPayload<Record<string, unknown>>;
+type OrderRealtimePayload = RealtimePostgresChangesPayload<
+  Record<string, unknown>
+>;
 type RestaurantTableRealtimePayload = RealtimePostgresChangesPayload<
   Record<string, unknown>
 >;
@@ -32,7 +33,9 @@ function getStringField(
   payload: RealtimePostgresChangesPayload<Record<string, unknown>>,
   field: string,
 ) {
-  return getStringValue(payload.new, field) ?? getStringValue(payload.old, field);
+  return (
+    getStringValue(payload.new, field) ?? getStringValue(payload.old, field)
+  );
 }
 
 export function useOrdersRealtime() {
@@ -120,13 +123,15 @@ export function useOrdersRealtime() {
       enqueueInvalidation(orderKeys.activeRoot);
     }
 
-    function enqueueTableInvalidations(payload: RestaurantTableRealtimePayload) {
+    function enqueueTableInvalidations(
+      payload: RestaurantTableRealtimePayload,
+    ) {
       const tableId = getStringField(payload, "id");
       const floorId = getStringField(payload, "floor_id");
 
       enqueueInvalidation(dashboardKeys.all);
       enqueueInvalidation(tableKeys.staffAll);
-
+      enqueueInvalidation(tableKeys.restaurantAll);
       if (floorId) {
         enqueueInvalidation(tableKeys.byFloor(floorId));
       } else {

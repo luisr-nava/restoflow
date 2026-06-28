@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
-import { RestaurantLogoUploadField } from "@/src/features/restaurants/components/restaurant-logo-upload-field";
+import { ImageUploadField } from "@/src/shared/components/ui/ImageUploadField";
 import {
   Form,
   FormInput,
@@ -81,7 +81,11 @@ export function UpdateMenuItemForm({
         ))}
       </FormSelect>
 
-      <RestaurantLogoUploadField
+      <ImageUploadField
+        label="Imagen del plato (opcional)"
+        imageAlt="Imagen del plato"
+        emptyText="Arrastrá una imagen o hacé click para seleccionarla"
+        removeText="Quitar imagen"
         value={form.getValues("imageFile")}
         currentImageUrl={form.getValues("imageUrl")}
         disabled={isPending}
@@ -110,7 +114,6 @@ export function UpdateMenuItemForm({
     </Form>
   );
 }
-
 
 
 

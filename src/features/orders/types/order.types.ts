@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   CloseTableSchema,
   CreateOrderItemSchema,
+  CreateQrTableOrderSchema,
   CreateTableOrderSchema,
   UpdateOrderStatusSchema,
 } from "../schemas/order.schema";
@@ -84,3 +85,6 @@ export type Payment = {
 export type CloseTableInput = z.infer<typeof CloseTableSchema>;
 
 export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
+
+export type CreateQrTableOrderInput = z.infer<typeof CreateQrTableOrderSchema>;
+

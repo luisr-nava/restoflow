@@ -3,12 +3,14 @@
 import { orderService } from "../services/order.service";
 import {
   CloseTableSchema,
+  CreateQrTableOrderSchema,
   CreateTableOrderSchema,
   UpdateOrderStatusSchema,
 } from "../schemas/order.schema";
 
 import type {
   CloseTableInput,
+  CreateQrTableOrderInput,
   CreateTableOrderInput,
   UpdateOrderStatusInput,
 } from "../types/order.types";
@@ -70,8 +72,8 @@ export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
   return orderService.updateOrderStatus(data.data);
 }
 
-export async function createQrTableOrderAction(input: CreateTableOrderInput) {
-  const data = CreateTableOrderSchema.safeParse(input);
+export async function createQrTableOrderAction(input: CreateQrTableOrderInput) {
+  const data = CreateQrTableOrderSchema.safeParse(input);
 
   if (!data.success) {
     return {
@@ -157,3 +159,4 @@ export async function updateStaffOrderStatusAction(
 
   return orderService.updateStaffOrderStatus(data.data);
 }
+

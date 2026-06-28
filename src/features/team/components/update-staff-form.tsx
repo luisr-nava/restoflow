@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm, useWatch, type Resolver } from "react-hook-form";
-
 import {
   Form,
   FormInput,
@@ -36,7 +36,8 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
 
   const assignedTableIds = tables
     .filter((table) => table.waiter_id === staff.id)
-    .map((table) => table.id);
+    .map((table) => table.id)
+    .sort();
 
   const form = useForm<UpdateStaffInput>({
     resolver: zodResolver(UpdateStaffSchema) as Resolver<UpdateStaffInput>,
@@ -50,7 +51,17 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
       tableIds: assignedTableIds,
     },
   });
-
+  useEffect(() => {
+    form.reset({
+      staffId: staff.id,
+      name: staff.name,
+      email: staff.email ?? "",
+      role: staff.role,
+      isActive: staff.is_active,
+      pin: "",
+      tableIds: assignedTableIds,
+    });
+  }, [assignedTableIds, form, staff]);
   const { mutate, isPending } = useUpdateStaff();
 
   const selectedRole = useWatch({
@@ -153,3 +164,5 @@ export function UpdateStaffForm({ staff, onSuccess }: UpdateStaffFormProps) {
     </Form>
   );
 }
+
+

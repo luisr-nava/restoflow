@@ -18,10 +18,14 @@ export function useUpdateRestaurantSettings() {
         return;
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: restaurantKeys.settings,
-      });
-
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: restaurantKeys.settings,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: restaurantKeys.staffCurrency,
+        }),
+      ]);
       toast.success(response.success);
     },
 
@@ -30,3 +34,4 @@ export function useUpdateRestaurantSettings() {
     },
   });
 }
+

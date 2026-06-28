@@ -52,3 +52,9 @@ export const UpdateOrderStatusSchema = z.object({
   }),
 });
 
+export const CreateQrTableOrderSchema = CreateTableOrderSchema.extend({
+  qrToken: z.string().trim().min(1, {
+    error: "El token QR es obligatorio",
+  }),
+});
+

@@ -9,6 +9,7 @@ import {
 } from "../repositories/order.repository";
 import type {
   CloseTableInput,
+  CreateQrTableOrderInput,
   CreateTableOrderInput,
   Order,
   OrderItemDetail,
@@ -60,7 +61,8 @@ class OrderService {
     } | null;
   }) {
     return (
-      menuItem.category_id !== null && menuItem.menu_categories?.is_active === false
+      menuItem.category_id !== null &&
+      menuItem.menu_categories?.is_active === false
     );
   }
 
@@ -310,26 +312,25 @@ class OrderService {
         };
       }
 
-      const total = orders.reduce((acc, order) => acc + Number(order.total), 0);
       const orderIds = orders.map((order) => order.id);
 
-      const { error: paymentError } = await this.orderRepository.createPayment(
-        supabase,
-        {
-          restaurantId: member.restaurant_id,
-          orderId: orderIds[0],
-          amount: total,
-          method: input.method,
-          paidAmount: input.paidAmount,
-          changeAmount: input.changeAmount,
-        },
-      );
+      for (const order of orders) {
+        const { error: paymentError } =
+          await this.orderRepository.createPayment(supabase, {
+            restaurantId: member.restaurant_id,
+            orderId: order.id,
+            amount: Number(order.total),
+            method: input.method,
+            paidAmount: undefined,
+            changeAmount: undefined,
+          });
 
-      if (paymentError) {
-        return {
-          error: paymentError.message,
-          success: "",
-        };
+        if (paymentError) {
+          return {
+            error: paymentError.message,
+            success: "",
+          };
+        }
       }
 
       const { error: ordersPaidError } =
@@ -400,10 +401,8 @@ class OrderService {
         throw new Error("No se pudo obtener la membresía del restaurante");
       }
 
-      const { data: order, error: orderError } = await this.orderRepository.findOrderById(
-        supabase,
-        orderId,
-      );
+      const { data: order, error: orderError } =
+        await this.orderRepository.findOrderById(supabase, orderId);
 
       if (orderError) {
         throw new Error(orderError.message);
@@ -504,7 +503,7 @@ class OrderService {
       };
     }
   }
-  async createQrTableOrder(input: CreateTableOrderInput) {
+  async createQrTableOrder(input: CreateQrTableOrderInput) {
     const supabase = createPublicClient();
 
     try {
@@ -514,6 +513,13 @@ class OrderService {
       if (tableError || !table) {
         return {
           error: tableError?.message || "La mesa no existe",
+          success: "",
+        };
+      }
+
+      if (table.qr_token !== input.qrToken) {
+        return {
+          error: "Código QR inválido",
           success: "",
         };
       }
@@ -919,26 +925,25 @@ class OrderService {
         };
       }
 
-      const total = orders.reduce((acc, order) => acc + Number(order.total), 0);
       const orderIds = orders.map((order) => order.id);
 
-      const { error: paymentError } = await this.orderRepository.createPayment(
-        supabase,
-        {
-          restaurantId: session.restaurantId,
-          orderId: orderIds[0],
-          amount: total,
-          method: input.method,
-          paidAmount: input.paidAmount,
-          changeAmount: input.changeAmount,
-        },
-      );
+      for (const order of orders) {
+        const { error: paymentError } =
+          await this.orderRepository.createPayment(supabase, {
+            restaurantId: session.restaurantId,
+            orderId: order.id,
+            amount: Number(order.total),
+            method: input.method,
+            paidAmount: undefined,
+            changeAmount: undefined,
+          });
 
-      if (paymentError) {
-        return {
-          error: paymentError.message,
-          success: "",
-        };
+        if (paymentError) {
+          return {
+            error: paymentError.message,
+            success: "",
+          };
+        }
       }
 
       const { error: ordersPaidError } =
@@ -1161,3 +1166,4 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
+

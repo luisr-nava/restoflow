@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
-import { RestaurantLogoUploadField } from "@/src/features/restaurants/components/restaurant-logo-upload-field";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
+import { ImageUploadField } from "@/src/shared/components/ui/ImageUploadField";
 
 import {
   Form,
@@ -39,6 +39,14 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
   });
 
   const { mutate, isPending } = useCreateMenuItem();
+  const imageFile = useWatch({
+    control: form.control,
+    name: "imageFile",
+  });
+  const imageUrl = useWatch({
+    control: form.control,
+    name: "imageUrl",
+  });
 
   const onSubmit = (input: CreateMenuItemInput) => {
     mutate(input, {
@@ -84,9 +92,13 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
         ))}
       </FormSelect>
 
-      <RestaurantLogoUploadField
-        value={form.watch("imageFile")}
-        currentImageUrl={form.watch("imageUrl")}
+      <ImageUploadField
+        label="Imagen del plato (opcional)"
+        imageAlt="Imagen del plato"
+        emptyText="Arrastrá una imagen o hacé click para seleccionarla"
+        removeText="Quitar imagen"
+        value={imageFile}
+        currentImageUrl={imageUrl}
         disabled={isPending}
         onChange={(file) => {
           form.setValue("imageFile", file, {
@@ -113,4 +125,3 @@ export function CreateMenuItemForm({ onSuccess }: CreateMenuItemFormProps) {
     </Form>
   );
 }
-
