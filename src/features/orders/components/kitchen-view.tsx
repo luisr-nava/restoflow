@@ -6,9 +6,7 @@ import {
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
-import {
-  isKitchenActiveStatus,
-} from "../lib/kitchen.helpers";
+import { isKitchenActiveStatus } from "../lib/kitchen.helpers";
 import { useGetOrders } from "../hooks/use-get-orders";
 import { useOrdersRealtime } from "../hooks/use-orders-realtime";
 import { useUpdateOrderStatus } from "../hooks/use-update-order-status";
@@ -21,18 +19,12 @@ export function KitchenView() {
   const { data: restaurantSettings } = useGetRestaurantSettings();
   const { mutate, isPending } = useUpdateOrderStatus();
   const currency = restaurantSettings?.data?.currency;
-  const activeOrders = orders.filter((order) => isKitchenActiveStatus(order.status));
+  const activeOrders = orders.filter((order) =>
+    isKitchenActiveStatus(order.status),
+  );
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          Cocina
-        </p>
-
-        <h1 className="mt-1 text-2xl font-semibold">Pedidos en cocina</h1>
-      </div>
-
       {isLoading ? (
         <LoadingState label="Cargando pedidos de cocina..." />
       ) : isError ? (
@@ -56,3 +48,4 @@ export function KitchenView() {
     </div>
   );
 }
+

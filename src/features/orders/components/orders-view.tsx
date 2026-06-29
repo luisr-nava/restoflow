@@ -28,14 +28,6 @@ export function OrdersView() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-          Pedidos
-        </p>
-
-        <h1 className="mt-1 text-2xl font-semibold">Pedidos del restaurante</h1>
-      </div>
-
       <div className="rounded-2xl border border-border bg-background">
         {isLoading ? (
           <LoadingState
@@ -89,3 +81,4 @@ export function OrdersView() {
     </div>
   );
 }
+

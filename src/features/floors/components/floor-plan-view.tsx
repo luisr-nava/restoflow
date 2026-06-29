@@ -39,15 +39,6 @@ export function FloorPlanView() {
   return (
     <section className="space-y-4">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Floor plan
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Mesas y pisos
-          </h1>
-        </div>
-
         <div className="flex items-center gap-2">
           {selectedFloorId && <CreateTableModal floorId={selectedFloorId} />}
           {selectedFloor && (
@@ -78,3 +69,4 @@ export function FloorPlanView() {
     </section>
   );
 }
+

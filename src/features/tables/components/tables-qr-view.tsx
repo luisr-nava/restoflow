@@ -100,7 +100,9 @@ function FloorQrSection({
   onCheckedChange: (tableId: string, checked: boolean) => void;
   onQrReady: (item: TableQrPdfItem) => void;
 }) {
-  const { data, error, isError, isLoading } = useGetTablesByFloorId({ floorId });
+  const { data, error, isError, isLoading } = useGetTablesByFloorId({
+    floorId,
+  });
   const tables = data ?? [];
 
   if (isLoading) {
@@ -225,15 +227,6 @@ export function TablesQrView() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            QR por mesa
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Seleccioná qué códigos QR querés exportar para impresión.
-          </p>
-        </div>
-
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -287,3 +280,4 @@ export function TablesQrView() {
     </div>
   );
 }
+

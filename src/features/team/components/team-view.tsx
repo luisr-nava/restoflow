@@ -27,16 +27,6 @@ export function TeamView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Equipo
-          </p>
-
-          <h1 className="mt-1 text-2xl font-semibold">
-            Personal del restaurante
-          </h1>
-        </div>
-
         <CreateStaffModal />
       </div>
 
@@ -118,3 +108,4 @@ export function TeamView() {
     </div>
   );
 }
+

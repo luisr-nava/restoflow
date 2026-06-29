@@ -18,16 +18,6 @@ export function MenuView() {
   return (
     <section className="space-y-4">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Menu
-          </p>
-
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Menú del restaurante
-          </h1>
-        </div>
-
         <CreateMenuItemModal showTrigger={activeTab === "items"} />
       </div>
 
@@ -76,3 +66,4 @@ export function MenuView() {
     </section>
   );
 }
+
