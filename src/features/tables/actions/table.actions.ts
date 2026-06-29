@@ -2,12 +2,14 @@
 
 import {
   CreateTableSchema,
+  UpdateTableReservationStatusSchema,
   UpdateTablePositionSchema,
   UpdateTableSchema,
 } from "../schemas/table.schema";
 
 import type {
   CreateTableInput,
+  UpdateTableReservationStatusInput,
   UpdateTableInput,
   UpdateTablePositionInput,
 } from "../types/table.types";
@@ -39,6 +41,21 @@ export async function updateTablePositionAction(
   }
 
   return tableService.updateTablePosition(data.data);
+}
+
+export async function updateTableReservationStatusAction(
+  input: UpdateTableReservationStatusInput,
+) {
+  const data = UpdateTableReservationStatusSchema.safeParse(input);
+
+  if (!data.success) {
+    return {
+      error: "Datos inválidos",
+      success: "",
+    };
+  }
+
+  return tableService.updateTableReservationStatus(data.data);
 }
 
 export async function getTablesByFloorIdAction(floorId: string) {
@@ -73,4 +90,3 @@ export async function getTablesByRestaurantIdAction() {
 export async function getTablesByStaffSessionAction() {
   return tableService.getTablesByStaffSession();
 }
-

@@ -6,6 +6,7 @@ import { useDashboardData } from "../hooks/use-dashboard-data";
 import { DashboardSalesChart } from "./dashboard-sales-chart";
 import { DashboardSummaryCards } from "./dashboard-summary-cards";
 import { RecentOrdersTable } from "./recent-orders-table";
+import { TodayReservationsCard } from "./today-reservations-card";
 import { TopTablesTable } from "./top-tables-table";
 
 function DashboardLoadingSkeleton() {
@@ -57,7 +58,8 @@ export function DashboardView() {
 
       <DashboardSalesChart data={data.data.salesChart} />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-3">
+        <TodayReservationsCard />
         <RecentOrdersTable
           orders={data.data.recentOrders}
           currency={currency}

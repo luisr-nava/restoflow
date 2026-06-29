@@ -17,6 +17,13 @@ type DraggableTableProps = {
   table: RestaurantTable;
 };
 
+const tableStatusClassName: Record<RestaurantTable["status"], string> = {
+  AVAILABLE: "border-border bg-background text-foreground",
+  OCCUPIED: "border-accent bg-accent-soft text-accent-ink",
+  RESERVED: "border-warn bg-warn-soft text-text",
+  CLOSED: "border-danger bg-danger-soft text-danger",
+};
+
 function DraggableTable({ table }: DraggableTableProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -32,7 +39,9 @@ function DraggableTable({ table }: DraggableTableProps) {
       type="button"
       {...listeners}
       {...attributes}
-      className={`absolute flex items-center justify-center rounded-xl border border-border bg-background text-sm font-medium shadow-sm ${
+      className={`absolute flex items-center justify-center rounded-xl border text-sm font-medium shadow-sm ${
+        tableStatusClassName[table.status]
+      } ${
         isDragging ? "z-20 cursor-grabbing opacity-80" : "z-10 cursor-grab"
       }`}
       style={{

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   CreateTableSchema,
+  UpdateTableReservationStatusSchema,
   UpdateTablePositionSchema,
   UpdateTableSchema,
 } from "../schemas/table.schema";
@@ -12,6 +13,9 @@ export type UpdateTablePositionInput = z.infer<
   typeof UpdateTablePositionSchema
 >;
 export type TableStatus = "AVAILABLE" | "OCCUPIED" | "RESERVED" | "CLOSED";
+export type UpdateTableReservationStatusInput = z.infer<
+  typeof UpdateTableReservationStatusSchema
+>;
 
 export type RestaurantTable = {
   id: string;
@@ -31,4 +35,3 @@ export type RestaurantTable = {
 };
 
 export type UpdateTableInput = z.infer<typeof UpdateTableSchema>;
-

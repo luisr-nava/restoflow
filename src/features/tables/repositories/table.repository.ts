@@ -13,6 +13,8 @@ type CreateTableParams = {
   waiterId?: string;
   name: string;
   seats: number;
+  x: number;
+  y: number;
 };
 
 export interface ITableRepository {
@@ -100,8 +102,8 @@ class TableRepository implements ITableRepository {
         name: input.name,
         seats: input.seats,
         status: "AVAILABLE",
-        x: 24,
-        y: 24,
+        x: input.x,
+        y: input.y,
         width: 120,
         height: 80,
       })
@@ -300,4 +302,3 @@ class TableRepository implements ITableRepository {
 }
 
 export const tableRepository = new TableRepository();
-

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  CalendarDays,
   ChefHat,
   ClipboardList,
   LayoutDashboard,
@@ -21,6 +22,11 @@ const navItems = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    label: "Reservas",
+    href: "/dashboard/reservations",
+    icon: CalendarDays,
   },
   {
     label: "Mesas",
@@ -57,7 +63,11 @@ const navItems = [
     href: "/dashboard/qr",
     icon: QrCode,
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+}>;
 
 type SidebarContentProps = {
   pathname: string;
@@ -96,7 +106,7 @@ function SidebarContent({ pathname, onNavigate }: SidebarContentProps) {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={{ pathname: item.href }}
               aria-current={isActive ? "page" : undefined}
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm transition ${

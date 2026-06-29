@@ -24,6 +24,20 @@ type StaffTableCardProps = {
   isOpenOrdersLoading: boolean;
 };
 
+const statusLabel: Record<RestaurantTable["status"], string> = {
+  AVAILABLE: "Disponible",
+  OCCUPIED: "Ocupada",
+  RESERVED: "Reservada",
+  CLOSED: "Cerrada",
+};
+
+const statusBadgeClassName: Record<RestaurantTable["status"], string> = {
+  AVAILABLE: "border-ok bg-ok-soft text-ok",
+  OCCUPIED: "border-accent bg-accent-soft text-accent-ink",
+  RESERVED: "border-warn bg-warn-soft text-text",
+  CLOSED: "border-danger bg-danger-soft text-danger",
+};
+
 function StaffTableCard({
   table,
   currency,
@@ -62,7 +76,10 @@ function StaffTableCard({
           ) : null}
         </div>
 
-        <span className="text-xs text-muted-foreground">{table.status}</span>
+        <span
+          className={`rounded-full border px-2 py-1 text-[10px] font-mono uppercase ${statusBadgeClassName[table.status]}`}>
+          {statusLabel[table.status]}
+        </span>
       </div>
 
       <div className="mt-4 flex justify-end gap-2">

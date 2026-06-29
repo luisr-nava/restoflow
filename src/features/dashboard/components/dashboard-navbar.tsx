@@ -8,6 +8,7 @@ import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
+  "/dashboard/reservations": "Reservas",
   "/dashboard/tables": "Mesas",
   "/dashboard/orders": "Pedidos",
   "/dashboard/kitchen": "Cocina",

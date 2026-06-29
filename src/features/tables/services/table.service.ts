@@ -7,10 +7,17 @@ import {
 } from "../repositories/table.repository";
 import type {
   CreateTableInput,
+  UpdateTableReservationStatusInput,
   UpdateTableInput,
   UpdateTablePositionInput,
 } from "../types/table.types";
 import { getStaffSession } from "../../team/lib/staff-session";
+
+const TABLE_START_X = 24;
+const TABLE_START_Y = 24;
+const TABLE_GAP_X = 140;
+const TABLE_GAP_Y = 120;
+const TABLES_PER_ROW = 4;
 
 class TableService {
   constructor(private readonly tableRepository: ITableRepository) {}
@@ -25,6 +32,13 @@ class TableService {
     }
 
     return new Error(fallback);
+  }
+
+  private getInitialTablePosition(tableCount: number) {
+    return {
+      x: TABLE_START_X + (tableCount % TABLES_PER_ROW) * TABLE_GAP_X,
+      y: TABLE_START_Y + Math.floor(tableCount / TABLES_PER_ROW) * TABLE_GAP_Y,
+    };
   }
 
   async createTable(input: CreateTableInput) {
@@ -47,12 +61,32 @@ class TableService {
         };
       }
 
+      const { data: existingTables, error: existingTablesError } =
+        await this.tableRepository.findTablesByFloorId(supabase, input.floorId);
+
+      if (existingTablesError) {
+        return {
+          error: existingTablesError.message,
+          success: "",
+        };
+      }
+
+      const position =
+        input.x !== undefined && input.y !== undefined
+          ? {
+              x: input.x,
+              y: input.y,
+            }
+          : this.getInitialTablePosition(existingTables?.length ?? 0);
+
       const { error } = await this.tableRepository.createTable(supabase, {
         restaurantId: member.restaurant_id,
         floorId: input.floorId,
         waiterId: input.waiterId || undefined,
         name: input.name,
         seats: input.seats,
+        x: position.x,
+        y: position.y,
       });
 
       if (error) {
@@ -213,6 +247,85 @@ class TableService {
     } catch {
       return {
         error: "No se pudo actualizar la mesa",
+        success: "",
+      };
+    }
+  }
+
+  async updateTableReservationStatus(input: UpdateTableReservationStatusInput) {
+    const supabase = await this.getSupabase();
+
+    try {
+      const member = await restaurantService.getCurrentUserRestaurantMember();
+
+      if (!member) {
+        return {
+          error: "El usuario no pertenece a un restaurante",
+          success: "",
+        };
+      }
+
+      if (member.role !== "OWNER" && member.role !== "MANAGER") {
+        return {
+          error: "No tenés permisos para gestionar reservas",
+          success: "",
+        };
+      }
+
+      const { data: table, error: tableError } =
+        await this.tableRepository.findTableById(supabase, input.tableId);
+
+      if (tableError || !table) {
+        return {
+          error: tableError?.message || "La mesa no existe",
+          success: "",
+        };
+      }
+
+      if (table.restaurant_id !== member.restaurant_id) {
+        return {
+          error: "No tenés permisos para modificar esta mesa",
+          success: "",
+        };
+      }
+
+      if (input.status === "RESERVED" && table.status !== "AVAILABLE") {
+        return {
+          error: "Sólo se pueden reservar mesas disponibles",
+          success: "",
+        };
+      }
+
+      if (input.status === "AVAILABLE" && table.status !== "RESERVED") {
+        return {
+          error: "Sólo se puede liberar una mesa reservada",
+          success: "",
+        };
+      }
+
+      const { error } = await this.tableRepository.updateTableStatus(
+        supabase,
+        table.id,
+        input.status,
+      );
+
+      if (error) {
+        return {
+          error: error.message,
+          success: "",
+        };
+      }
+
+      return {
+        error: "",
+        success:
+          input.status === "RESERVED"
+            ? "Mesa reservada correctamente"
+            : "Reserva liberada correctamente",
+      };
+    } catch {
+      return {
+        error: "No se pudo actualizar la reserva de la mesa",
         success: "",
       };
     }

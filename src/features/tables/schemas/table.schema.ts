@@ -16,6 +16,8 @@ export const CreateTableSchema = z.object({
     .max(30, { error: "No puede superar las 30 sillas" }),
 
   waiterId: z.string().uuid().optional().or(z.literal("")),
+  x: z.coerce.number().int().optional(),
+  y: z.coerce.number().int().optional(),
 });
 
 export const UpdateTablePositionSchema = z.object({
@@ -43,5 +45,9 @@ export const UpdateTableSchema = z.object({
     .max(30, { error: "No puede superar las 30 sillas" }),
 
   waiterId: z.string().uuid().optional().or(z.literal("")),
+});
 
+export const UpdateTableReservationStatusSchema = z.object({
+  tableId: z.string().uuid({ error: "La mesa es obligatoria" }),
+  status: z.enum(["AVAILABLE", "RESERVED"]),
 });
