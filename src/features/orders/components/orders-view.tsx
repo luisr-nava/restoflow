@@ -4,8 +4,9 @@ import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-g
 import {
   EmptyState,
   ErrorState,
-  LoadingState,
 } from "@/src/shared/components/states";
+import { Card, CardContent } from "@/src/shared/components/ui/Card";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import { useGetOrders } from "../hooks/use-get-orders";
 import type { OrderStatus } from "../types/order.types";
@@ -28,12 +29,25 @@ export function OrdersView() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-border bg-background">
+      <Card variant="default" size="lg" className="p-0">
         {isLoading ? (
-          <LoadingState
-            label="Cargando pedidos..."
-            className="rounded-none border-0 bg-transparent"
-          />
+          <CardContent className="divide-y divide-border">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-4 p-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-8 w-24 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </CardContent>
         ) : isError ? (
           <ErrorState
             title="No se pudieron cargar los pedidos"
@@ -47,7 +61,7 @@ export function OrdersView() {
             className="rounded-none border-0 bg-transparent"
           />
         ) : (
-          <div className="divide-y divide-border">
+          <CardContent className="divide-y divide-border">
             {orders.map((order) => (
               <div
                 key={order.id}
@@ -75,10 +89,9 @@ export function OrdersView() {
                 </div>
               </div>
             ))}
-          </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
-

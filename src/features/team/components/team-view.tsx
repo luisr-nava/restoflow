@@ -7,8 +7,9 @@ import {
 import {
   EmptyState,
   ErrorState,
-  LoadingState,
 } from "@/src/shared/components/states";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/Card";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateStaffModal } from "./create-staff-modal";
 import { useGetStaff } from "../hooks/use-get-staff";
@@ -30,16 +31,29 @@ export function TeamView() {
         <CreateStaffModal />
       </div>
 
-      <div className="rounded-2xl border border-border bg-background">
-        <div className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-medium">Personal</h2>
-        </div>
+      <Card variant="default" size="lg" className="p-0">
+        <CardHeader className="border-b border-border px-4 py-3">
+          <CardTitle className="text-sm font-medium">Personal</CardTitle>
+        </CardHeader>
 
         {isLoading ? (
-          <LoadingState
-            label="Cargando personal..."
-            className="rounded-none border-0 bg-transparent"
-          />
+          <CardContent className="divide-y divide-border">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-4 p-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                </div>
+              </div>
+            ))}
+          </CardContent>
         ) : isError ? (
           <ErrorState
             title="No se pudo cargar el personal"
@@ -53,7 +67,7 @@ export function TeamView() {
             className="rounded-none border-0 bg-transparent"
           />
         ) : (
-          <div className="divide-y divide-border">
+          <CardContent className="divide-y divide-border">
             {staff.map((member) => (
               <div
                 key={member.id}
@@ -102,10 +116,9 @@ export function TeamView() {
                 </div>
               </div>
             ))}
-          </div>
+          </CardContent>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
-

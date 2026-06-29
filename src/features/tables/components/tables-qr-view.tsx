@@ -9,6 +9,8 @@ import {
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
+import { Button } from "@/src/shared/components/ui/Button";
+import { Card, CardContent, CardTitle } from "@/src/shared/components/ui/Card";
 
 import { useGetTablesByFloorId } from "../hooks/use-get-tables-by-floor-id";
 import type { TableQrPdfItem } from "../types/table-qr.types";
@@ -58,7 +60,7 @@ function TableQrItem({
   }, [floorName, onQrReady, qrUrl, table.id, table.name, table.qr_token]);
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <Card variant="muted" size="lg" className="rounded-xl p-5">
       <label className="mb-4 flex cursor-pointer items-center gap-2 text-sm text-foreground">
         <input
           type="checkbox"
@@ -69,21 +71,21 @@ function TableQrItem({
         Imprimir este QR
       </label>
 
-      <div className="mb-4 text-center">
-        <p className="text-lg font-semibold text-foreground">{table.name}</p>
+      <CardContent className="mb-4 text-center">
+        <CardTitle className="text-lg">{table.name}</CardTitle>
         <p className="mt-1 text-xs text-muted-foreground">
           {floorName} · Escaneá para ver el menú
         </p>
-      </div>
+      </CardContent>
 
-      <div className="flex justify-center rounded-lg bg-white p-4">
+      <CardContent className="flex justify-center rounded-lg bg-white p-4">
         <QRCodeSVG value={qrUrl} size={180} />
-      </div>
+      </CardContent>
 
       <p className="mt-3 break-all text-center text-[11px] text-muted-foreground">
         {qrUrl}
       </p>
-    </div>
+    </Card>
   );
 }
 
@@ -228,19 +230,23 @@ export function TablesQrView() {
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="md"
             onClick={handleSelectAll}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-2">
+            className="py-2.5 hover:bg-surface-2">
             Seleccionar todos
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="md"
             onClick={handleClearSelection}
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition hover:bg-surface-2">
+            className="py-2.5 hover:bg-surface-2">
             Limpiar
-          </button>
+          </Button>
 
           <ExportTableQrPdfButton items={selectedPdfItems} />
         </div>
@@ -280,4 +286,3 @@ export function TablesQrView() {
     </div>
   );
 }
-

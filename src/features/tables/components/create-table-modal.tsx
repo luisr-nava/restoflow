@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateTableForm } from "./create-table-form";
 
@@ -23,12 +24,13 @@ export function CreateTableModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        onClick={() => openModal("createTable", { floorId })}
-        className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
+        variant="secondary"
+        size="sm"
+        onClick={() => openModal("createTable", { floorId })}>
         {openText}
-      </button>
+      </Button>
 
       <AppDialog
         open={open}

@@ -1,6 +1,7 @@
 "use client";
 
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import { EmptyState } from "@/src/shared/components/states";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useDashboardData } from "../hooks/use-dashboard-data";
 import { DashboardSalesChart } from "./dashboard-sales-chart";
@@ -12,22 +13,17 @@ import { TopTablesTable } from "./top-tables-table";
 function DashboardLoadingSkeleton() {
   return (
     <div className="space-y-6">
-      <LoadingState label="Cargando dashboard..." className="bg-surface" />
-
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-28 rounded-2xl border border-border bg-background"
-          />
+          <Skeleton key={index} className="h-28 rounded-2xl" />
         ))}
       </div>
 
-      <div className="h-80 rounded-2xl border border-border bg-background" />
+      <Skeleton className="h-80 rounded-2xl" />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <div className="h-72 rounded-2xl border border-border bg-background" />
-        <div className="h-72 rounded-2xl border border-border bg-background" />
+        <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-72 rounded-2xl" />
       </div>
     </div>
   );

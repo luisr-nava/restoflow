@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 import type { RestaurantFloor } from "../types/floor.types";
 
@@ -27,9 +28,11 @@ export function FloorTabs({ floors }: FloorTabsProps) {
         const active = floor.id === selectedFloorId;
 
         return (
-          <button
+          <Button
             key={floor.id}
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setSelectedFloorId(floor.id)}
             className={`rounded-lg border px-3 py-2 text-sm font-medium ${
               active
@@ -37,7 +40,7 @@ export function FloorTabs({ floors }: FloorTabsProps) {
                 : "border-border bg-background text-muted-foreground hover:text-foreground"
             }`}>
             {floor.name}
-          </button>
+          </Button>
         );
       })}
     </div>

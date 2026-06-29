@@ -7,6 +7,8 @@ import {
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
+import { Button } from "@/src/shared/components/ui/Button";
+import { Card, CardContent } from "@/src/shared/components/ui/Card";
 
 import { useGetReservations } from "../hooks/use-get-reservations";
 import { CreateReservationModal } from "./create-reservation-modal";
@@ -14,8 +16,12 @@ import { ReservationCalendar } from "./reservation-calendar";
 import { UpdateReservationModal } from "./update-reservation-modal";
 
 export function ReservationsView() {
-  const { data: reservations = [], error, isError, isLoading } =
-    useGetReservations();
+  const {
+    data: reservations = [],
+    error,
+    isError,
+    isLoading,
+  } = useGetReservations();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createReservationStartsAt, setCreateReservationStartsAt] = useState<
     string | undefined
@@ -25,38 +31,37 @@ export function ReservationsView() {
   >(null);
 
   const selectedReservation =
-    reservations.find((reservation) => reservation.id === selectedReservationId) ??
-    null;
+    reservations.find(
+      (reservation) => reservation.id === selectedReservationId,
+    ) ?? null;
 
   return (
     <>
       <div className="space-y-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-background p-6 shadow-sm md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              Reservas
-            </p>
+        <Card
+          size="lg"
+          className="bg-white shadow-sm md:flex-row md:items-end md:justify-between">
+          <CardContent className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                Organizá la agenda del salón, visualizá la ocupación por día o
+                semana y editá cada reserva desde el calendario.
+              </p>
+            </div>
 
-            <h1 className="mt-1 text-2xl font-semibold text-foreground">
-              Gestión de reservas
-            </h1>
-
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              Organizá la agenda del salón, visualizá la ocupación por día o
-              semana y editá cada reserva desde el calendario.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setCreateReservationStartsAt(undefined);
-              setIsCreateModalOpen(true);
-            }}
-            className="inline-flex items-center justify-center rounded-lg bg-text px-4 py-2.5 text-sm font-medium text-bg transition hover:opacity-90">
-            Crear reserva
-          </button>
-        </div>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={() => {
+                setCreateReservationStartsAt(undefined);
+                setIsCreateModalOpen(true);
+              }}
+              className="cursor-pointer py-2.5 hover:opacity-90">
+              Crear reserva
+            </Button>
+          </CardContent>
+        </Card>
 
         {isLoading ? (
           <LoadingState label="Cargando reservas..." className="bg-surface" />

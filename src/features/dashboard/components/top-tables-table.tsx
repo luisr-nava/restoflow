@@ -1,4 +1,5 @@
 import { formatMoney } from "@/src/shared/utils/format-money";
+import { Card, CardContent, CardTitle } from "@/src/shared/components/ui/Card";
 import type { DashboardTopTable } from "../types/dashboard.types";
 
 type TopTablesTableProps = {
@@ -9,25 +10,21 @@ type TopTablesTableProps = {
 export function TopTablesTable({ tables, currency }: TopTablesTableProps) {
   if (tables.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          Mesas con mayor consumo
-        </h2>
+      <Card variant="muted" size="md">
+        <CardTitle className="text-lg">Mesas con mayor consumo</CardTitle>
 
         <p className="mt-2 text-sm text-muted-foreground">
           Todavía no hay datos para mostrar.
         </p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <h2 className="text-lg font-semibold text-foreground">
-        Mesas con mayor consumo
-      </h2>
+    <Card variant="muted" size="md">
+      <CardTitle className="text-lg">Mesas con mayor consumo</CardTitle>
 
-      <div className="mt-4 overflow-x-auto">
+      <CardContent className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">
             Mesas con mayor consumo y su total acumulado.
@@ -57,7 +54,7 @@ export function TopTablesTable({ tables, currency }: TopTablesTableProps) {
             ))}
           </tbody>
         </table>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

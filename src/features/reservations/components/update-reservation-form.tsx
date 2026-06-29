@@ -17,6 +17,7 @@ import {
   FormTextArea,
 } from "@/src/shared/components/forms";
 import { useGetRestaurantTables } from "@/src/features/tables/hooks/use-get-restaurant-tables";
+import { Button } from "@/src/shared/components/ui/Button";
 
 import { useCancelReservation } from "../hooks/use-cancel-reservation";
 import { useUpdateReservation } from "../hooks/use-update-reservation";
@@ -206,13 +207,15 @@ export function UpdateReservationForm({
       />
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
+        <Button
           type="button"
+          variant="danger"
+          size="lg"
           onClick={handleCancelReservation}
           disabled={reservation.status !== "ACTIVE" || isUpdating || isCanceling}
-          className="inline-flex items-center justify-center rounded-lg border border-danger/20 bg-danger-soft px-4 py-3 text-sm font-medium text-danger transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+          className="border-danger/20 bg-danger-soft text-danger hover:opacity-90 disabled:opacity-50">
           {isCanceling ? "Cancelando..." : "Cancelar reserva"}
-        </button>
+        </Button>
 
         <FormSubmit
           value="Guardar cambios"

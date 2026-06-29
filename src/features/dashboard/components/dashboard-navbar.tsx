@@ -2,6 +2,7 @@
 
 import { Menu, Plus } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiLayoutStore } from "@/src/shared/stores/ui-layout.store";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
@@ -92,28 +93,31 @@ export function DashboardNavbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="icon"
             aria-label="Abrir menú de navegación"
             onClick={toggleMobileSidebar}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text lg:hidden">
-            <Menu className="size-4" />
-          </button>
+            className="h-8 w-10 bg-surface text-text lg:hidden"
+            leftIcon={<Menu className="size-4" />}
+          />
 
           {primaryAction && (
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               aria-label={primaryAction.label}
               onClick={primaryAction.onClick}
               disabled={primaryAction.disabled}
-              className="inline-flex items-center gap-2 rounded-lg bg-text px-4 py-2 text-sm font-medium text-bg hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40">
-              <Plus className="size-4" />
+              className="hover:opacity-90 disabled:opacity-40"
+              leftIcon={<Plus className="size-4" />}>
               <span className="hidden sm:inline">{primaryAction.label}</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>
     </header>
   );
 }
-

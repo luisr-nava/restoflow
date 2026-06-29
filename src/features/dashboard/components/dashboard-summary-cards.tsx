@@ -1,4 +1,5 @@
 import { formatMoney } from "@/src/shared/utils/format-money";
+import { Card, CardDescription, CardTitle } from "@/src/shared/components/ui/Card";
 import type { DashboardSummary } from "../types/dashboard.types";
 
 type DashboardSummaryCardsProps = {
@@ -36,14 +37,16 @@ export function DashboardSummaryCards({
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {cards.map((card) => (
-        <div
+        <Card
           key={card.label}
-          className="rounded-xl border border-border bg-surface p-4 shadow-sm">
-          <p className="text-sm text-muted-foreground">{card.label}</p>
-          <p className="mt-2 text-2xl font-semibold text-foreground">
+          variant="muted"
+          size="md"
+          className="shadow-sm">
+          <CardDescription>{card.label}</CardDescription>
+          <CardTitle className="mt-2 text-2xl">
             {card.value}
-          </p>
-        </div>
+          </CardTitle>
+        </Card>
       ))}
     </div>
   );

@@ -5,6 +5,8 @@ import {
   ActionMenuItem,
 } from "@/src/shared/components/ui/ActionMenu";
 import { EmptyState } from "@/src/shared/components/states";
+import { Button } from "@/src/shared/components/ui/Button";
+import { Card, CardTitle } from "@/src/shared/components/ui/Card";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { DeleteMenuCategoryButton } from "./delete-menu-category-button";
 import { UpdateMenuCategoryModal } from "./update-menu-category-modal";
@@ -32,14 +34,14 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
   return (
     <div className="grid gap-3">
       {categories.map((category) => (
-        <div
+        <Card
           key={category.id}
-          className="rounded-2xl border border-border bg-background p-4">
+          variant="default"
+          size="lg"
+          className="p-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-sm font-medium text-foreground">
-                {category.name}
-              </h3>
+              <CardTitle className="text-sm font-medium">{category.name}</CardTitle>
 
               <p className="mt-1 font-mono text-xs text-muted-foreground">
                 Orden: {category.sort_order}
@@ -47,8 +49,10 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant={category.is_active ? "success" : "outline"}
+                size="sm"
                 disabled={isPending}
                 onClick={() =>
                   mutate({
@@ -56,13 +60,9 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
                     isActive: !category.is_active,
                   })
                 }
-                className={`rounded-full px-2 py-1 font-mono text-[10px] uppercase disabled:cursor-not-allowed disabled:opacity-40 ${
-                  category.is_active
-                    ? "border border-green-200 text-green-600"
-                    : "border border-border text-muted-foreground"
-                }`}>
+                className="rounded-full px-2 py-1 font-mono text-[10px] font-normal uppercase">
                 {category.is_active ? "Activa" : "Inactiva"}
-              </button>
+              </Button>
 
               <ActionMenu ariaLabel={`Acciones de ${category.name}`}>
                 <ActionMenuItem
@@ -89,7 +89,7 @@ export function MenuCategoriesList({ categories }: MenuCategoriesListProps) {
               />
             </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );

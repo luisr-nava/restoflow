@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateStaffForm } from "./create-staff-form";
 
@@ -11,12 +12,13 @@ export function CreateStaffModal() {
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        onClick={() => openModal("createStaff")}
-        className="rounded-lg border border-border px-4 py-2 text-sm font-medium">
+        variant="outline"
+        size="md"
+        onClick={() => openModal("createStaff")}>
         Agregar personal
-      </button>
+      </Button>
 
       <AppDialog
         open={open}

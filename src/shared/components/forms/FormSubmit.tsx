@@ -25,7 +25,7 @@ export function FormSubmit({
       value={isSubmitting ? loadingText : value}
       disabled={disabled || isSubmitting}
       className={clsx(
-        "w-full rounded-lg bg-text px-4 py-3 text-sm font-medium text-bg",
+        "w-full rounded-lg bg-text px-4 py-3 text-sm font-medium text-bg cursor-pointer",
         "cursor-pointer transition-opacity hover:opacity-90",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,

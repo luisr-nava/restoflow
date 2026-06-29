@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import { createQrTableOrderAction } from "@/src/features/orders/actions/order.actions";
 import { EmptyState } from "@/src/shared/components/states";
+import { Button } from "@/src/shared/components/ui/Button";
 import { formatMoney } from "@/src/shared/utils/format-money";
 
 import type { CustomerQrData } from "../types/customer-qr.types";
@@ -165,8 +166,10 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
                           {formatMoney(item.price, currency)}
                         </p>
 
-                        <button
+                        <Button
                           type="button"
+                          variant="primary"
+                          size="sm"
                           onClick={() =>
                             handleAddItem(
                               item.id,
@@ -174,9 +177,9 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
                               Number(item.price),
                             )
                           }
-                          className="mt-3 rounded-lg bg-text px-3 py-2 text-xs font-medium text-bg">
+                          className="mt-3">
                           Agregar
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -195,13 +198,15 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
               </p>
             </div>
 
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="lg"
               onClick={handleSubmitOrder}
               disabled={isSubmitting || cartItems.length === 0}
-              className="rounded-lg bg-text px-4 py-3 text-sm font-medium text-bg disabled:cursor-not-allowed disabled:opacity-50">
+              className="disabled:opacity-50">
               {isSubmitting ? "Enviando..." : "Enviar pedido"}
-            </button>
+            </Button>
           </div>
 
           {cartItems.length > 0 && (
@@ -218,23 +223,27 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="icon"
                       onClick={() => handleRemoveItem(item.menuItemId)}
-                      className="grid size-8 place-items-center rounded-lg border border-border">
+                      className="grid place-items-center">
                       -
-                    </button>
+                    </Button>
 
                     <span className="w-6 text-center">{item.quantity}</span>
 
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="icon"
                       onClick={() =>
                         handleAddItem(item.menuItemId, item.name, item.price)
                       }
-                      className="grid size-8 place-items-center rounded-lg border border-border">
+                      className="grid place-items-center">
                       +
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -245,4 +254,3 @@ export function CustomerQrOrderView({ data }: CustomerQrOrderViewProps) {
     </main>
   );
 }
-

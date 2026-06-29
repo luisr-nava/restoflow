@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateTableOrderForm } from "./create-table-order-form";
 
@@ -26,13 +27,14 @@ export function CreateTableOrderModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         disabled={disabled}
-        onClick={() => openModal("createOrder", { tableId, mode })}
-        className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40">
+        onClick={() => openModal("createOrder", { tableId, mode })}>
         Tomar pedido
-      </button>
+      </Button>
 
       <AppDialog
         open={open}

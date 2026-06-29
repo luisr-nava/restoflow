@@ -1,4 +1,5 @@
 import { formatMoney } from "@/src/shared/utils/format-money";
+import { Card, CardContent, CardTitle } from "@/src/shared/components/ui/Card";
 import type { DashboardRecentOrder } from "../types/dashboard.types";
 
 type RecentOrdersTableProps = {
@@ -38,22 +39,20 @@ export function RecentOrdersTable({
 }: RecentOrdersTableProps) {
   if (orders.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          Últimos pedidos
-        </h2>
+      <Card variant="muted" size="md">
+        <CardTitle className="text-lg">Últimos pedidos</CardTitle>
         <p className="mt-2 text-sm text-muted-foreground">
           Todavía no hay pedidos registrados.
         </p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <h2 className="text-lg font-semibold text-foreground">Últimos pedidos</h2>
+    <Card variant="muted" size="md">
+      <CardTitle className="text-lg">Últimos pedidos</CardTitle>
 
-      <div className="mt-4 overflow-x-auto">
+      <CardContent className="mt-4 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <caption className="sr-only">
             Últimos pedidos registrados con mesa, estado, total y fecha.
@@ -94,7 +93,7 @@ export function RecentOrdersTable({
             ))}
           </tbody>
         </table>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

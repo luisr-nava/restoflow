@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Form, FormSubmit } from "@/src/shared/components/forms";
+import { Button } from "@/src/shared/components/ui/Button";
 
 import { useResendVerification } from "../hooks/use-resend-verification";
 import { ResendVerificationInput } from "../types/auth.types";
@@ -45,13 +46,9 @@ export function ResendVerificationForm({ onBack }: Props) {
 
       <FormSubmit value="Reenviar código" loadingText="Enviando..." />
 
-      <button
-        type="button"
-        onClick={onBack}
-        className="text-xs text-muted-foreground underline">
+      <Button type="button" variant="link" size="sm" onClick={onBack}>
         Volver
-      </button>
+      </Button>
     </Form>
   );
 }
-

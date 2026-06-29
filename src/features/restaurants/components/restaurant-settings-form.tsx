@@ -12,7 +12,8 @@ import {
   FormSelect,
   FormSubmit,
 } from "@/src/shared/components/forms";
-import { EmptyState, LoadingState } from "@/src/shared/components/states";
+import { EmptyState } from "@/src/shared/components/states";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 import {
   RESTAURANT_SETTINGS_CURRENCY_OPTIONS,
@@ -26,30 +27,30 @@ import type { UpdateRestaurantInput } from "../types/restaurant.types";
 function RestaurantSettingsLoadingSkeleton() {
   return (
     <div className="rounded-xl border border-border bg-surface p-6">
-      <LoadingState
-        label="Cargando configuración..."
-        className="border-0 bg-transparent px-0 pt-0"
-      />
+      <div className="space-y-2 pb-6">
+        <Skeleton className="h-6 w-52" />
+        <Skeleton className="h-4 w-72" />
+      </div>
 
       <div className="space-y-4">
-        <div className="h-10 rounded-lg border border-border bg-background" />
-        <div className="h-10 rounded-lg border border-border bg-background" />
+        <Skeleton className="h-10 rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="h-10 rounded-lg border border-border bg-background" />
-          <div className="h-10 rounded-lg border border-border bg-background" />
+          <Skeleton className="h-10 rounded-lg" />
+          <Skeleton className="h-10 rounded-lg" />
         </div>
 
-        <div className="h-10 rounded-lg border border-border bg-background" />
+        <Skeleton className="h-10 rounded-lg" />
 
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="h-10 rounded-lg border border-border bg-background" />
-          <div className="h-10 rounded-lg border border-border bg-background" />
+          <Skeleton className="h-10 rounded-lg" />
+          <Skeleton className="h-10 rounded-lg" />
         </div>
 
-        <div className="h-10 rounded-lg border border-border bg-background" />
+        <Skeleton className="h-56 rounded-lg" />
 
-        <div className="h-11 w-48 rounded-lg bg-foreground/10" />
+        <Skeleton className="h-11 w-48 rounded-lg" />
       </div>
     </div>
   );

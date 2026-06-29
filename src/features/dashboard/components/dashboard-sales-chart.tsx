@@ -7,6 +7,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/src/shared/components/ui/Card";
 
 type DashboardSalesChartPoint = {
   hour: string;
@@ -19,13 +26,13 @@ type DashboardSalesChartProps = {
 
 export function DashboardSalesChart({ data }: DashboardSalesChartProps) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5 shadow-sm">
-      <div>
-        <h2 className="text-lg font-semibold text-foreground">Ventas</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Ventas por hora</p>
-      </div>
+    <Card variant="muted" size="lg" className="rounded-xl p-5 shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-lg">Ventas</CardTitle>
+        <CardDescription>Ventas por hora</CardDescription>
+      </CardHeader>
 
-      <div className="mt-6 h-80">
+      <CardContent className="mt-6 h-80">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
@@ -49,7 +56,7 @@ export function DashboardSalesChart({ data }: DashboardSalesChartProps) {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

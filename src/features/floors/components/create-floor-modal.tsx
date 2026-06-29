@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateFloorForm } from "./create-floor-form";
 
@@ -17,12 +18,14 @@ export function CreateFloorModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        size="sm"
         onClick={() => openModal("createFloor")}
-        className="rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
+        className="bg-accent">
         {openText}
-      </button>
+      </Button>
 
       <AppDialog
         open={open}

@@ -3,6 +3,7 @@
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CloseTableForm } from "./close-table-form";
 
@@ -89,13 +90,14 @@ export function CloseTableModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="sm"
         disabled={disabled}
-        onClick={() => openModal("closeTable", { tableId, mode })}
-        className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40">
+        onClick={() => openModal("closeTable", { tableId, mode })}>
         Cerrar mesa
-      </button>
+      </Button>
 
       <AppDialog
         open={open}

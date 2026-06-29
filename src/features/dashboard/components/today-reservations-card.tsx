@@ -1,6 +1,14 @@
 "use client";
 
 import { useGetTodayReservations } from "@/src/features/reservations/hooks/use-get-today-reservations";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/src/shared/components/ui/Card";
+import { Skeleton } from "@/src/shared/components/ui/Skeleton";
 
 function formatTime(value: string) {
   const date = new Date(value);
@@ -34,31 +42,28 @@ export function TodayReservationsCard() {
   const nextReservations = activeReservations.slice(0, 3);
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <div className="flex items-start justify-between gap-4">
+    <Card variant="muted" size="md">
+      <CardHeader className="flex-row items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Reservas de hoy
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {activeReservations.length} activas
-          </p>
+          <CardTitle className="text-lg">Reservas de hoy</CardTitle>
+          <CardDescription>{activeReservations.length} activas</CardDescription>
         </div>
 
         <div className="rounded-full bg-accent-soft px-3 py-1 font-mono text-xs font-medium uppercase tracking-[0.08em] text-accent-ink">
           {activeReservations.length}
         </div>
-      </div>
+      </CardHeader>
 
       {isLoading ? (
-        <div className="mt-4 space-y-3">
+        <CardContent className="mt-4 space-y-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              key={index}
-              className="h-16 rounded-xl border border-border bg-background"
-            />
+            <div key={index} className="space-y-2 rounded-xl border border-border bg-background p-3">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-24" />
+            </div>
           ))}
-        </div>
+        </CardContent>
       ) : isError ? (
         <p className="mt-4 text-sm text-danger">
           {error.message || "No se pudieron cargar las reservas de hoy"}
@@ -68,11 +73,12 @@ export function TodayReservationsCard() {
           No hay reservas para hoy
         </p>
       ) : (
-        <div className="mt-4 space-y-3">
+        <CardContent className="mt-4 space-y-3">
           {nextReservations.map((reservation) => (
-            <div
+            <Card
               key={reservation.id}
-              className="rounded-xl border border-border bg-background p-3">
+              variant="default"
+              size="sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">
@@ -92,10 +98,10 @@ export function TodayReservationsCard() {
                 {reservation.party_size}{" "}
                 {reservation.party_size === 1 ? "persona" : "personas"}
               </p>
-            </div>
+            </Card>
           ))}
-        </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }

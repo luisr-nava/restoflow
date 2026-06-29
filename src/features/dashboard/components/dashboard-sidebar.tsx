@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -15,6 +16,7 @@ import {
   Utensils,
   QrCode,
 } from "lucide-react";
+import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useUiLayoutStore } from "@/src/shared/stores/ui-layout.store";
 
 const navItems = [
@@ -71,25 +73,57 @@ const navItems = [
 
 type SidebarContentProps = {
   pathname: string;
+  restaurantLogoUrl: string | null;
+  restaurantName: string;
   onNavigate?: () => void;
 };
 
-function SidebarContent({ pathname, onNavigate }: SidebarContentProps) {
+function getRestaurantInitials(name?: string) {
+  if (!name) {
+    return "R";
+  }
+
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
+
+  return initials || "R";
+}
+
+function SidebarContent({
+  pathname,
+  restaurantLogoUrl,
+  restaurantName,
+  onNavigate,
+}: SidebarContentProps) {
   const isSettingsActive = pathname === "/dashboard/settings";
+  const restaurantInitials = getRestaurantInitials(restaurantName);
 
   return (
     <>
       <div className="flex items-center gap-3 px-2 pb-6">
-        <div className="grid size-8 place-items-center rounded-lg bg-text font-serif text-lg italic text-bg">
-          R
+        <div className="relative grid size-8 place-items-center overflow-hidden rounded-lg bg-text font-serif text-lg italic text-bg">
+          {restaurantLogoUrl ? (
+            <Image
+              src={restaurantLogoUrl}
+              alt={`Logo de ${restaurantName}`}
+              fill
+              unoptimized
+              sizes="32px"
+              className="object-cover"
+            />
+          ) : (
+            restaurantInitials
+          )}
         </div>
 
         <div>
           <p className="text-sm font-semibold leading-none text-text">
-            Restoflow
-          </p>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-text-3">
-            Manager
+            {restaurantName}
           </p>
         </div>
       </div>
@@ -164,12 +198,15 @@ function SidebarContent({ pathname, onNavigate }: SidebarContentProps) {
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { data: restaurantSettings } = useGetRestaurantSettings();
   const isMobileSidebarOpen = useUiLayoutStore(
     (state) => state.isMobileSidebarOpen,
   );
   const closeMobileSidebar = useUiLayoutStore(
     (state) => state.closeMobileSidebar,
   );
+  const restaurantName = restaurantSettings?.data?.name?.trim() || "Restoflow";
+  const restaurantLogoUrl = restaurantSettings?.data?.logo_url ?? null;
 
   useEffect(() => {
     closeMobileSidebar();
@@ -178,7 +215,11 @@ export function DashboardSidebar() {
   return (
     <>
       <aside className="hidden border-r border-border bg-surface px-3 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:overflow-y-auto">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent
+          pathname={pathname}
+          restaurantLogoUrl={restaurantLogoUrl}
+          restaurantName={restaurantName}
+        />
       </aside>
 
       {isMobileSidebarOpen && (
@@ -193,6 +234,8 @@ export function DashboardSidebar() {
           <aside className="absolute inset-y-0 left-0 flex w-[280px] max-w-[85vw] flex-col overflow-y-auto border-r border-border bg-surface px-3 py-5 shadow-xl">
             <SidebarContent
               pathname={pathname}
+              restaurantLogoUrl={restaurantLogoUrl}
+              restaurantName={restaurantName}
               onNavigate={closeMobileSidebar}
             />
           </aside>

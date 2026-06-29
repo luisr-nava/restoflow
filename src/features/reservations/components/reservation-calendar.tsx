@@ -6,6 +6,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { Card } from "@/src/shared/components/ui/Card";
 
 import type { ReservationWithTable } from "../types/reservation.types";
 
@@ -61,9 +62,9 @@ export function ReservationCalendar({
   });
 
   return (
-    <div
+    <Card
       className={[
-        "rounded-2xl border border-border bg-background p-4 shadow-sm",
+        "bg-white shadow-sm",
         "[&_.fc]:font-sans [&_.fc]:text-sm [&_.fc-theme-standard_td]:border-border",
         "[&_.fc-theme-standard_th]:border-border [&_.fc-theme-standard_.fc-scrollgrid]:border-border",
         "[&_.fc-col-header-cell]:bg-surface [&_.fc-col-header-cell]:py-3",
@@ -114,6 +115,6 @@ export function ReservationCalendar({
           onReservationSelect(info.event.id);
         }}
       />
-    </div>
+    </Card>
   );
 }

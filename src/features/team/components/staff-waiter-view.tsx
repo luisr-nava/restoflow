@@ -11,6 +11,7 @@ import {
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
+import { Card, CardTitle } from "@/src/shared/components/ui/Card";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
@@ -90,9 +91,11 @@ function StaffMenuPreview() {
   return (
     <div className="grid gap-3">
       {visibleItems.map((item) => (
-        <article
+        <Card
           key={item.id}
-          className="rounded-2xl border border-border bg-surface p-4">
+          variant="muted"
+          size="lg"
+          className="p-4">
           <div className="flex gap-3">
             {item.image_url ? (
               <Image
@@ -112,9 +115,7 @@ function StaffMenuPreview() {
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-medium text-foreground">
-                    {item.name}
-                  </h3>
+                  <CardTitle className="text-sm font-medium">{item.name}</CardTitle>
 
                   {item.menu_categories?.name && (
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -141,7 +142,7 @@ function StaffMenuPreview() {
               )}
             </div>
           </div>
-        </article>
+        </Card>
       ))}
     </div>
   );

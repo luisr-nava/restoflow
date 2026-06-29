@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteStaff } from "../hooks/use-delete-staff";
 import type { RestaurantStaff } from "../types/team.types";
@@ -43,13 +44,15 @@ export function DeleteStaffButton({
   return (
     <>
       {showTrigger && (
-        <button
+        <Button
           type="button"
+          variant="danger"
+          size="sm"
           onClick={() => openModal("deleteStaff", { staffId: staff.id })}
           disabled={isPending}
-          className="rounded-lg border border-destructive px-3 py-2 text-xs font-medium text-destructive disabled:opacity-50">
+          className="border-destructive text-destructive disabled:opacity-50">
           Eliminar
-        </button>
+        </Button>
       )}
 
       <AppDialog
@@ -68,21 +71,24 @@ export function DeleteStaffButton({
         size="sm"
         footer={
           <>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => closeModal("deleteStaff")}
-              disabled={isPending}
-              className="rounded-lg border border-border px-3 py-2 text-xs">
+              disabled={isPending}>
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="sm"
               onClick={onDelete}
               disabled={isPending}
-              className="rounded-lg border border-destructive px-3 py-2 text-xs font-medium text-destructive disabled:opacity-50">
+              className="border-destructive text-destructive disabled:opacity-50">
               {isPending ? "Eliminando..." : "Eliminar"}
-            </button>
+            </Button>
           </>
         }>
         <p className="text-sm text-muted-foreground">

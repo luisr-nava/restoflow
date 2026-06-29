@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ImagePlus, Trash2 } from "lucide-react";
 
 import { RestaurantLogoFileSchema } from "@/src/features/restaurants/schemas/restaurant-logo.schema";
+import { Button } from "@/src/shared/components/ui/Button";
 
 type ImageUploadFieldProps = {
   label: string;
@@ -126,14 +127,16 @@ export function ImageUploadField({
       />
 
       {imageUrl && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="md"
           disabled={disabled}
           onClick={handleRemove}
-          className="inline-flex items-center gap-2 text-sm text-destructive disabled:cursor-not-allowed disabled:opacity-50">
-          <Trash2 className="size-4" />
+          className="px-0 py-0 text-sm text-destructive hover:bg-transparent hover:text-destructive disabled:opacity-50"
+          leftIcon={<Trash2 className="size-4" />}>
           {removeText}
-        </button>
+        </Button>
       )}
     </div>
   );

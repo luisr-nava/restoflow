@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useDeleteFloor } from "../hooks/use-delete-floor";
 import type { RestaurantFloor } from "../types/floor.types";
 
@@ -44,12 +46,15 @@ export function DeleteFloorButton({
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant="danger"
+        size="sm"
         onClick={() => setConfirmOpen(true)}
-        className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600">
+        className="cursor-pointer bg-red-200 text-red-800 hover:bg-red-200"
+        leftIcon={<Trash2 size={15} />}>
         Eliminar piso
-      </button>
+      </Button>
 
       <AppDialog
         open={confirmOpen}
@@ -58,20 +63,22 @@ export function DeleteFloorButton({
         size="md"
         footer={
           <>
-            <button
+            <Button
               type="button"
-              onClick={() => setConfirmOpen(false)}
-              className="rounded-lg border border-border px-3 py-2 text-sm">
+              variant="outline"
+              size="md"
+              onClick={() => setConfirmOpen(false)}>
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="md"
               disabled={isPending}
-              onClick={() => handleDelete(false)}
-              className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+              onClick={() => handleDelete(false)}>
               {isPending ? "Eliminando..." : "Eliminar"}
-            </button>
+            </Button>
           </>
         }>
         <p className="text-sm text-muted-foreground">
@@ -90,20 +97,22 @@ export function DeleteFloorButton({
         size="md"
         footer={
           <>
-            <button
+            <Button
               type="button"
-              onClick={() => setForceConfirmOpen(false)}
-              className="rounded-lg border border-border px-3 py-2 text-sm">
+              variant="outline"
+              size="md"
+              onClick={() => setForceConfirmOpen(false)}>
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="md"
               disabled={isPending}
-              onClick={() => handleDelete(true)}
-              className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+              onClick={() => handleDelete(true)}>
               {isPending ? "Eliminando..." : "Confirmar y eliminar"}
-            </button>
+            </Button>
           </>
         }>
         <p className="text-sm text-muted-foreground">

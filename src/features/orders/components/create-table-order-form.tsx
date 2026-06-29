@@ -12,6 +12,7 @@ import { useGetMenuItems } from "@/src/features/menu-items/hooks/use-get-menu-it
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
 import { Form, FormInput, FormSubmit } from "@/src/shared/components/forms";
+import { Button } from "@/src/shared/components/ui/Button";
 import { formatMoney } from "@/src/shared/utils/format-money";
 
 import { useCreateStaffTableOrder } from "../hooks/use-create-staff-table-order";
@@ -266,25 +267,29 @@ export function CreateTableOrderForm({
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
+                        size="icon"
                         disabled={quantity === 0 || isPending}
                         onClick={() => decreaseQuantity(item.id)}
-                        className="flex size-8 items-center justify-center rounded-lg border border-border disabled:cursor-not-allowed disabled:opacity-40">
-                        <Minus className="size-4" />
-                      </button>
+                        className="flex items-center justify-center"
+                        leftIcon={<Minus className="size-4" />}
+                      />
 
                       <span className="w-6 text-center text-sm font-medium text-foreground">
                         {quantity}
                       </span>
 
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
+                        size="icon"
                         disabled={!item.is_available || isPending}
                         onClick={() => increaseQuantity(item.id)}
-                        className="flex size-8 items-center justify-center rounded-lg border border-border disabled:cursor-not-allowed disabled:opacity-40">
-                        <Plus className="size-4" />
-                      </button>
+                        className="flex items-center justify-center"
+                        leftIcon={<Plus className="size-4" />}
+                      />
                     </div>
                   </div>
 
@@ -342,4 +347,3 @@ export function CreateTableOrderForm({
     </Form>
   );
 }
-

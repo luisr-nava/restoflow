@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { RestaurantTable } from "../types/table.types";
 import { EditTableForm } from "./edit-table-form";
@@ -25,12 +26,13 @@ export function EditTableModal({
   return (
     <>
       {showTrigger && (
-        <button
+        <Button
           type="button"
-          onClick={() => openModal("editTable", { tableId: table.id })}
-          className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:bg-muted">
+          variant="secondary"
+          size="sm"
+          onClick={() => openModal("editTable", { tableId: table.id })}>
           Editar
-        </button>
+        </Button>
       )}
 
       <AppDialog

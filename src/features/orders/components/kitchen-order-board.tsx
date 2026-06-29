@@ -1,5 +1,13 @@
 "use client";
 
+import { Button } from "@/src/shared/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardTitle,
+} from "@/src/shared/components/ui/Card";
 import { OrderDetailsModal } from "./order-details-modal";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import {
@@ -36,13 +44,14 @@ function KitchenOrderCard({
   const ageLevel = getKitchenOrderAgeLevel(order.created_at);
 
   return (
-    <div
+    <Card
+      as="article"
       className={`rounded-2xl border p-4 ${ageCardClassNameByLevel[ageLevel]}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-foreground">
+          <CardTitle className="text-base">
             {order.restaurant_tables?.name ?? "Mesa sin nombre"}
-          </h3>
+          </CardTitle>
 
           <p className="mt-1 font-mono text-xs text-muted-foreground">
             #{order.id.slice(0, 8)}
@@ -72,25 +81,26 @@ function KitchenOrderCard({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap justify-end gap-2">
+      <CardFooter className="mt-4 flex-wrap justify-end gap-2">
         <OrderDetailsModal orderId={order.id} currency={currency} />
 
         {nextStatus && actionLabel && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             disabled={isPending}
             onClick={() => {
               onAdvanceStatus({
                 orderId: order.id,
                 status: nextStatus,
               });
-            }}
-            className="rounded-lg border border-border px-3 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40">
+            }}>
             {isPending ? "Actualizando..." : actionLabel}
-          </button>
+          </Button>
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
 
@@ -115,28 +125,32 @@ export function KitchenOrderBoard({
         );
 
         return (
-          <section
+          <Card
+            as="section"
             key={column.title}
-            className="rounded-2xl border border-border bg-muted/20 p-3">
-            <div className="mb-3 rounded-xl border border-border/70 bg-background/70 p-3">
+            variant="muted"
+            size="sm"
+            className="rounded-2xl bg-muted/20">
+            <Card
+              variant="default"
+              size="sm"
+              className="mb-3 border-border/70 bg-background/70">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-semibold text-foreground">
-                    {column.title}
-                  </h2>
+                  <CardTitle className="text-sm">{column.title}</CardTitle>
 
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <CardDescription className="mt-1 text-xs">
                     {column.description}
-                  </p>
+                  </CardDescription>
                 </div>
 
                 <span className="rounded-full border border-border bg-background px-2.5 py-1 font-mono text-xs text-foreground">
                   {columnOrders.length}
                 </span>
               </div>
-            </div>
+            </Card>
 
-            <div className="space-y-3">
+            <CardContent className="space-y-3">
               {columnOrders.length === 0 ? (
                 <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
                   Sin pedidos.
@@ -152,8 +166,8 @@ export function KitchenOrderBoard({
                   />
                 ))
               )}
-            </div>
-          </section>
+            </CardContent>
+          </Card>
         );
       })}
     </div>

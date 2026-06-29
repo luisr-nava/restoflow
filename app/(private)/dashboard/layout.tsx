@@ -1,5 +1,6 @@
 import { DashboardNavbar } from "@/src/features/dashboard/components/dashboard-navbar";
 import { DashboardSidebar } from "@/src/features/dashboard/components/dashboard-sidebar";
+import { PageTransition } from "@/src/shared/components/ui/PageTransition";
 import { ReactNode } from "react";
 
 type Props = {
@@ -14,9 +15,10 @@ export default async function DashboardLayout({ children }: Props) {
       <div className="min-w-0">
         <DashboardNavbar />
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        <main className="px-4 py-6 sm:px-6 lg:px-8">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );
 }
-

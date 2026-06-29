@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteMenuCategory } from "../hooks/use-delete-menu-category";
 import type { MenuCategory } from "../types/menu-category.types";
@@ -34,15 +35,16 @@ export function DeleteMenuCategoryButton({
   return (
     <>
       {showTrigger && (
-        <button
+        <Button
           type="button"
+          variant="danger"
+          size="sm"
           onClick={() =>
             openModal("deleteMenuCategory", { categoryId: category.id })
           }
-          disabled={isPending}
-          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+          disabled={isPending}>
           Eliminar
-        </button>
+        </Button>
       )}
 
       <AppDialog
@@ -61,21 +63,23 @@ export function DeleteMenuCategoryButton({
         size="sm"
         footer={
           <>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => closeModal("deleteMenuCategory")}
-              disabled={isPending}
-              className="rounded-lg border border-border px-3 py-2 text-xs">
+              disabled={isPending}>
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="sm"
               onClick={onDelete}
-              disabled={isPending}
-              className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:opacity-40">
+              disabled={isPending}>
               {isPending ? "Eliminando..." : "Eliminar"}
-            </button>
+            </Button>
           </>
         }>
         <p className="text-sm text-muted-foreground">

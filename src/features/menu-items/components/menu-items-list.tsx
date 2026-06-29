@@ -7,6 +7,8 @@ import {
   ActionMenu,
   ActionMenuItem,
 } from "@/src/shared/components/ui/ActionMenu";
+import { Button } from "@/src/shared/components/ui/Button";
+import { Card, CardTitle } from "@/src/shared/components/ui/Card";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { formatMoney } from "@/src/shared/utils/format-money";
 import { DeleteMenuItemButton } from "./delete-menu-item-button";
@@ -35,9 +37,11 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
   return (
     <div className="grid gap-3">
       {items.map((item) => (
-        <div
+        <Card
           key={item.id}
-          className="rounded-2xl border border-border bg-background p-4">
+          variant="default"
+          size="lg"
+          className="p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex gap-3">
               {item.image_url && (
@@ -52,9 +56,7 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
               )}
 
               <div>
-                <h3 className="text-sm font-medium text-foreground">
-                  {item.name}
-                </h3>
+                <CardTitle className="text-sm font-medium">{item.name}</CardTitle>
 
                 {item.description && (
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -73,22 +75,19 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
                 {formatMoney(item.price)}
               </p>
 
-              <button
+              <Button
                 type="button"
+                variant={item.is_available ? "success" : "outline"}
+                size="sm"
                 disabled={isPending}
                 onClick={() =>
                   mutate({
                     menuItemId: item.id,
                     isAvailable: !item.is_available,
                   })
-                }
-                className={`rounded-lg border px-3 py-2 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40 ${
-                  item.is_available
-                    ? "border-green-200 text-green-600"
-                    : "border-border text-muted-foreground"
-                }`}>
+                }>
                 {item.is_available ? "Disponible" : "No disponible"}
-              </button>
+              </Button>
 
               <ActionMenu ariaLabel={`Acciones de ${item.name}`}>
                 <ActionMenuItem
@@ -112,7 +111,7 @@ export function MenuItemsList({ items }: MenuItemsListProps) {
               <DeleteMenuItemButton item={item} showTrigger={false} />
             </div>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );

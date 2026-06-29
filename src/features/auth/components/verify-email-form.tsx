@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Form, FormOtpInput, FormSubmit } from "@/src/shared/components/forms";
+import { Button } from "@/src/shared/components/ui/Button";
 
 import { VerifyEmailSchema } from "../schemas/auth.schema";
 import { VerifyEmailInput } from "../types/auth.types";
@@ -32,12 +33,9 @@ export function VerifyEmailForm({ onResend }: Props) {
 
       <FormSubmit value="Verificar cuenta" loadingText="Verificando..." />
 
-      <button
-        type="button"
-        onClick={onResend}
-        className="text-sm text-muted-foreground underline">
+      <Button type="button" variant="link" size="md" onClick={onResend}>
         No recibiste el código?
-      </button>
+      </Button>
     </Form>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import type { RestaurantStaff } from "../types/team.types";
 import { UpdateStaffForm } from "./update-staff-form";
@@ -25,12 +26,13 @@ export function UpdateStaffModal({
   return (
     <>
       {showTrigger && (
-        <button
+        <Button
           type="button"
-          onClick={() => openModal("editStaff", { staffId: staff.id })}
-          className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
+          variant="outline"
+          size="sm"
+          onClick={() => openModal("editStaff", { staffId: staff.id })}>
           Editar
-        </button>
+        </Button>
       )}
 
       <AppDialog

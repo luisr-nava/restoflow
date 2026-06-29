@@ -1,6 +1,8 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
+import { Card, CardTitle } from "@/src/shared/components/ui/Card";
 import {
   EmptyState,
   ErrorState,
@@ -34,12 +36,13 @@ export function OrderDetailsModal({
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        onClick={() => openModal("orderDetails", { orderId })}
-        className="rounded-lg border border-border px-3 py-2 text-xs font-medium">
+        variant="outline"
+        size="sm"
+        onClick={() => openModal("orderDetails", { orderId })}>
         Ver detalle
-      </button>
+      </Button>
 
       <AppDialog
         open={open}
@@ -75,11 +78,12 @@ export function OrderDetailsModal({
         ) : (
           <div className="space-y-3">
             {items.map((item) => (
-              <div
+              <Card
                 key={item.id}
-                className="flex items-center justify-between rounded-xl border border-border p-3">
+                size="sm"
+                className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium">{item.name}</h3>
+                  <CardTitle className="text-sm font-medium">{item.name}</CardTitle>
 
                   <p className="mt-1 text-xs text-muted-foreground">
                     {item.quantity} x {formatMoney(item.unit_price, currency)}
@@ -89,7 +93,7 @@ export function OrderDetailsModal({
                 <p className="font-mono text-sm font-medium">
                   {formatMoney(item.total, currency)}
                 </p>
-              </div>
+              </Card>
             ))}
           </div>
         )}

@@ -10,6 +10,7 @@ import {
   ErrorState,
   LoadingState,
 } from "@/src/shared/components/states";
+import { Card, CardFooter, CardTitle } from "@/src/shared/components/ui/Card";
 import { formatMoney } from "@/src/shared/utils/format-money";
 
 import { useGetStaffTables } from "../hooks/use-get-staff-tables";
@@ -50,10 +51,10 @@ function StaffTableCard({
   const canCloseTable = hasOpenOrder;
 
   return (
-    <div className="rounded-2xl border border-border bg-surface p-4">
+    <Card variant="muted" size="lg" className="p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-medium">{table.name}</h3>
+          <CardTitle className="text-base font-medium">{table.name}</CardTitle>
 
           <p className="mt-2 text-sm text-muted-foreground">
             {table.seats} lugares
@@ -82,7 +83,7 @@ function StaffTableCard({
         </span>
       </div>
 
-      <div className="mt-4 flex justify-end gap-2">
+      <CardFooter className="mt-4 justify-end gap-2">
         <CreateTableOrderModal
           tableId={table.id}
           mode="staff"
@@ -92,8 +93,8 @@ function StaffTableCard({
         {canCloseTable && (
           <CloseTableModal tableId={table.id} total={total} mode="staff" />
         )}
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
 

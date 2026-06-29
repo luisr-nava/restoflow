@@ -52,7 +52,7 @@ export function AppDialog({
         <div className="flex min-h-full items-center justify-center">
           <DialogPanel
             className={clsx(
-              "w-full rounded-2xl border border-border bg-background p-6 shadow-xl",
+              "w-full rounded-2xl border border-border bg-gray-100 p-6 shadow-xl",
               "max-h-[calc(100vh-2rem)] overflow-y-auto",
               sizeClassNameBySize[size],
               panelClassName,

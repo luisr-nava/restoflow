@@ -2,6 +2,7 @@
 
 import { pdf } from "@react-pdf/renderer";
 import toast from "react-hot-toast";
+import { Button } from "@/src/shared/components/ui/Button";
 
 import type { TableQrPdfItem } from "../types/table-qr.types";
 import { TableQrPdfDocument } from "./table-qr-pdf-document";
@@ -30,11 +31,13 @@ export function ExportTableQrPdfButton({ items }: ExportTableQrPdfButtonProps) {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="primary"
+      size="md"
       onClick={handleExport}
-      className="rounded-lg bg-text px-4 py-2.5 text-sm font-medium text-bg transition hover:opacity-90">
+      className="py-2.5 hover:opacity-90">
       Exportar PDF
-    </button>
+    </Button>
   );
 }

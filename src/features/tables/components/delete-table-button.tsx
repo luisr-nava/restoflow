@@ -1,6 +1,7 @@
 "use client";
 
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
+import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { useDeleteTable } from "../hooks/use-delete-table";
 import type { RestaurantTable } from "../types/table.types";
@@ -40,13 +41,14 @@ export function DeleteTableButton({
   return (
     <>
       {showTrigger && (
-        <button
+        <Button
           type="button"
+          variant="danger"
+          size="sm"
           disabled={table.status !== "AVAILABLE"}
-          onClick={() => openModal("deleteTable", { tableId: table.id })}
-          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40">
+          onClick={() => openModal("deleteTable", { tableId: table.id })}>
           Eliminar
-        </button>
+        </Button>
       )}
 
       <AppDialog
@@ -56,20 +58,22 @@ export function DeleteTableButton({
         size="md"
         footer={
           <>
-            <button
+            <Button
               type="button"
-              onClick={() => closeModal("deleteTable")}
-              className="rounded-lg border border-border px-3 py-2 text-sm">
+              variant="outline"
+              size="md"
+              onClick={() => closeModal("deleteTable")}>
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="danger"
+              size="md"
               disabled={isPending}
-              onClick={handleDelete}
-              className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600">
+              onClick={handleDelete}>
               Eliminar
-            </button>
+            </Button>
           </>
         }>
         <p className="text-sm text-muted-foreground">

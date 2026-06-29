@@ -4,6 +4,15 @@ import { CreateTableOrderModal } from "@/src/features/orders/components/create-t
 import { useGetOpenOrdersByTableIds } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
 import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
 import { EmptyState, ErrorState } from "@/src/shared/components/states";
+import { Button } from "@/src/shared/components/ui/Button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/shared/components/ui/Card";
 import {
   ActionMenu,
   ActionMenuItem,
@@ -54,8 +63,10 @@ function TableReservationButton({ table }: TableReservationButtonProps) {
   const isDisabled = table.status !== "AVAILABLE" && table.status !== "RESERVED";
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       disabled={isDisabled || isPending}
       onClick={() =>
         mutate({
@@ -63,10 +74,9 @@ function TableReservationButton({ table }: TableReservationButtonProps) {
           floorId: table.floor_id,
           status: isReserved ? "AVAILABLE" : "RESERVED",
         })
-      }
-      className="rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground disabled:cursor-not-allowed disabled:opacity-40">
+      }>
       {isReserved ? "Liberar reserva" : "Reservar"}
-    </button>
+    </Button>
   );
 }
 
@@ -83,22 +93,20 @@ function FloorTableCard({
   const hasActiveOrder = Boolean(openOrder);
 
   return (
-    <div className="rounded-xl border border-border bg-background p-3">
-      <div className="flex items-start justify-between gap-3">
+    <Card variant="default" size="sm">
+      <CardHeader className="flex-row items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-medium text-foreground">{table.name}</h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {table.seats} sillas
-          </p>
+          <CardTitle className="text-sm font-medium">{table.name}</CardTitle>
+          <CardDescription className="text-xs">{table.seats} sillas</CardDescription>
         </div>
 
         <span
           className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${statusBadgeClassName[table.status]}`}>
           {statusLabel[table.status]}
         </span>
-      </div>
+      </CardHeader>
 
-      <div className="mt-4 border-t border-border pt-3">
+      <CardContent className="mt-4 border-t border-border pt-3">
         {openOrdersErrorMessage ? (
           <ErrorState
             title="No se pudo cargar el consumo"
@@ -123,9 +131,9 @@ function FloorTableCard({
             )}
           </div>
         )}
-      </div>
+      </CardContent>
 
-      <div className="mt-3 flex flex-wrap justify-end gap-2">
+      <CardFooter className="mt-3 flex-wrap justify-end gap-2">
         <TableReservationButton table={table} />
 
         <CreateTableOrderModal
@@ -149,8 +157,8 @@ function FloorTableCard({
 
         <EditTableModal table={table} showTrigger={false} />
         <DeleteTableButton table={table} showTrigger={false} />
-      </div>
-    </div>
+      </CardFooter>
+    </Card>
   );
 }
 
@@ -165,17 +173,15 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
   const currency = restaurantSettings?.data?.currency;
 
   return (
-    <aside className="rounded-2xl border border-border bg-background">
-      <div className="border-b border-border px-4 py-3">
+    <Card as="aside" variant="default" size="lg" className="p-0">
+      <CardHeader className="border-b border-border px-4 py-3">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
           Mesas
         </p>
-        <h2 className="mt-1 text-sm font-medium text-foreground">
-          Estado del piso
-        </h2>
-      </div>
+        <CardTitle className="text-sm font-medium">Estado del piso</CardTitle>
+      </CardHeader>
 
-      <div className="max-h-130 space-y-3 overflow-y-auto p-3">
+      <CardContent className="max-h-130 space-y-3 overflow-y-auto p-3">
         {tables.length === 0 ? (
           <EmptyState
             title="Sin mesas en este piso"
@@ -194,7 +200,7 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
             />
           ))
         )}
-      </div>
-    </aside>
+      </CardContent>
+    </Card>
   );
 }
