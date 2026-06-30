@@ -13,6 +13,7 @@ import type {
   CreateTableOrderInput,
   Order,
   OrderItemDetail,
+  OrderWithTableAndItems,
   OrderWithTable,
   UpdateOrderStatusInput,
 } from "../types/order.types";
@@ -368,7 +369,7 @@ class OrderService {
       };
     }
   }
-  async getOrders(): Promise<OrderWithTable[]> {
+  async getOrders(): Promise<OrderWithTableAndItems[]> {
     const supabase = await this.getSupabase();
 
     const member =
@@ -387,7 +388,12 @@ class OrderService {
       throw new Error(error.message);
     }
 
-    return data ?? [];
+    return (data ?? []).map((order) => ({
+      ...order,
+      order_items: [...(order.order_items ?? [])].sort((leftItem, rightItem) =>
+        leftItem.created_at.localeCompare(rightItem.created_at),
+      ),
+    }));
   }
 
   async getOrderItems(orderId: string): Promise<OrderItemDetail[]> {
@@ -1166,4 +1172,3 @@ class OrderService {
 }
 
 export const orderService = new OrderService(orderRepository);
-

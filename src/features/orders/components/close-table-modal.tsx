@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContextFallback } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
@@ -19,14 +19,14 @@ type CloseTableFormContentProps = Omit<CloseTableModalProps, "disabled"> & {
 };
 
 function AdminCloseTableForm(props: CloseTableFormContentProps) {
-  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const { restaurant } = useRestaurantSettingsContextFallback();
 
   return (
     <CloseTableForm
       tableId={props.tableId}
       total={props.total}
       mode={props.mode}
-      currency={restaurantSettings?.data?.currency}
+      currency={restaurant?.currency}
       onSuccess={props.onSuccess}
     />
   );
@@ -125,4 +125,3 @@ export function CloseTableModal({
     </>
   );
 }
-

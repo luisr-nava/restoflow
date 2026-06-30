@@ -16,7 +16,7 @@ import {
   Utensils,
   QrCode,
 } from "lucide-react";
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContext } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import { useUiLayoutStore } from "@/src/shared/stores/ui-layout.store";
 
 const navItems = [
@@ -198,15 +198,15 @@ function SidebarContent({
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const { restaurant } = useRestaurantSettingsContext();
   const isMobileSidebarOpen = useUiLayoutStore(
     (state) => state.isMobileSidebarOpen,
   );
   const closeMobileSidebar = useUiLayoutStore(
     (state) => state.closeMobileSidebar,
   );
-  const restaurantName = restaurantSettings?.data?.name?.trim() || "Restoflow";
-  const restaurantLogoUrl = restaurantSettings?.data?.logo_url ?? null;
+  const restaurantName = restaurant?.name?.trim() || "Restoflow";
+  const restaurantLogoUrl = restaurant?.logo_url ?? null;
 
   useEffect(() => {
     closeMobileSidebar();

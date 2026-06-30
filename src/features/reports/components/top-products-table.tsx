@@ -1,22 +1,30 @@
 "use client";
 
 import { formatMoney } from "@/src/shared/utils/format-money";
-import { useTopProducts } from "../hooks/use-top-products";
+import type { TopProduct } from "../types/report.types";
 import { ReportWidgetCard } from "./report-widget-card";
 
 type TopProductsTableProps = {
   currency?: string | null;
+  products: TopProduct[];
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
 };
 
-export function TopProductsTable({ currency }: TopProductsTableProps) {
-  const { data: products = [], error, isError, isLoading } = useTopProducts();
-
+export function TopProductsTable({
+  currency,
+  products,
+  isLoading,
+  isError,
+  errorMessage,
+}: TopProductsTableProps) {
   return (
     <ReportWidgetCard
       title="Productos más vendidos"
       isLoading={isLoading}
       isError={isError}
-      errorMessage={error?.message}
+      errorMessage={errorMessage}
       isEmpty={products.length === 0}
       loadingLabel="Cargando productos vendidos..."
       emptyTitle="Todavía no hay productos vendidos"

@@ -2,15 +2,23 @@
 
 import { EmptyState, ErrorState } from "@/src/shared/components/states";
 import { formatMoney } from "@/src/shared/utils/format-money";
-import { useSalesSummary } from "../hooks/use-sales-summary";
+import type { SalesSummary } from "../types/report.types";
 
 type SalesSummaryCardsProps = {
   currency?: string | null;
+  data?: SalesSummary;
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
 };
 
-export function SalesSummaryCards({ currency }: SalesSummaryCardsProps) {
-  const { data, error, isError, isLoading } = useSalesSummary();
-
+export function SalesSummaryCards({
+  currency,
+  data,
+  isLoading,
+  isError,
+  errorMessage,
+}: SalesSummaryCardsProps) {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -28,7 +36,7 @@ export function SalesSummaryCards({ currency }: SalesSummaryCardsProps) {
     return (
       <ErrorState
         title="No se pudo cargar el resumen de ventas"
-        description={error.message}
+        description={errorMessage}
       />
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContext } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import {
   EmptyState,
   ErrorState,
@@ -16,9 +16,9 @@ export function KitchenView() {
   useOrdersRealtime();
 
   const { data: orders = [], error, isError, isLoading } = useGetOrders();
-  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const { restaurant } = useRestaurantSettingsContext();
   const { mutate, isPending } = useUpdateOrderStatus();
-  const currency = restaurantSettings?.data?.currency;
+  const currency = restaurant?.currency;
   const activeOrders = orders.filter((order) =>
     isKitchenActiveStatus(order.status),
   );
@@ -48,4 +48,3 @@ export function KitchenView() {
     </div>
   );
 }
-

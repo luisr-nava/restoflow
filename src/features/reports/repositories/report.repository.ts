@@ -2,12 +2,18 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
   PaymentMethodReport,
+  ReportsOverview,
   SalesSummary,
   TopCategory,
   TopProduct,
 } from "../types/report.types";
 
 export interface IReportRepository {
+  getReportsOverview(
+    supabase: SupabaseClient,
+    restaurantId: string,
+  ): Promise<{ data: ReportsOverview; error: Error | null }>;
+
   getSalesSummary(
     supabase: SupabaseClient,
     restaurantId: string,
@@ -30,6 +36,35 @@ export interface IReportRepository {
 }
 
 class ReportRepository implements IReportRepository {
+  async getReportsOverview(
+    supabase: SupabaseClient,
+    restaurantId: string,
+  ): Promise<{ data: ReportsOverview; error: Error | null }> {
+    const [salesSummaryResult, topProductsResult, topCategoriesResult, paymentMethodsResult] =
+      await Promise.all([
+        this.getSalesSummary(supabase, restaurantId),
+        this.getTopProducts(supabase, restaurantId),
+        this.getTopCategories(supabase, restaurantId),
+        this.getPaymentMethods(supabase, restaurantId),
+      ]);
+
+    const error =
+      salesSummaryResult.error ??
+      topProductsResult.error ??
+      topCategoriesResult.error ??
+      paymentMethodsResult.error;
+
+    return {
+      data: {
+        salesSummary: salesSummaryResult.data,
+        topProducts: topProductsResult.data,
+        topCategories: topCategoriesResult.data,
+        paymentMethods: paymentMethodsResult.data,
+      },
+      error,
+    };
+  }
+
   async getSalesSummary(
     supabase: SupabaseClient,
     restaurantId: string,

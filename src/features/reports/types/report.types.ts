@@ -21,3 +21,10 @@ export type PaymentMethodReport = {
   method: "CASH" | "CARD" | "TRANSFER" | "ACCOUNT";
   total: number;
 };
+
+export type ReportsOverview = {
+  salesSummary: SalesSummary;
+  topProducts: TopProduct[];
+  topCategories: TopCategory[];
+  paymentMethods: PaymentMethodReport[];
+};

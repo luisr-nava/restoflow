@@ -5,7 +5,7 @@ import type {
   OrderItem,
   OrderItemDetail,
   OrderSource,
-  OrderWithTable,
+  OrderWithTableAndItems,
   UpdateOrderStatusInput,
 } from "../types/order.types";
 
@@ -74,7 +74,7 @@ export interface IOrderRepository {
   findOrdersByRestaurantId(
     supabase: SupabaseClient,
     restaurantId: string,
-  ): Promise<{ data: OrderWithTable[] | null; error: Error | null }>;
+  ): Promise<{ data: OrderWithTableAndItems[] | null; error: Error | null }>;
 
   findOrderItems(
     supabase: SupabaseClient,
@@ -233,12 +233,13 @@ class OrderRepository implements IOrderRepository {
   async findOrdersByRestaurantId(
     supabase: SupabaseClient,
     restaurantId: string,
-  ): Promise<{ data: OrderWithTable[] | null; error: Error | null }> {
+  ): Promise<{ data: OrderWithTableAndItems[] | null; error: Error | null }> {
     const { data, error } = await supabase
       .from("orders")
       .select(
         `
       *,
+      order_items (*),
       restaurant_tables (
         id,
         name
@@ -356,7 +357,5 @@ class OrderRepository implements IOrderRepository {
 }
 
 export const orderRepository = new OrderRepository();
-
-
 
 

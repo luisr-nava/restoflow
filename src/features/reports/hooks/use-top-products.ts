@@ -1,13 +1,12 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-
-import { getTopProductsAction } from "../actions/report.actions";
-import { reportKeys } from "../query-keys/report.keys";
+import { useReportsOverview } from "./use-reports-overview";
 
 export function useTopProducts() {
-  return useQuery({
-    queryKey: reportKeys.topProducts,
-    queryFn: getTopProductsAction,
-  });
+  const query = useReportsOverview();
+
+  return {
+    ...query,
+    data: query.data?.topProducts ?? [],
+  };
 }

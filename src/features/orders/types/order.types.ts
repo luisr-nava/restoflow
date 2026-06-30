@@ -34,6 +34,7 @@ export type Order = {
   status: OrderStatus;
   covers: number;
   total: number;
+  notes?: string | null;
   accepted_at: string | null;
   preparing_at: string | null;
   ready_at: string | null;
@@ -48,6 +49,10 @@ export type OrderWithTable = Order & {
   } | null;
 };
 
+export type OrderWithTableAndItems = OrderWithTable & {
+  order_items: OrderItemDetail[];
+};
+
 export type OrderItem = {
   id: string;
   order_id: string;
@@ -56,6 +61,7 @@ export type OrderItem = {
   quantity: number;
   unit_price: number;
   total: number;
+  notes?: string | null;
   created_at: string;
 };
 
@@ -67,6 +73,7 @@ export type OrderItemDetail = {
   quantity: number;
   unit_price: number;
   total: number;
+  notes?: string | null;
   created_at: string;
 };
 
@@ -87,4 +94,3 @@ export type CloseTableInput = z.infer<typeof CloseTableSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof UpdateOrderStatusSchema>;
 
 export type CreateQrTableOrderInput = z.infer<typeof CreateQrTableOrderSchema>;
-

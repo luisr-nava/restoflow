@@ -2,6 +2,10 @@
 
 import { reportService } from "../services/report.service";
 
+export async function getReportsOverviewAction() {
+  return reportService.getReportsOverview();
+}
+
 export async function getSalesSummaryAction() {
   return reportService.getSalesSummary();
 }

@@ -2,7 +2,7 @@
 
 import { CreateTableOrderModal } from "@/src/features/orders/components/create-table-order-modal";
 import { useGetOpenOrdersByTableIds } from "@/src/features/orders/hooks/use-get-open-order-by-table-id";
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContext } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import { EmptyState, ErrorState } from "@/src/shared/components/states";
 import { Button } from "@/src/shared/components/ui/Button";
 import {
@@ -174,7 +174,7 @@ function FloorTableCard({
 }
 
 export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
-  const { data: restaurantSettings } = useGetRestaurantSettings();
+  const { restaurant } = useRestaurantSettingsContext();
   const selectedFloorId = useUiSelectionStore((state) => state.selectedFloorId);
   const tableIds = tables.map((table) => table.id);
   const {
@@ -182,7 +182,7 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
     error: openOrdersError,
     isLoading: isOpenOrdersLoading,
   } = useGetOpenOrdersByTableIds(tableIds);
-  const currency = restaurantSettings?.data?.currency;
+  const currency = restaurant?.currency;
 
   return (
     <Card as="aside" variant="default" size="lg" className="p-0 bg-white">
@@ -216,4 +216,3 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
     </Card>
   );
 }
-

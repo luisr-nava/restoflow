@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 import { useGetStaffMenuItems } from "@/src/features/menu-items/hooks/use-get-staff-menu-items";
 import { useGetMenuItems } from "@/src/features/menu-items/hooks/use-get-menu-items";
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContextFallback } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import { useGetStaffRestaurantCurrency } from "@/src/features/restaurants/hooks/use-get-staff-restaurant-currency";
 import { Form, FormInput, FormSubmit } from "@/src/shared/components/forms";
 import { Button } from "@/src/shared/components/ui/Button";
@@ -34,14 +34,15 @@ export function CreateTableOrderForm({
   const isStaffMode = mode === "staff";
   const adminMenuItems = useGetMenuItems(!isStaffMode);
   const staffMenuItems = useGetStaffMenuItems(isStaffMode);
-  const { data: restaurantSettings } = useGetRestaurantSettings(!isStaffMode);
+  const { restaurant: adminRestaurantSettings } =
+    useRestaurantSettingsContextFallback(!isStaffMode);
   const { data: staffRestaurantCurrency } =
     useGetStaffRestaurantCurrency(isStaffMode);
   const [search, setSearch] = useState("");
 
   const currency = isStaffMode
     ? staffRestaurantCurrency?.data?.currency
-    : restaurantSettings?.data?.currency;
+    : adminRestaurantSettings?.currency;
 
   const menuItems =
     isStaffMode

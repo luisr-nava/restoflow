@@ -1,7 +1,7 @@
 "use client";
 
 import { formatMoney } from "@/src/shared/utils/format-money";
-import { usePaymentMethods } from "../hooks/use-payment-methods";
+import type { PaymentMethodReport } from "../types/report.types";
 import { ReportWidgetCard } from "./report-widget-card";
 
 const methodLabel = {
@@ -13,20 +13,25 @@ const methodLabel = {
 
 type PaymentMethodsTableProps = {
   currency?: string | null;
+  methods: PaymentMethodReport[];
+  isLoading: boolean;
+  isError: boolean;
+  errorMessage?: string;
 };
 
 export function PaymentMethodsTable({
   currency,
+  methods,
+  isLoading,
+  isError,
+  errorMessage,
 }: PaymentMethodsTableProps) {
-  const { data: methods = [], error, isError, isLoading } =
-    usePaymentMethods();
-
   return (
     <ReportWidgetCard
       title="Métodos de pago"
       isLoading={isLoading}
       isError={isError}
-      errorMessage={error?.message}
+      errorMessage={errorMessage}
       isEmpty={methods.length === 0}
       loadingLabel="Cargando métodos de pago..."
       emptyTitle="Todavía no hay pagos registrados"

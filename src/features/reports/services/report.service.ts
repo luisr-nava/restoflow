@@ -5,6 +5,7 @@ import {
   IReportRepository,
   reportRepository,
 } from "../repositories/report.repository";
+import type { ReportsOverview } from "../types/report.types";
 
 class ReportService {
   constructor(private readonly reportRepository: IReportRepository) {}
@@ -21,19 +22,45 @@ class ReportService {
     return new Error(fallback);
   }
 
+  private async getRestaurantId() {
+    const member = await restaurantService.getCurrentUserRestaurantMember();
+
+    if (!member) {
+      throw new Error("No se pudo obtener la membresía del restaurante");
+    }
+
+    return member.restaurant_id;
+  }
+
+  async getReportsOverview(): Promise<ReportsOverview> {
+    const supabase = await this.getSupabase();
+
+    try {
+      const restaurantId = await this.getRestaurantId();
+      const { data, error } = await this.reportRepository.getReportsOverview(
+        supabase,
+        restaurantId,
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    } catch (error) {
+      throw this.toError(error, "No se pudo cargar el resumen de reportes");
+    }
+  }
+
   async getSalesSummary() {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
-
-      if (!member) {
-        throw new Error("No se pudo obtener la membresía del restaurante");
-      }
+      const restaurantId = await this.getRestaurantId();
 
       const { data, error } = await this.reportRepository.getSalesSummary(
         supabase,
-        member.restaurant_id,
+        restaurantId,
       );
 
       if (error) {
@@ -50,15 +77,11 @@ class ReportService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
-
-      if (!member) {
-        throw new Error("No se pudo obtener la membresía del restaurante");
-      }
+      const restaurantId = await this.getRestaurantId();
 
       const { data, error } = await this.reportRepository.getTopProducts(
         supabase,
-        member.restaurant_id,
+        restaurantId,
       );
 
       if (error) {
@@ -75,15 +98,11 @@ class ReportService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
-
-      if (!member) {
-        throw new Error("No se pudo obtener la membresía del restaurante");
-      }
+      const restaurantId = await this.getRestaurantId();
 
       const { data, error } = await this.reportRepository.getTopCategories(
         supabase,
-        member.restaurant_id,
+        restaurantId,
       );
 
       if (error) {
@@ -100,15 +119,11 @@ class ReportService {
     const supabase = await this.getSupabase();
 
     try {
-      const member = await restaurantService.getCurrentUserRestaurantMember();
-
-      if (!member) {
-        throw new Error("No se pudo obtener la membresía del restaurante");
-      }
+      const restaurantId = await this.getRestaurantId();
 
       const { data, error } = await this.reportRepository.getPaymentMethods(
         supabase,
-        member.restaurant_id,
+        restaurantId,
       );
 
       if (error) {

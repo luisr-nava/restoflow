@@ -2,7 +2,7 @@
 
 import { EmptyState } from "@/src/shared/components/states";
 import { Skeleton } from "@/src/shared/components/ui/Skeleton";
-import { useGetRestaurantSettings } from "@/src/features/restaurants/hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContext } from "@/src/features/restaurants/hooks/use-restaurant-settings-context";
 import { useDashboardData } from "../hooks/use-dashboard-data";
 import { DashboardSalesChart } from "./dashboard-sales-chart";
 import { DashboardSummaryCards } from "./dashboard-summary-cards";
@@ -31,8 +31,8 @@ function DashboardLoadingSkeleton() {
 
 export function DashboardView() {
   const { data, isLoading, isError } = useDashboardData();
-  const { data: restaurantSettings } = useGetRestaurantSettings();
-  const currency = restaurantSettings?.data?.currency;
+  const { restaurant } = useRestaurantSettingsContext();
+  const currency = restaurant?.currency;
 
   if (isLoading) {
     return <DashboardLoadingSkeleton />;

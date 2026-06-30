@@ -20,7 +20,7 @@ import {
   RESTAURANT_SETTINGS_TIMEZONE_OPTIONS,
 } from "../constants/restaurant-options";
 import { UpdateRestaurantSchema } from "../schemas/restaurant.schema";
-import { useGetRestaurantSettings } from "../hooks/use-get-restaurant-settings";
+import { useRestaurantSettingsContext } from "../hooks/use-restaurant-settings-context";
 import { useUpdateRestaurantSettings } from "../hooks/use-update-restaurant-settings";
 import type { UpdateRestaurantInput } from "../types/restaurant.types";
 
@@ -57,7 +57,7 @@ function RestaurantSettingsLoadingSkeleton() {
 }
 
 export function RestaurantSettingsForm() {
-  const { data, isLoading, isError } = useGetRestaurantSettings();
+  const { restaurant, isLoading, isError } = useRestaurantSettingsContext();
   const { mutateAsync, isPending: isUpdatingSettings } =
     useUpdateRestaurantSettings();
 
@@ -87,21 +87,21 @@ export function RestaurantSettingsForm() {
   });
 
   useEffect(() => {
-    if (!data?.data) {
+    if (!restaurant) {
       return;
     }
 
     form.reset({
-      name: data.data.name,
-      address: data.data.address,
-      phone: data.data.phone ?? "",
-      email: data.data.email ?? "",
-      taxId: data.data.tax_id ?? "",
-      currency: data.data.currency,
-      timezone: data.data.timezone,
-      logoUrl: data.data.logo_url ?? "",
+      name: restaurant.name,
+      address: restaurant.address,
+      phone: restaurant.phone ?? "",
+      email: restaurant.email ?? "",
+      taxId: restaurant.tax_id ?? "",
+      currency: restaurant.currency,
+      timezone: restaurant.timezone,
+      logoUrl: restaurant.logo_url ?? "",
     });
-  }, [data?.data, form]);
+  }, [restaurant, form]);
 
   async function onSubmit(input: UpdateRestaurantInput) {
     const { logoFile, ...restaurantData } = input;
@@ -137,7 +137,7 @@ export function RestaurantSettingsForm() {
     );
   }
 
-  if (!data?.data) {
+  if (!restaurant) {
     return (
       <EmptyState
         title="No encontramos la configuración del restaurante"
