@@ -39,11 +39,9 @@ function DraggableTable({ table }: DraggableTableProps) {
       type="button"
       {...listeners}
       {...attributes}
-      className={`absolute flex items-center justify-center rounded-xl border text-sm font-medium shadow-sm ${
+      className={`absolute flex items-center justify-center rounded-xl border text-sm font-medium shadow-sm bg-white border-accent ${
         tableStatusClassName[table.status]
-      } ${
-        isDragging ? "z-20 cursor-grabbing opacity-80" : "z-10 cursor-grab"
-      }`}
+      } ${isDragging ? "z-20 cursor-grabbing opacity-80" : "z-10 cursor-grab"}`}
       style={{
         left: x,
         top: y,
@@ -124,24 +122,21 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <div className="relative min-h-[560px] overflow-hidden rounded-2xl border border-border bg-background">
+      <div className="relative min-h-140 overflow-hidden rounded-2xl border border-border bg-white">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              Canvas
-            </p>
             <h2 className="text-sm font-medium text-foreground">
               Distribución de mesas
             </h2>
           </div>
 
-          <p className="font-mono text-xs text-muted-foreground">
+          <p className="font-sans italic text-xs text-muted-foreground ">
             {localTables.length} mesas
           </p>
         </div>
 
         <DndContext onDragEnd={handleDragEnd}>
-          <div className="relative h-[520px] bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] bg-[size:24px_24px]">
+          <div className="relative bg-accent/10 bg-[linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] bg-size-[24px_24px] h-full">
             {isLoading ? (
               <LoadingState
                 label="Cargando mesas..."
@@ -150,7 +145,7 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
             ) : localTables.length === 0 ? (
               <EmptyState
                 title="Este piso todavía no tiene mesas"
-                description="Creá la primera mesa para empezar a operar."
+                description=""
                 className="flex h-full items-center justify-center rounded-none border-0 bg-transparent"
               />
             ) : (
@@ -166,3 +161,4 @@ export function FloorTableCanvas({ floorId }: FloorTableCanvasProps) {
     </div>
   );
 }
+

@@ -51,7 +51,6 @@ export function DeleteFloorButton({
         variant="danger"
         size="sm"
         onClick={() => setConfirmOpen(true)}
-        className="cursor-pointer bg-red-200 text-red-800 hover:bg-red-200"
         leftIcon={<Trash2 size={15} />}>
         Eliminar piso
       </Button>
@@ -65,7 +64,7 @@ export function DeleteFloorButton({
           <>
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="md"
               onClick={() => setConfirmOpen(false)}>
               Cancelar
@@ -76,6 +75,7 @@ export function DeleteFloorButton({
               variant="danger"
               size="md"
               disabled={isPending}
+              leftIcon={<Trash2 size={14} />}
               onClick={() => handleDelete(false)}>
               {isPending ? "Eliminando..." : "Eliminar"}
             </Button>
@@ -127,3 +127,4 @@ export function DeleteFloorButton({
     </>
   );
 }
+

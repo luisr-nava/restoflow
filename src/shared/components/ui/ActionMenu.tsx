@@ -27,18 +27,20 @@ export function ActionMenu({
   itemsClassName,
 }: ActionMenuProps) {
   return (
-    <Menu as="div" className={clsx("relative inline-block text-left", className)}>
+    <Menu
+      as="div"
+      className={clsx("relative inline-block text-left ", className)}>
       <MenuButton
         aria-label={ariaLabel}
-        className="inline-flex items-center justify-center rounded-lg border border-border px-2.5 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+        className="inline-flex items-center justify-center rounded-lg  px-2.5 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground">
         <MoreHorizontal className="size-4" />
       </MenuButton>
 
       <MenuItems
         transition
         className={clsx(
-          "absolute right-0 z-40 mt-2 min-w-40 origin-top-right rounded-xl border border-border bg-background p-1 shadow-xl outline-none",
-          "data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:transition data-[leave]:transition",
+          "absolute right-0 z-40 mt-1 min-w-40 origin-top-right rounded-xl border border-border bg-background p-1 shadow-xl outline-none bg-white",
+          "data-closed:scale-95 data-closed:opacity-0 data-enter:transition data-leave:transition",
           itemsClassName,
         )}>
         {children}
@@ -70,7 +72,7 @@ export function ActionMenuItem({
           }}
           className={clsx(
             "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition",
-            focus && "bg-muted",
+            focus && "bg-white",
             itemDisabled && "cursor-not-allowed opacity-40",
             tone === "danger" ? "text-destructive" : "text-foreground",
           )}>
@@ -81,3 +83,4 @@ export function ActionMenuItem({
     </MenuItem>
   );
 }
+

@@ -39,23 +39,23 @@ export function FloorPlanView() {
   return (
     <section className="space-y-4">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-2">
-          {selectedFloorId && <CreateTableModal floorId={selectedFloorId} />}
-          {selectedFloor && (
-            <DeleteFloorButton
-              floor={selectedFloor}
-              onDeleted={() => setSelectedFloorId(null)}
-            />
-          )}
-          <CreateFloorModal />
-        </div>
+        {isLoading ? (
+          <LoadingState label="Cargando pisos..." />
+        ) : (
+          <div className="flex gap-10 flex-1 ">
+            <FloorTabs floors={floors} />
+            <div className="flex gap-5">
+              {selectedFloor && (
+                <DeleteFloorButton
+                  floor={selectedFloor}
+                  onDeleted={() => setSelectedFloorId(null)}
+                />
+              )}
+              <CreateFloorModal />
+            </div>
+          </div>
+        )}
       </div>
-
-      {isLoading ? (
-        <LoadingState label="Cargando pisos..." />
-      ) : (
-        <FloorTabs floors={floors} />
-      )}
 
       {selectedFloorId ? (
         <FloorTableCanvas floorId={selectedFloorId} />
@@ -63,7 +63,7 @@ export function FloorPlanView() {
         <EmptyState
           title="Todavía no tenés pisos"
           description="Creá un piso para empezar a organizar tus mesas."
-          className="min-h-[560px] flex items-center justify-center"
+          className="min-h-140 flex items-center justify-center"
         />
       )}
     </section>

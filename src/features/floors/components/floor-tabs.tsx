@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/src/shared/components/ui/Button";
+import { Select } from "@/src/shared/components/ui/Select";
 import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 import type { RestaurantFloor } from "../types/floor.types";
 
@@ -23,26 +23,24 @@ export function FloorTabs({ floors }: FloorTabsProps) {
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto">
-      {floors.map((floor) => {
-        const active = floor.id === selectedFloorId;
+    <div className="w-full max-w-xs">
+      <Select
+        aria-label="Seleccionar piso"
+        value={selectedFloorId ?? ""}
+        onChange={(event) => {
+          const nextFloorId = event.target.value;
 
-        return (
-          <Button
-            key={floor.id}
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setSelectedFloorId(floor.id)}
-            className={`rounded-lg border px-3 py-2 text-sm font-medium ${
-              active
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-background text-muted-foreground hover:text-foreground"
-            }`}>
+          setSelectedFloorId(nextFloorId || null);
+        }}>
+        <option value="" disabled>
+          Seleccionar piso
+        </option>
+        {floors.map((floor) => (
+          <option key={floor.id} value={floor.id}>
             {floor.name}
-          </Button>
-        );
-      })}
+          </option>
+        ))}
+      </Select>
     </div>
   );
 }

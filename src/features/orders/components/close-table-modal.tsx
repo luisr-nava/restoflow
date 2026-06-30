@@ -92,7 +92,7 @@ export function CloseTableModal({
     <>
       <Button
         type="button"
-        variant="outline"
+        variant="danger"
         size="sm"
         disabled={disabled}
         onClick={() => openModal("closeTable", { tableId, mode })}>
@@ -125,3 +125,4 @@ export function CloseTableModal({
     </>
   );
 }
+

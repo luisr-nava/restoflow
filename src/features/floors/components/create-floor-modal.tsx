@@ -4,6 +4,7 @@ import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateFloorForm } from "./create-floor-form";
+import { CirclePlus } from "lucide-react";
 
 type CreateFloorModalProps = {
   openText?: string;
@@ -22,8 +23,9 @@ export function CreateFloorModal({
         type="button"
         variant="secondary"
         size="sm"
+        leftIcon={<CirclePlus size={15}/>}
         onClick={() => openModal("createFloor")}
-        className="bg-accent">
+        >
         {openText}
       </Button>
 
@@ -38,3 +40,4 @@ export function CreateFloorModal({
     </>
   );
 }
+

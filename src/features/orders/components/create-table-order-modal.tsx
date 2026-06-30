@@ -4,6 +4,7 @@ import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateTableOrderForm } from "./create-table-order-form";
+import { CirclePlus } from "lucide-react";
 
 type CreateTableOrderModalProps = {
   tableId: string;
@@ -29,8 +30,9 @@ export function CreateTableOrderModal({
     <>
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         size="sm"
+        leftIcon={<CirclePlus size={10} />}
         disabled={disabled}
         onClick={() => openModal("createOrder", { tableId, mode })}>
         Tomar pedido
@@ -61,3 +63,4 @@ export function CreateTableOrderModal({
     </>
   );
 }
+

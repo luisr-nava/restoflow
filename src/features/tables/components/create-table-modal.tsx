@@ -4,6 +4,7 @@ import { AppDialog } from "@/src/shared/components/ui/AppDialog";
 import { Button } from "@/src/shared/components/ui/Button";
 import { useUiModalStore } from "@/src/shared/stores/ui-modal.store";
 import { CreateTableForm } from "./create-table-form";
+import { Plus } from "lucide-react";
 
 type CreateTableModalProps = {
   floorId: string;
@@ -28,6 +29,7 @@ export function CreateTableModal({
         type="button"
         variant="secondary"
         size="sm"
+        leftIcon={<Plus size={15} />}
         onClick={() => openModal("createTable", { floorId })}>
         {openText}
       </Button>
@@ -46,3 +48,4 @@ export function CreateTableModal({
     </>
   );
 }
+

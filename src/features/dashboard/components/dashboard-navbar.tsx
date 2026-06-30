@@ -52,20 +52,6 @@ export function DashboardNavbar() {
 
   let primaryAction: PrimaryActionConfig | null = null;
 
-  if (pathname === "/dashboard/tables") {
-    primaryAction = {
-      label: "Nueva mesa",
-      disabled: !selectedFloorId,
-      onClick: () => {
-        if (!selectedFloorId) {
-          return;
-        }
-
-        openModal("createTable", { floorId: selectedFloorId });
-      },
-    };
-  }
-
   if (pathname === "/dashboard/team") {
     primaryAction = {
       label: "Nuevo personal",
@@ -121,3 +107,4 @@ export function DashboardNavbar() {
     </header>
   );
 }
+

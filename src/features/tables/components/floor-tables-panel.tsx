@@ -26,6 +26,10 @@ import { useUpdateTableReservationStatus } from "../hooks/use-update-table-reser
 import type { RestaurantTable } from "../types/table.types";
 import { CloseTableModal } from "../../orders/components/close-table-modal";
 import type { Order } from "../../orders/types/order.types";
+import { CalendarClock } from "lucide-react";
+import { CreateFloorModal } from "../../floors/components/create-floor-modal";
+import { CreateTableModal } from "./create-table-modal";
+import { useUiSelectionStore } from "@/src/shared/stores/ui-selection.store";
 
 type FloorTablesPanelProps = {
   tables: RestaurantTable[];
@@ -60,13 +64,15 @@ type TableReservationButtonProps = {
 function TableReservationButton({ table }: TableReservationButtonProps) {
   const { mutate, isPending } = useUpdateTableReservationStatus();
   const isReserved = table.status === "RESERVED";
-  const isDisabled = table.status !== "AVAILABLE" && table.status !== "RESERVED";
+  const isDisabled =
+    table.status !== "AVAILABLE" && table.status !== "RESERVED";
 
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="primary"
       size="sm"
+      leftIcon={<CalendarClock size={10} />}
       disabled={isDisabled || isPending}
       onClick={() =>
         mutate({
@@ -93,20 +99,39 @@ function FloorTableCard({
   const hasActiveOrder = Boolean(openOrder);
 
   return (
-    <Card variant="default" size="sm">
+    <Card variant="default" size="sm" className="bg-white border-accent/10">
       <CardHeader className="flex-row items-start justify-between gap-3">
         <div>
           <CardTitle className="text-sm font-medium">{table.name}</CardTitle>
-          <CardDescription className="text-xs">{table.seats} sillas</CardDescription>
+          <CardDescription className="text-xs">
+            {table.seats} sillas
+          </CardDescription>
         </div>
 
-        <span
-          className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${statusBadgeClassName[table.status]}`}>
-          {statusLabel[table.status]}
-        </span>
+        <div className="grid">
+          <span
+            className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${statusBadgeClassName[table.status]}`}>
+            {statusLabel[table.status]}
+          </span>
+          <div className="flex justify-end">
+            <ActionMenu ariaLabel={`Acciones de ${table.name}`}>
+              <ActionMenuItem
+                onClick={() => openModal("editTable", { tableId: table.id })}>
+                Editar
+              </ActionMenuItem>
+
+              <ActionMenuItem
+                onClick={() => openModal("deleteTable", { tableId: table.id })}
+                disabled={table.status !== "AVAILABLE"}
+                tone="danger">
+                Eliminar
+              </ActionMenuItem>
+            </ActionMenu>
+          </div>
+        </div>
       </CardHeader>
 
-      <CardContent className="mt-4 border-t border-border pt-3">
+      <CardContent className="mt-1 border-t border-border pt-3">
         {openOrdersErrorMessage ? (
           <ErrorState
             title="No se pudo cargar el consumo"
@@ -133,27 +158,13 @@ function FloorTableCard({
         )}
       </CardContent>
 
-      <CardFooter className="mt-3 flex-wrap justify-end gap-2">
+      <CardFooter className="mt-3 flex-wrap justify-end gap-2 ">
         <TableReservationButton table={table} />
 
         <CreateTableOrderModal
           tableId={table.id}
           disabled={table.status === "CLOSED"}
         />
-
-        <ActionMenu ariaLabel={`Acciones de ${table.name}`}>
-          <ActionMenuItem
-            onClick={() => openModal("editTable", { tableId: table.id })}>
-            Editar
-          </ActionMenuItem>
-
-          <ActionMenuItem
-            onClick={() => openModal("deleteTable", { tableId: table.id })}
-            disabled={table.status !== "AVAILABLE"}
-            tone="danger">
-            Eliminar
-          </ActionMenuItem>
-        </ActionMenu>
 
         <EditTableModal table={table} showTrigger={false} />
         <DeleteTableButton table={table} showTrigger={false} />
@@ -164,6 +175,7 @@ function FloorTableCard({
 
 export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
   const { data: restaurantSettings } = useGetRestaurantSettings();
+  const selectedFloorId = useUiSelectionStore((state) => state.selectedFloorId);
   const tableIds = tables.map((table) => table.id);
   const {
     data: openOrdersByTable = {},
@@ -173,12 +185,12 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
   const currency = restaurantSettings?.data?.currency;
 
   return (
-    <Card as="aside" variant="default" size="lg" className="p-0">
-      <CardHeader className="border-b border-border px-4 py-3">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+    <Card as="aside" variant="default" size="lg" className="p-0 bg-white">
+      <CardHeader className="border-b border-border px-4 py-3 flex! flex-row items-center justify-between">
+        <p className="font-serif italic text-xs uppercase tracking-[0.18em] text-muted-foreground w-1/2">
           Mesas
         </p>
-        <CardTitle className="text-sm font-medium">Estado del piso</CardTitle>
+        {selectedFloorId && <CreateTableModal floorId={selectedFloorId} />}
       </CardHeader>
 
       <CardContent className="max-h-130 space-y-3 overflow-y-auto p-3">
@@ -204,3 +216,4 @@ export function FloorTablesPanel({ tables }: FloorTablesPanelProps) {
     </Card>
   );
 }
+

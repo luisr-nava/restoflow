@@ -1,22 +1,15 @@
-import {
-  forwardRef,
-  type ButtonHTMLAttributes,
-  type ReactNode,
-} from "react";
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
 const buttonVariantClassName = {
   primary: "bg-text text-bg",
-  secondary:
-    "border border-border bg-background text-foreground hover:bg-muted",
+  secondary: "border border-border bg-accent/75 text-white hover:bg-accent ",
   outline: "border border-border text-foreground",
-  ghost:
-    "text-muted-foreground hover:bg-muted hover:text-foreground",
-  danger: "border border-red-200 text-red-600",
+  ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
+  danger: "bg-red-200  text-red-900 hover:bg-red-300",
   success: "border border-green-200 text-green-600",
-  link:
-    "rounded-none p-0 text-muted-foreground underline underline-offset-2 hover:text-foreground",
+  link: "rounded-none p-0 text-muted-foreground underline underline-offset-2 hover:text-foreground",
 } as const;
 
 const buttonSizeClassName = {
@@ -57,7 +50,7 @@ function getButtonClassName({
 
   return twMerge(
     clsx(
-      "inline-flex items-center justify-center gap-2 rounded-lg transition disabled:cursor-not-allowed disabled:opacity-40",
+      "inline-flex items-center justify-center gap-2 rounded-lg transition disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer transition-all duration-500 ",
       buttonVariantClassName[variant],
       sizeClassName,
       loading && "cursor-not-allowed opacity-40",
@@ -100,3 +93,4 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
+
